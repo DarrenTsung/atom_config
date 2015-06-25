@@ -3,10 +3,8 @@
     userId: "44048cfb-4890-b4a9-ea94-754b28c3f60f"
   welcome:
     showOnStartup: false
-  core:
-    themes: [
-      "atom-dark-ui"
-      "atom-dark-syntax"
-    ]
+  core: {}
   editor:
     invisibles: {}
+    fontSize: 12
+    fontFamily: "Monaco"
