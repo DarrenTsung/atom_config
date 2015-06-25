@@ -24,7 +24,7 @@
 # If you are unfamiliar with CSON, you can read more about it here:
 # https://github.com/bevry/cson#what-is-cson
 
-'.atom-text-editor.vim-mode.insert-mode':
+'.editor.vim-mode.insert-mode':
   'k': 'exit-insert-mode-if-preceded-by-j'
 
 '.platform-darwin':
