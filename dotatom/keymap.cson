@@ -30,5 +30,4 @@
   'space 4': 'editor:fold-at-indent-level-4'
   'space 5': 'editor:fold-at-indent-level-5'
   
-  'space f': 'editor:fold-current-row'
-  'space u': 'editor:unfold-current-row'
+  'space f': 'editor:toggle-current-row-folding'

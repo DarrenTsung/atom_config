@@ -20,3 +20,12 @@ atom.commands.add 'atom-text-editor', 'exit-insert-mode-if-preceded-by-j': (e) -
   else
     editor.backspace()
     atom.commands.dispatch(e.currentTarget, 'vim-mode:activate-command-mode')
+    
+atom.commands.add 'atom-text-editor',
+  'editor:toggle-current-row-folding': (event) ->
+    editor = @getModel()
+    bufferRow = editor.bufferPositionForScreenPosition(editor.getCursorScreenPosition()).row
+    if editor.isFoldedAtBufferRow(bufferRow)
+      editor.unfoldBufferRow(bufferRow)
+    else
+      editor.foldBufferRow(bufferRow)

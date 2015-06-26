@@ -13,9 +13,9 @@
     ensureSingleTrailingNewline: false
     ignoreWhitespaceOnCurrentLine: false
   "vim-mode": {}
-  "disable-keybindings":
-    prefixKeys: [
-      "cmd-w"
-    ]
   "linter-php": {}
   linter: {}
+  "fuzzy-finder":
+    ignoredNames: [
+      "*.html"
+    ]
