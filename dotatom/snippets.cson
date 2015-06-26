@@ -31,3 +31,17 @@
     'prefix': 'debugLog'
     'body': 'lo'
   
+# Unity Snippets
+'.source.cs':
+  'deltaTime':
+    'prefix': 'dt'
+    'body': 'Time.deltaTime'
+  'Debug.Log':
+    'prefix': 'log'
+    'body': 'Debug.Log("$1");'
+  'Debug.LogWarning':
+    'prefix': 'logWarn'
+    'body': 'Debug.LogWarning("$1");'
+  'Debug.LogError':
+    'prefix': 'logError'
+    'body': 'Debug.LogError("$1");'
