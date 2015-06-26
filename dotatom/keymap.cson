@@ -1,31 +1,34 @@
-# Your keymap
-#
-# Atom keymaps work similarly to style sheets. Just as style sheets use
-# selectors to apply styles to elements, Atom keymaps use selectors to associate
-# keystrokes with events in specific contexts.
-#
-# You can create a new keybinding in this file by typing "key" and then hitting
-# tab.
-#
-# Here's an example taken from Atom's built-in keymap:
-#
-# 'atom-text-editor':
-#   'enter': 'editor:newline'
-#
-# 'atom-workspace':
-#   'ctrl-shift-p': 'core:move-up'
-#   'ctrl-p': 'core:move-down'
-#
-# You can find more information about keymaps in these guides:
-# * https://atom.io/docs/latest/using-atom-basic-customization#customizing-key-bindings
-# * https://atom.io/docs/latest/behind-atom-keymaps-in-depth
-#
-# This file uses CoffeeScript Object Notation (CSON).
-# If you are unfamiliar with CSON, you can read more about it here:
-# https://github.com/bevry/cson#what-is-cson
-
+### UN-MAPPINGS ###
+  
+### MAPPINGS ###
+# remap jk to map to esc (doesn't timeout)
 '.editor.vim-mode.insert-mode':
   'k': 'exit-insert-mode-if-preceded-by-j'
 
+# remap cmd-shift-o to fuzzy finder, just preference
 '.platform-darwin':
   'shift-cmd-o': 'fuzzy-finder:toggle-file-finder'
+
+'atom-text-editor.vim-mode:not(.insert-mode)':
+  # remap panes to use space shift-hjkl
+  'space shift-h': 'pane:split-left'
+  'space shift-j': 'pane:split-down'
+  'space shift-k': 'pane:split-up'
+  'space shift-l': 'pane:split-right'
+  
+  # navigate panes by using space hjkl
+  'space h': 'window:focus-pane-on-left'
+  'space j': 'window:focus-pane-below'
+  'space k': 'window:focus-pane-above'
+  'space l': 'window:focus-pane-on-right'
+  
+  # I use cmd-(1-9) to switch between commonly used applications so remap folding to space N
+  'space 0': 'editor:unfold-all'
+  'space 1': 'editor:fold-at-indent-level-1'
+  'space 2': 'editor:fold-at-indent-level-2'
+  'space 3': 'editor:fold-at-indent-level-3'
+  'space 4': 'editor:fold-at-indent-level-4'
+  'space 5': 'editor:fold-at-indent-level-5'
+  
+  'space f': 'editor:fold-current-row'
+  'space u': 'editor:unfold-current-row'

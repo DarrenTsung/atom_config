@@ -8,3 +8,14 @@
     invisibles: {}
     fontSize: 12
     fontFamily: "Monaco"
+  whitespace:
+    removeTrailingWhitespace: false
+    ensureSingleTrailingNewline: false
+    ignoreWhitespaceOnCurrentLine: false
+  "vim-mode": {}
+  "disable-keybindings":
+    prefixKeys: [
+      "cmd-w"
+    ]
+  "linter-php": {}
+  linter: {}

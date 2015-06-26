@@ -16,3 +16,18 @@
 # This file uses CoffeeScript Object Notation (CSON).
 # If you are unfamiliar with CSON, you can read more about it here:
 # https://github.com/bevry/cson#what-is-cson
+
+# Storm8 Snippets
+'.text.html.php':
+  'debugLog':
+    'prefix': 'log'
+    'body': 'debugLog("$1");'
+  'debugLogVar':
+    'prefix': 'logVar'
+    'body': 'debugLogVar($1, "$2");'
+    
+  # reminders for myself to use the snippets
+  'Snippets \'log\'/\'logVar\'!':
+    'prefix': 'debugLog'
+    'body': 'lo'
+  
