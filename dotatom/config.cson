@@ -3,7 +3,18 @@
     userId: "44048cfb-4890-b4a9-ea94-754b28c3f60f"
   welcome:
     showOnStartup: false
-  core: {}
+  core:
+    disabledPackages: [
+      "background-tips"
+      "git-diff"
+      "go-to-line"
+      "image-view"
+      "language-clojure"
+      "language-go"
+      "language-toml"
+      "language-yaml"
+      "link"
+    ]
   editor:
     invisibles: {}
     fontSize: 12
@@ -17,5 +28,11 @@
   linter: {}
   "fuzzy-finder":
     ignoredNames: [
-      "*.html"
+      "*.html, tags"
     ]
+  tabs: {}
+  "one-dark-ui": {}
+  minimap: {}
+  "lazy-motion": {}
+  "find-and-replace":
+    openProjectFindResultsInRightPane: true

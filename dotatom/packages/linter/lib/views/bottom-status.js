@@ -1,8 +1,7 @@
 'use strict';
 
 class BottomStatus extends HTMLElement{
-
-  initialize() {
+  createdCallback() {
     this.classList.add('inline-block')
     this.classList.add('linter-highlight')
 
@@ -11,8 +10,11 @@ class BottomStatus extends HTMLElement{
     this.appendChild(this.iconSpan)
 
     this.count = 0
-  }
 
+    this.addEventListener('click', function(){
+      atom.commands.dispatch(atom.views.getView(atom.workspace), 'linter:next-error')
+    })
+  }
   set count(Value) {
     if (Value) {
       this.classList.remove('status-success')
@@ -21,7 +23,7 @@ class BottomStatus extends HTMLElement{
       this.classList.add('status-error')
       this.iconSpan.classList.add('icon-x')
 
-      this.iconSpan.textContent = Value === 1 ? '1 Error' : `${Value} Errors`
+      this.iconSpan.textContent = Value === 1 ? '1 Issue' : `${Value} Issues`
     } else {
       this.classList.remove('status-error')
       this.iconSpan.classList.remove('icon-x')
@@ -29,7 +31,7 @@ class BottomStatus extends HTMLElement{
       this.classList.add('status-success')
       this.iconSpan.classList.add('icon-check')
 
-      this.iconSpan.textContent = 'No Errors'
+      this.iconSpan.textContent = 'No Issues'
     }
   }
 

@@ -8,25 +8,67 @@ module.exports =
       type: 'boolean'
       default: true
     showErrorPanel:
-      title: "Show Error Panel at the bottom"
+      title: 'Show Error Panel at the bottom'
+      type: 'boolean'
+      default: true
+    showErrorTabLine:
+      title: 'Show Line tab in Bottom Panel'
+      type: 'boolean'
+      default: false
+    showErrorTabFile:
+      title: 'Show File tab in Bottom Panel'
+      type: 'boolean'
+      default: true
+    showErrorTabProject:
+      title: 'Show Project tab in Bottom Panel'
       type: 'boolean'
       default: true
     showErrorInline:
-      title: "Show Inline Tooltips"
-      descriptions: "Show inline tooltips for errors"
+      title: 'Show Inline Tooltips'
+      descriptions: 'Show inline tooltips for errors'
       type: 'boolean'
       default: true
+    underlineIssues:
+      title: 'Underline Issues'
+      type: 'boolean'
+      default: true
+    statusIconPosition:
+      title: 'Position of Status Icon on Bottom Bar'
+      description: 'Requires a reload/restart to update'
+      enum: ['Left', 'Right']
+      type: 'string'
+      default: 'Left'
+    ignoredMessageTypes:
+      title: "Ignored message Types"
+      type: 'array'
+      default: []
+      items:
+        type: 'string'
 
-  activate: ->
+  activate: (state) ->
     LinterPlus = require('./linter-plus.coffee')
-    @instance = new LinterPlus()
+    @instance = new LinterPlus state
 
     legacy = require('./legacy.coffee')
+    {deprecate} = require('grim')
     for atomPackage in atom.packages.getLoadedPackages()
       if atomPackage.metadata['linter-package'] is true
         implementation = atomPackage.metadata['linter-implementation'] ? atomPackage.name
-        linter = legacy(require("#{atomPackage.path}/lib/#{implementation}"))
-        @consumeLinter(linter)
+        deprecate('AtomLinter v0.X.Y API has been deprecated.
+          Please refer to the Linter docs to update and the latest API:
+          https://github.com/AtomLinter/Linter/wiki/Migrating-to-the-new-API', {
+          packageName: atomPackage.name
+        })
+        try
+          linter = legacy(require("#{atomPackage.path}/lib/#{implementation}"))
+          @consumeLinter(linter)
+        catch error
+          atom.notifications.addError "
+            Failed to activate '#{atomPackage.metadata['name']}' package",
+            {detail: error.message + "\n" + error.stack, dismissable: true}
+
+  serialize: ->
+    @instance.serialize()
 
   consumeLinter: (linters) ->
     unless linters instanceof Array
@@ -43,7 +85,7 @@ module.exports =
     @instance.views.attachBottom(statusBar)
 
   provideLinter: ->
-    @Linter
+    @instance
 
   deactivate: ->
     @instance?.deactivate()

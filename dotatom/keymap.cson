@@ -31,3 +31,17 @@
   'space 5': 'editor:fold-at-indent-level-5'
   
   'space f': 'editor:toggle-current-row-folding'
+  
+  # Bookmarks
+  'space m': 'bookmarks:view-all'
+  'm': 'bookmarks:toggle-bookmark'
+  'shift-cmd-m': 'bookmarks:clear-bookmarks'
+  
+  # Lazy-motion
+  'space s': 'lazy-motion:search-forward'
+ 
+'.platform-darwin atom-text-editor.lazy-motion[mini]':
+  ']':      'lazy-motion:forward'
+  '[':      'lazy-motion:backward'
+  ';':      'core:confirm'
+  'ctrl-g': 'core:cancel'
