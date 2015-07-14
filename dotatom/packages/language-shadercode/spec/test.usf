@@ -1,0 +1,58 @@
+#include "Common.usf"
+#include "Material.usf"
+#include "VertexFactory.usf"
+
+/*=============================================================================
+ * Vertex Shader
+ *============================================================================*/
+
+// .r: zMin, .g: zMax, b:unused, a:unused
+float4 SmartPawnZ;
+struct FSmartPawnVSToPS
+{
+  float4 Position : SV_POSITION;
+  float4 Color : COLOR0;
+  float Depth : COLOR1;
+};
+
+void MainVertexShader(
+  FVertexFactoryInput Input,
+  out FSmartPawnVSToPS Output )
+  {
+    FVertexFactoryIntermediates VFIntermediates = GetVertexFactoryIntermediates(Input);
+
+    float4 TranslatedWorldPosition = VertexFactoryGetWorldPosition( Input, VFIntermediates );
+    float3x3 TangentToLocal = VertexFactoryGetTangentToLocal( Input, VFIntermediates );
+
+    FMaterialVertexParameters VertexParameters = GetMaterialVertexParameters(Input, VFIntermediates, TranslatedWorldPosition.xyz, TangentToLocal);
+    TranslatedWorldPosition.xyz += GetMaterialWorldPositionOffset(VertexParameters);
+
+    {
+      float4 ScreenPosition;
+      ISOLATE
+      {
+        ScreenPosition = mul(float4(TranslatedWorldPosition.xyz, 1), View.TranslatedWorldToClip);
+        Output.Position = ScreenPosition;
+        Output.Color = mul(float4(VertexParameters.TangentToWorld[2], 0), View.TranslatedWorldToView);
+        Output.Depth = ScreenPosition.w;
+        Output.Color = (Output.Color + 1) / 2;
+      }
+    }
+
+    OutputVertexID( Output );
+  }
+
+  /*=============================================================================
+  * Pixel Shader
+  *============================================================================*/
+
+  void MainPixelShader(
+    FSmartPawnVSToPS Input,
+    out float4 OutNormal : SV_Target0,
+    out float4 OutDepth : SV_Target1
+    )
+    {
+      OutNormal = normalize(Input.Color);
+      //OutDepth = Input.Position.z;
+      OutDepth = Input.Depth;
+    }

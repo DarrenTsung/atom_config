@@ -1,0 +1,4 @@
+'.source.shadercode':
+  'editor':
+    'commentStart': '// '
+    'foldEndPattern': '^\\s*\\}|^\\s*\\]|^\\s*\\)'

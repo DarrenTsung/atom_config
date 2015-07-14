@@ -1,0 +1,243 @@
+'scopeName': 'source.cg'
+'name': 'Shader code : CG'
+'fileTypes': [
+  'fx'
+  'cg'
+]
+'foldingStartMarker': '/\\*\\*|\\{\\s*$'
+'foldingStopMarker': '\\*\\*/|^\\s*\\}'
+'patterns': [
+  {
+    'comment': 'Cg extentions'
+    'match': '\\b(tex1D|tex2D|tex3D|texRECT|texCUBE)\\b'
+    'name': 'support.other.statement.cg'
+  }
+  {
+    'comment': 'Cg extentions'
+    'match': '\\b(tex1Dproj|tex2Dproj|tex3Dproj|texRECTproj|texCUBEproj)\\b'
+    'name': 'support.other.statement.cg'
+  }
+  {
+    'comment': 'Cg extentions'
+    'match': '\\b(offsettex2D|offsettexRECT|offsettex2DScaleBias|offsettexRECTScaleBias)\\b'
+    'name': 'support.other.statement.cg'
+  }
+  {
+    'comment': 'Cg extentions'
+    'match': '\\b(tex1D_dp3|tex2D_dp3x2|texRECT_dp3x2)\\b'
+    'name': 'support.other.statement.cg'
+  }
+  {
+    'comment': 'Cg extentions'
+    'match': '\\b(tex3D_dp3x3|texCUBE_dp3x3|tex_dp3x2_depth)\\b'
+    'name': 'support.other.statement.cg'
+  }
+  {
+    'comment': 'Cg extentions'
+    'match': '\\b(texCUBE_reflect_dp3x3|texCUBE_reflect_eye_dp3x3)\\b'
+    'name': 'support.other.statement.cg'
+  }
+  {
+    'comment': 'Cg extentions'
+    'match': '\\b(discard)\\b'
+    'name': 'support.other.statement.cg'
+  }
+  {
+    'comment': 'Cg extentions'
+    'match': '\\b(arbfp1|arbvp1)\\b'
+    'name': 'support.type.profile.cg'
+  }
+  {
+    'comment': 'Cg extentions'
+    'match': '\\b(ps_1_1|ps_1_2|ps_1_3|vs_1_1|vs_2_0|vs_2_x|ps_2_0|ps_2_x)\\b'
+    'name': 'support.type.profile.cg'
+  }
+  {
+    'comment': 'Cg extentions'
+    'match': '\\b(fp20|vp20|fp30|vp30)\\b'
+    'name': 'support.type.profile.cg'
+  }
+  {
+    'comment': 'many Cg data types'
+    'match': '\\b(bool|bool2|bool3|bool4)\\b'
+    'name': 'storage.type.cg'
+  }
+  {
+    'comment': 'many Cg data types'
+    'match': '\\b(bool1x2|bool1x3|bool1x4)\\b'
+    'name': 'storage.type.cg'
+  }
+  {
+    'comment': 'many Cg data types'
+    'match': '\\b(bool2x2|bool2x3|bool2x4)\\b'
+    'name': 'storage.type.cg'
+  }
+  {
+    'comment': 'many Cg data types'
+    'match': '\\b(bool3x2|bool3x3|bool3x4)\\b'
+    'name': 'storage.type.cg'
+  }
+  {
+    'comment': 'many Cg data types'
+    'match': '\\b(bool4x2|bool4x3|bool4x4)\\b'
+    'name': 'storage.type.cg'
+  }
+  {
+    'comment': 'many Cg data types'
+    'match': '\\b(half|half2|half3|half4)\\b'
+    'name': 'storage.type.cg'
+  }
+  {
+    'comment': 'many Cg data types'
+    'match': '\\b(half1x2|half1x3|half1x4)\\b'
+    'name': 'storage.type.cg'
+  }
+  {
+    'comment': 'many Cg data types'
+    'match': '\\b(half2x2|half2x3|half2x4)\\b'
+    'name': 'storage.type.cg'
+  }
+  {
+    'comment': 'many Cg data types'
+    'match': '\\b(half3x2|half3x3|half3x4)\\b'
+    'name': 'storage.type.cg'
+  }
+  {
+    'comment': 'many Cg data types'
+    'match': '\\b(half4x2|half4x3|half4x4)\\b'
+    'name': 'storage.type.cg'
+  }
+  {
+    'comment': 'many Cg data types'
+    'match': '\\b(fixed|fixed2|fixed3|fixed4)\\b'
+    'name': 'storage.type.cg'
+  }
+  {
+    'comment': 'many Cg data types'
+    'match': '\\b(fixed1x2|fixed1x3|fixed1x4)\\b'
+    'name': 'storage.type.cg'
+  }
+  {
+    'comment': 'many Cg data types'
+    'match': '\\b(fixed2x2|fixed2x3|fixed2x4)\\b'
+    'name': 'storage.type.cg'
+  }
+  {
+    'comment': 'many Cg data types'
+    'match': '\\b(fixed3x2|fixed3x3|fixed3x4)\\b'
+    'name': 'storage.type.cg'
+  }
+  {
+    'comment': 'many Cg data types'
+    'match': '\\b(fixed4x2|fixed4x3|fixed4x4)\\b'
+    'name': 'storage.type.cg'
+  }
+  {
+    'comment': 'many Cg data types'
+    'match': '\\b(float2|float3|float4)\\b'
+    'name': 'storage.type.cg'
+  }
+  {
+    'comment': 'many Cg data types'
+    'match': '\\b(float1x2|float1x3|float1x4)\\b'
+    'name': 'storage.type.cg'
+  }
+  {
+    'comment': 'many Cg data types'
+    'match': '\\b(float2x2|float2x3|float2x4)\\b'
+    'name': 'storage.type.cg'
+  }
+  {
+    'comment': 'many Cg data types'
+    'match': '\\b(float3x2|float3x3|float3x4)\\b'
+    'name': 'storage.type.cg'
+  }
+  {
+    'comment': 'many Cg data types'
+    'match': '\\b(float4x2|float4x3|float4x4)\\b'
+    'name': 'storage.type.cg'
+  }
+  {
+    'comment': 'many Cg data types'
+    'match': '\\b(sampler1D|sampler2D|sampler3D|samplerRECT|samplerCUBE)\\b'
+    'name': 'storage.type.cg'
+  }
+  {
+    'comment': 'compile-time special types'
+    'match': '\\b(cint|cfloat)\\b'
+    'name': 'storage.type.cg'
+  }
+  {
+    'comment': 'how to disable switch continue case default int break goto double enum union'
+    'match': '\\b(MinFilter|MagFilter|MipFilter)\\b'
+    'name': 'support.other.samplerarg.cg'
+  }
+  # {
+  #   'comment': 'syn keyword cgSamplerArg	MinFilter MagFilter MipFilter'
+  #   'match': '\\<\\c(min|mag|mip)filter\\>'
+  #   'name': 'support.other.samplerarg.cg'
+  # }
+  {
+    'comment': 'syn keyword cgSamplerArg	MinFilter MagFilter MipFilter'
+    'match': '\\b(AddressU|AddressV|AddressW)\\b'
+    'name': 'support.other.samplerarg.cg'
+  }
+  {
+    'comment': 'fx'
+    'match': '\\b(compile|asm)\\b'
+    'name': 'support.other.statement.fx'
+  }
+  {
+    'comment': 'fx'
+    'match': '\\b(string|texture|technique|pass)\\b'
+    'name': 'storage.type.fx'
+  }
+  {
+    'comment': 'fx'
+    'match': '\\.[xyzw]\\{1,4\\}'
+    'name': 'MISSING'
+  }
+  {
+    'comment': 'fx'
+    'match': '\\.[rgba]\\{1,4\\}'
+    'name': 'MISSING'
+  }
+  {
+    'comment': 'fx'
+    'match': '\\.[stqr]\\{1,4\\}'
+    'name': 'MISSING'
+  }
+  {
+    'comment': 'fx'
+    'match': '\\.(_m[0-3]\\{2})\\{1,4\\}'
+    'name': 'MISSING'
+  }
+  {
+    'comment': 'fx'
+    'match': '\\.(_[1-4]\\{2})\\{1,4\\}'
+    'name': 'MISSING'
+  }
+  {
+    'comment': 'fx'
+    'match': ':\\s*[A-Z]\\w*'
+    'name': 'storage.modifier.semantic.cg'
+  }
+  {
+    'comment': 'fx'
+    'match': '\\b(in|out|inout|uniform|packed|const)\\b'
+    'name': 'storage.modifier.cg'
+  }
+  {
+    'comment': 'fx'
+    'match': '\\b(NPOS)\\b'
+    'name': 'support.constant.number.cg'
+  }
+  {
+    'comment': 'fx'
+    'match': '\\b(true|false|none)\\b'
+    'name': 'support.constant.bool.cg'
+  }
+  {
+    'include': 'source.c'
+  }
+]
