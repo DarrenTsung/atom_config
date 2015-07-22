@@ -35,12 +35,39 @@ atom.commands.add 'atom-text-editor', 'replace-app-constant-to-api': (e) ->
   selectedText = editor.getSelectedText()
   selectedBufferRange = editor.getSelectedBufferRange()
   
-  # multiline option
-  regex = /(\s*?)\w*? (\w*) .*?;/m
+  convertToVariableName = ((appConstantName) -> 
+    # lowercase the first word
+    variableName = appConstantName.replace(/[^\_]*/, (text) ->
+      text.toLowerCase()
+    )
+    # camelcase the rest of the words
+    variableName = variableName.replace(/\_\w[^\_]*/g, (text) ->
+      variable = text[1].toUpperCase()
+      if (text.length > 2)
+        variable += text[2..text.length - 1].toLowerCase()
+      variable
+    )
+    variableName
+  )
   
-  console.log 'selected text: ' + selectedText
-  console.log 'selected buffer range: ' + selectedBufferRange
-  editor.scanInBufferRange regex, selectedBufferRange, (result) ->
-    console.log 'matched text: ' + result.matchText
-    console.log 'match: ' + result.match
-    result.replace(result.match[1] + "$data[''] = AppConstant::" + result.match[2] + ";")
+  # replace all
+  # const APP_CONSTANT_NAME = ....;
+  # with
+  # $data['appConstantName'] = AppConstant::APP_CONSTANT_NAME
+  regex = /[^;]*?(\s*)const\b (\w*)\b .*?;/gm
+  editor.scanInBufferRange(regex, selectedBufferRange, ({match, replace}) ->
+    appConstantName = match[2]
+    variableName = convertToVariableName(appConstantName)
+    replace(match[1] + "$data['" + variableName + "'] = AppConstant::" + appConstantName + ";")
+  )
+    
+  # replace all
+  # public static $APP_CONSTANT_NAME = ....;
+  # with
+  # $data['appConstantName'] = AppConstant::$APP_CONSTANT_NAME
+  regex = /[^;]*?^(\s*)public static \$(\w*) =[\s\S]*?;/gm
+  editor.scanInBufferRange(regex, selectedBufferRange, ({match, replace}) ->
+    appConstantName = match[2]
+    variableName = convertToVariableName(appConstantName)
+    replace(match[1] + "$data['" + variableName + "'] = AppConstant::$" + appConstantName + ";")
+  )
