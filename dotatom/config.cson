@@ -6,7 +6,6 @@
   core:
     disabledPackages: [
       "background-tips"
-      "git-diff"
       "go-to-line"
       "image-view"
       "language-clojure"
@@ -14,6 +13,10 @@
       "language-toml"
       "language-yaml"
       "link"
+    ]
+    ignoredNames: [
+      ".git"
+      "*.meta"
     ]
   editor:
     invisibles: {}
@@ -28,7 +31,9 @@
   linter: {}
   "fuzzy-finder":
     ignoredNames: [
-      "*.html, tags"
+      "*.html"
+      "tags"
+      ".meta"
     ]
   tabs: {}
   "one-dark-ui": {}
@@ -36,3 +41,7 @@
   "lazy-motion": {}
   "find-and-replace":
     openProjectFindResultsInRightPane: true
+  "tree-view":
+    hideIgnoredNames: true
+  "autocomplete-plus": {}
+  "git-plus": {}

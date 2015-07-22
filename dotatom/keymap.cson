@@ -41,7 +41,9 @@
   'cmd-j': 'symbols-view:go-to-declaration'
   
   # Lazy-motion
-  'space s': 'lazy-motion:search-forward'
+  's': 'lazy-motion:search-forward'
+  
+  'shift-tab': 'snippets:next-tab-stop'
  
 '.platform-darwin atom-text-editor.lazy-motion[mini]':
   ']':      'lazy-motion:forward'
