@@ -29,3 +29,18 @@ atom.commands.add 'atom-text-editor',
       editor.unfoldBufferRow(bufferRow)
     else
       editor.foldBufferRow(bufferRow)
+
+atom.commands.add 'atom-text-editor', 'replace-app-constant-to-api': (e) ->
+  editor = @getModel()
+  selectedText = editor.getSelectedText()
+  selectedBufferRange = editor.getSelectedBufferRange()
+  
+  # multiline option
+  regex = /(\s*?)\w*? (\w*) .*?;/m
+  
+  console.log 'selected text: ' + selectedText
+  console.log 'selected buffer range: ' + selectedBufferRange
+  editor.scanInBufferRange regex, selectedBufferRange, (result) ->
+    console.log 'matched text: ' + result.matchText
+    console.log 'match: ' + result.match
+    result.replace(result.match[1] + "$data[''] = AppConstant::" + result.match[2] + ";")

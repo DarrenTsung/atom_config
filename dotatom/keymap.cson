@@ -37,6 +37,9 @@
   'm': 'bookmarks:toggle-bookmark'
   'shift-cmd-m': 'bookmarks:clear-bookmarks'
   
+  # go to declaration
+  'cmd-j': 'symbols-view:go-to-declaration'
+  
   # Lazy-motion
   'space s': 'lazy-motion:search-forward'
  

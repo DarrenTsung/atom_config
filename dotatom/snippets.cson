@@ -21,10 +21,13 @@
 '.text.html.php':
   'debugLog':
     'prefix': 'log'
-    'body': 'debugLog("$1");'
+    'body': 'debugLog("$1: ".\$$1, false);'
   'debugLogVar':
     'prefix': 'logVar'
-    'body': 'debugLogVar($1, "$2");'
+    'body': 'debugLogVar(\$$1, "$1", false);'
+  'callStack':
+    'prefix': 'callStack'
+    'body': 'debugLog(getCallStack(), false);'
     
   # reminders for myself to use the snippets
   'Snippets \'log\'/\'logVar\'!':
