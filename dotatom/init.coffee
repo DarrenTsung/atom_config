@@ -30,6 +30,9 @@ atom.commands.add 'atom-text-editor',
     else
       editor.foldBufferRow(bufferRow)
 
+
+
+#pragma mark - Storm8
 atom.commands.add 'atom-text-editor', 'replace-app-constant-to-api': (e) ->
   editor = @getModel()
   selectedText = editor.getSelectedText()
@@ -70,4 +73,14 @@ atom.commands.add 'atom-text-editor', 'replace-app-constant-to-api': (e) ->
     appConstantName = match[2]
     variableName = convertToVariableName(appConstantName)
     replace(match[1] + "$data['" + variableName + "'] = AppConstant::$" + appConstantName + ";")
+  )
+
+atom.commands.add 'atom-text-editor', 'replace-api-to-client-app-constant': (e) ->
+  editor = @getModel()
+  selectedText = editor.getSelectedText()
+  selectedBufferRange = editor.getSelectedBufferRange()
+  
+  regex = /.*'(.*)'.*/gm
+  editor.scanInBufferRange(regex, selectedBufferRange, ({match, replace}) ->
+    replace("@property (nonatomic) float " + match[1] + ";");
   )
