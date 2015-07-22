@@ -36,12 +36,41 @@
   'deltaTime':
     'prefix': 'dt'
     'body': 'Time.deltaTime'
+    
   'Debug.Log':
     'prefix': 'log'
-    'body': 'Debug.Log("$1");'
+    'body': 'Locator.Logger.Log("$1");'
+    
+  'Debug.LogVariable':
+    'prefix': 'logVariable'
+    'body': 'Locator.Logger.Log("$1: " + $1);'
+    
   'Debug.LogWarning':
     'prefix': 'logWarn'
-    'body': 'Debug.LogWarning("$1");'
+    'body': 'Locator.Logger.LogWarning("$1");'
+    
   'Debug.LogError':
     'prefix': 'logError'
-    'body': 'Debug.LogError("$1");'
+    'body': 'Locator.Logger.LogError("$1");'
+    
+  'Pragma Mark':
+    'prefix': 'pragma'
+    'body': '// PRAGMA MARK - $1'
+    
+  'Method':
+    'prefix': 'm'
+    'body': '${1:protected} ${2:void} ${3:Method}($4) {\n\t$5\n}'
+    
+  'Virtual Method':
+    'prefix': 'vm'
+    'body': '${1:protected} virtual ${2:void} ${3:Method}($4) {\n\t$5\n}'
+    
+  'Property':
+    'prefix': 'prop'
+    'body': """
+      ${1:public} ${2:string} ${3:Property} {
+        ${4:get {}
+        ${5:set {}
+      }
+      """
+  

@@ -6,7 +6,6 @@
   core:
     disabledPackages: [
       "background-tips"
-      "git-diff"
       "go-to-line"
       "image-view"
       "language-clojure"
@@ -44,4 +43,5 @@
     openProjectFindResultsInRightPane: true
   "tree-view":
     hideIgnoredNames: true
-    hideVcsIgnoredFiles: true
+  "autocomplete-plus": {}
+  "git-plus": {}
