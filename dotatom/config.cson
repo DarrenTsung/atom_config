@@ -17,6 +17,7 @@
     ignoredNames: [
       ".git"
       "*.meta"
+      ".svn"
     ]
   editor:
     invisibles: {}

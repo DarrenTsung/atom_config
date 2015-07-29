@@ -84,3 +84,13 @@ atom.commands.add 'atom-text-editor', 'replace-api-to-client-app-constant': (e) 
   editor.scanInBufferRange(regex, selectedBufferRange, ({match, replace}) ->
     replace("@property (nonatomic) float " + match[1] + ";");
   )
+
+atom.commands.add 'atom-text-editor', 'replace-selected-double-quotes-with-single-quotes': (e) ->
+  editor = @getModel()
+  selectedText = editor.getSelectedText()
+  selectedBufferRange = editor.getSelectedBufferRange()
+  
+  regex = /"/gm
+  editor.scanInBufferRange(regex, selectedBufferRange, ({match, replace}) ->
+    replace("'");
+  )
