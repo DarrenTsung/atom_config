@@ -1,18 +1,79 @@
 'atom-text-editor.vim-mode':
-  'escape': 'vim-mode:reset-command-mode'
-  'ctrl-c': 'vim-mode:reset-command-mode'
-  'ctrl-[': 'vim-mode:reset-command-mode'
+  'escape': 'vim-mode:reset-normal-mode'
+  'ctrl-c': 'vim-mode:reset-normal-mode'
+  'ctrl-[': 'vim-mode:reset-normal-mode'
 
-'atom-text-editor.vim-mode:not(.command-mode)':
-  'escape': 'vim-mode:activate-command-mode'
-  'ctrl-[': 'vim-mode:activate-command-mode'
+'atom-text-editor.vim-mode:not(.normal-mode)':
+  'escape': 'vim-mode:activate-normal-mode'
+  'ctrl-[': 'vim-mode:activate-normal-mode'
 
-'.platform-darwin atom-text-editor.vim-mode:not(.command-mode)':
-  'ctrl-c': 'vim-mode:activate-command-mode'
+'.platform-darwin atom-text-editor.vim-mode:not(.normal-mode)':
+  'ctrl-c': 'vim-mode:activate-normal-mode'
 
 'atom-text-editor.vim-mode.insert-mode':
   'ctrl-w': 'editor:delete-to-beginning-of-word'
   'ctrl-u': 'editor:delete-to-beginning-of-line'
+
+  'ctrl-r a': 'vim-mode:insert-mode-put'
+  'ctrl-r b': 'vim-mode:insert-mode-put'
+  'ctrl-r c': 'vim-mode:insert-mode-put'
+  'ctrl-r d': 'vim-mode:insert-mode-put'
+  'ctrl-r e': 'vim-mode:insert-mode-put'
+  'ctrl-r f': 'vim-mode:insert-mode-put'
+  'ctrl-r g': 'vim-mode:insert-mode-put'
+  'ctrl-r h': 'vim-mode:insert-mode-put'
+  'ctrl-r i': 'vim-mode:insert-mode-put'
+  'ctrl-r j': 'vim-mode:insert-mode-put'
+  'ctrl-r k': 'vim-mode:insert-mode-put'
+  'ctrl-r l': 'vim-mode:insert-mode-put'
+  'ctrl-r m': 'vim-mode:insert-mode-put'
+  'ctrl-r n': 'vim-mode:insert-mode-put'
+  'ctrl-r o': 'vim-mode:insert-mode-put'
+  'ctrl-r p': 'vim-mode:insert-mode-put'
+  'ctrl-r q': 'vim-mode:insert-mode-put'
+  'ctrl-r r': 'vim-mode:insert-mode-put'
+  'ctrl-r s': 'vim-mode:insert-mode-put'
+  'ctrl-r t': 'vim-mode:insert-mode-put'
+  'ctrl-r u': 'vim-mode:insert-mode-put'
+  'ctrl-r v': 'vim-mode:insert-mode-put'
+  'ctrl-r w': 'vim-mode:insert-mode-put'
+  'ctrl-r x': 'vim-mode:insert-mode-put'
+  'ctrl-r y': 'vim-mode:insert-mode-put'
+  'ctrl-r z': 'vim-mode:insert-mode-put'
+  'ctrl-r A': 'vim-mode:insert-mode-put'
+  'ctrl-r B': 'vim-mode:insert-mode-put'
+  'ctrl-r C': 'vim-mode:insert-mode-put'
+  'ctrl-r D': 'vim-mode:insert-mode-put'
+  'ctrl-r E': 'vim-mode:insert-mode-put'
+  'ctrl-r F': 'vim-mode:insert-mode-put'
+  'ctrl-r G': 'vim-mode:insert-mode-put'
+  'ctrl-r H': 'vim-mode:insert-mode-put'
+  'ctrl-r I': 'vim-mode:insert-mode-put'
+  'ctrl-r J': 'vim-mode:insert-mode-put'
+  'ctrl-r K': 'vim-mode:insert-mode-put'
+  'ctrl-r L': 'vim-mode:insert-mode-put'
+  'ctrl-r M': 'vim-mode:insert-mode-put'
+  'ctrl-r N': 'vim-mode:insert-mode-put'
+  'ctrl-r O': 'vim-mode:insert-mode-put'
+  'ctrl-r P': 'vim-mode:insert-mode-put'
+  'ctrl-r Q': 'vim-mode:insert-mode-put'
+  'ctrl-r R': 'vim-mode:insert-mode-put'
+  'ctrl-r S': 'vim-mode:insert-mode-put'
+  'ctrl-r T': 'vim-mode:insert-mode-put'
+  'ctrl-r U': 'vim-mode:insert-mode-put'
+  'ctrl-r V': 'vim-mode:insert-mode-put'
+  'ctrl-r W': 'vim-mode:insert-mode-put'
+  'ctrl-r X': 'vim-mode:insert-mode-put'
+  'ctrl-r Y': 'vim-mode:insert-mode-put'
+  'ctrl-r Z': 'vim-mode:insert-mode-put'
+  'ctrl-r *': 'vim-mode:insert-mode-put'
+  'ctrl-r +': 'vim-mode:insert-mode-put'
+  'ctrl-r %': 'vim-mode:insert-mode-put'
+  'ctrl-r _': 'vim-mode:insert-mode-put'
+  'ctrl-r "': 'vim-mode:insert-mode-put'
+
+'atom-text-editor.vim-mode.replace-mode':
+  'backspace': 'vim-mode:replace-mode-backspace'
 
 'atom-text-editor.vim-mode:not(.insert-mode)':
   'h': 'vim-mode:move-left'
@@ -145,8 +206,9 @@
   '8': 'vim-mode:repeat-prefix'
   '9': 'vim-mode:repeat-prefix'
 
-'atom-text-editor.vim-mode.command-mode':
+'atom-text-editor.vim-mode.normal-mode':
   'i': 'vim-mode:activate-insert-mode'
+  'R': 'vim-mode:activate-replace-mode'
   'v': 'vim-mode:activate-characterwise-visual-mode'
   'V': 'vim-mode:activate-linewise-visual-mode'
   'ctrl-v': 'vim-mode:activate-blockwise-visual-mode'
@@ -228,6 +290,7 @@
 
 'atom-text-editor.vim-mode.operator-pending-mode, atom-text-editor.vim-mode.visual-mode':
   'i w': 'vim-mode:select-inside-word'
+  'i W': 'vim-mode:select-inside-whole-word'
   'i "': 'vim-mode:select-inside-double-quotes'
   'i \'': 'vim-mode:select-inside-single-quotes'
   'i `': 'vim-mode:select-inside-back-ticks'
@@ -244,6 +307,7 @@
   'i b': 'vim-mode:select-inside-parentheses'
   'i p': 'vim-mode:select-inside-paragraph'
   'a w': 'vim-mode:select-a-word'
+  'a W': 'vim-mode:select-a-whole-word'
   'a "': 'vim-mode:select-around-double-quotes'
   'a \'': 'vim-mode:select-around-single-quotes'
   'a `': 'vim-mode:select-around-back-ticks'
@@ -258,7 +322,7 @@
   'a )': 'vim-mode:select-around-parentheses'
   'a b': 'vim-mode:select-around-parentheses'
   'a p': 'vim-mode:select-around-paragraph'
-  'x': 'vim-mode:reset-command-mode'
+  'x': 'vim-mode:reset-normal-mode'
 
 'atom-text-editor.vim-mode.visual-mode':
   'x': 'vim-mode:delete'

@@ -1,7 +1,7 @@
 {
   "name": "ex-mode",
   "main": "./lib/ex-mode",
-  "version": "0.5.1",
+  "version": "0.6.2",
   "description": "Ex for Atom's vim-mode",
   "activationCommands": {
     "atom-workspace": "ex-mode:open"
@@ -18,7 +18,8 @@
     "underscore-plus": "1.x",
     "event-kit": "^0.7.2",
     "space-pen": "^5.1.1",
-    "atom-space-pen-views": "^2.0.4"
+    "atom-space-pen-views": "^2.0.4",
+    "fs-plus": "^2.2.8"
   },
   "consumedServices": {
     "vim-mode": {
@@ -41,10 +42,10 @@
     "url": "https://github.com/lloeki/ex-mode/issues"
   },
   "homepage": "https://github.com/lloeki/ex-mode",
-  "_id": "ex-mode@0.5.1",
-  "_shasum": "8af9a669232d55ae62ee5b6d21750e864564a7fe",
-  "_resolved": "file:../d-115525-5310-1h0t5ce/package.tgz",
-  "_from": "../d-115525-5310-1h0t5ce/package.tgz",
+  "_id": "ex-mode@0.6.2",
+  "_shasum": "04c8e7f0da46bc99fad05217fa1b9f896d7baa62",
+  "_resolved": "file:../d-115629-32923-1l6lbne/package.tgz",
+  "_from": "../d-115629-32923-1l6lbne/package.tgz",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [
@@ -109,6 +110,26 @@
         "path": "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/property-accessors/lib/property-accessors.js"
       },
       {
+        "name": "fs-plus",
+        "version": "2.8.1",
+        "path": "node_modules/fs-plus/lib/fs-plus.js"
+      },
+      {
+        "name": "async",
+        "version": "0.2.10",
+        "path": "node_modules/fs-plus/node_modules/async/lib/async.js"
+      },
+      {
+        "name": "mkdirp",
+        "version": "0.3.5",
+        "path": "node_modules/fs-plus/node_modules/mkdirp/index.js"
+      },
+      {
+        "name": "rimraf",
+        "version": "2.2.8",
+        "path": "node_modules/fs-plus/node_modules/rimraf/rimraf.js"
+      },
+      {
         "name": "space-pen",
         "version": "5.1.1",
         "path": "node_modules/space-pen/lib/space-pen.js"
@@ -134,33 +155,13 @@
         "path": "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/node_modules/mkdirp/index.js"
       },
       {
-        "name": "fs-plus",
-        "version": "2.8.1",
-        "path": "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/lib/fs-plus.js"
-      },
-      {
-        "name": "async",
-        "version": "0.2.10",
-        "path": "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/async/lib/async.js"
-      },
-      {
-        "name": "mkdirp",
-        "version": "0.3.5",
-        "path": "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/mkdirp/index.js"
-      },
-      {
-        "name": "rimraf",
-        "version": "2.2.8",
-        "path": "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/rimraf/rimraf.js"
-      },
-      {
         "name": "source-map",
         "version": "0.1.43",
         "path": "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map.js"
       },
       {
         "name": "amdefine",
-        "version": "0.1.1",
+        "version": "1.0.0",
         "path": "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/node_modules/amdefine/amdefine.js"
       },
       {
@@ -230,7 +231,8 @@
         "lib/ex.coffee",
         "lib/find.coffee",
         "lib/global-ex-state.coffee",
-        "lib/view-model.coffee"
+        "lib/view-model.coffee",
+        "lib/vim-option.coffee"
       ],
       ".js": [
         "node_modules/atom-space-pen-views/lib/main.js",
@@ -655,6 +657,12 @@
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/valid-weak-map.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/mixto/lib/mixin.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/property-accessors/lib/property-accessors.js",
+        "node_modules/fs-plus/lib/fs-plus.js",
+        "node_modules/fs-plus/node_modules/async/lib/async.js",
+        "node_modules/fs-plus/node_modules/mkdirp/examples/pow.js",
+        "node_modules/fs-plus/node_modules/mkdirp/index.js",
+        "node_modules/fs-plus/node_modules/rimraf/bin.js",
+        "node_modules/fs-plus/node_modules/rimraf/rimraf.js",
         "node_modules/space-pen/lib/space-pen.js",
         "node_modules/space-pen/node_modules/grim/lib/deprecation.js",
         "node_modules/space-pen/node_modules/grim/lib/grim.js",
@@ -679,12 +687,6 @@
         "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/node_modules/mkdirp/index.js",
         "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/register.js",
         "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/repl.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/lib/fs-plus.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/async/lib/async.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/mkdirp/examples/pow.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/mkdirp/index.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/rimraf/bin.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/rimraf/rimraf.js",
         "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/Makefile.dryice.js",
         "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/build/assert-shim.js",
         "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/build/mini-require.js",
@@ -1214,14 +1216,14 @@
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/package.json",
         "node_modules/event-kit/node_modules/grim/package.json",
         "node_modules/event-kit/package.json",
+        "node_modules/fs-plus/node_modules/async/component.json",
+        "node_modules/fs-plus/node_modules/async/package.json",
+        "node_modules/fs-plus/node_modules/mkdirp/package.json",
+        "node_modules/fs-plus/node_modules/rimraf/package.json",
+        "node_modules/fs-plus/package.json",
         "node_modules/space-pen/api.json",
         "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/node_modules/mkdirp/package.json",
         "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/package.json",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/async/component.json",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/async/package.json",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/mkdirp/package.json",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/rimraf/package.json",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/package.json",
         "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/node_modules/amdefine/package.json",
         "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/package.json",
         "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/package.json",
@@ -1253,7 +1255,8 @@
           "underscore-plus": "1.x",
           "event-kit": "^0.7.2",
           "space-pen": "^5.1.1",
-          "atom-space-pen-views": "^2.0.4"
+          "atom-space-pen-views": "^2.0.4",
+          "fs-plus": "^2.2.8"
         }
       },
       {
@@ -1513,6 +1516,18 @@
       },
       {
         "paths": [
+          "node_modules/fs-plus/lib",
+          "node_modules/fs-plus"
+        ],
+        "dependencies": {
+          "underscore-plus": "1.x",
+          "mkdirp": "~0.3.5",
+          "rimraf": "~2.2.2",
+          "async": "~0.2.9"
+        }
+      },
+      {
+        "paths": [
           "node_modules/space-pen",
           "node_modules/space-pen/lib"
         ],
@@ -1549,18 +1564,6 @@
         ],
         "dependencies": {
           "mkdirp": "~0.3.5"
-        }
-      },
-      {
-        "paths": [
-          "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/lib",
-          "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/fs-plus"
-        ],
-        "dependencies": {
-          "underscore-plus": "1.x",
-          "mkdirp": "~0.3.5",
-          "rimraf": "~2.2.2",
-          "async": "~0.2.9"
         }
       },
       {

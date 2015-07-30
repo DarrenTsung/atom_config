@@ -10,16 +10,21 @@
 #   editor.onDidSave ->
 #     console.log "Saved! #{editor.getPath()}"
 
-atom.commands.add 'atom-text-editor', 'exit-insert-mode-if-preceded-by-j': (e) ->
-  editor = @getModel()
-  pos = editor.getCursorBufferPosition()
-  range = [pos.traverse([0,-1]), pos]
-  lastChar = editor.getTextInBufferRange(range)
-  if lastChar != "j"
-    e.abortKeyBinding()
-  else
-    editor.backspace()
-    atom.commands.dispatch(e.currentTarget, 'vim-mode:activate-command-mode')
+
+
+# With the new updated version of the atom editor, this no longer needs to exist.
+# Godspeed.
+#
+# atom.commands.add 'atom-text-editor', 'exit-insert-mode-if-preceded-by-j': (e) ->
+#   editor = @getModel()
+#   pos = editor.getCursorBufferPosition()
+#   range = [pos.traverse([0,-1]), pos]
+#   lastChar = editor.getTextInBufferRange(range)
+#   if lastChar != "j"
+#     e.abortKeyBinding()
+#   else
+#     editor.backspace()
+#     atom.commands.dispatch(e.currentTarget, 'vim-mode:activate-command-mode')
     
 atom.commands.add 'atom-text-editor',
   'editor:toggle-current-row-folding': (event) ->
@@ -29,8 +34,6 @@ atom.commands.add 'atom-text-editor',
       editor.unfoldBufferRow(bufferRow)
     else
       editor.foldBufferRow(bufferRow)
-
-
 
 #pragma mark - Storm8
 atom.commands.add 'atom-text-editor', 'replace-app-constant-to-api': (e) ->

@@ -10,7 +10,7 @@ run `apm install vim-mode` from the command line.
 
 ### Current Status
 
-Sizable portions of Vim's command mode work as you'd expect, including
+Sizable portions of Vim's normal mode work as you'd expect, including
 many complex combinations. Even so, this package is far from finished (Vim
 wasn't built in a day).
 
@@ -28,7 +28,7 @@ to see examples of community contributions. We're looking forward to yours, too.
 ### Documentation
 
 * [Overview](https://github.com/atom/vim-mode/blob/master/docs/overview.md)
-* [Motions](https://github.com/atom/vim-mode/blob/master/docs/motions.md)
+* [Motions and Text Objects](https://github.com/atom/vim-mode/blob/master/docs/motions.md)
 * [Operators](https://github.com/atom/vim-mode/blob/master/docs/operators.md)
 * [Windows](https://github.com/atom/vim-mode/blob/master/docs/windows.md)
 * [Scrolling](https://github.com/atom/vim-mode/blob/master/docs/scrolling.md)

@@ -1,10 +1,9 @@
 ### UN-MAPPINGS ###
   
 ### MAPPINGS ###
-# remap jk to map to esc (doesn't timeout)
-'.editor.vim-mode.insert-mode':
-  'k': 'exit-insert-mode-if-preceded-by-j'
-
+'atom-text-editor.vim-mode:not(.normal-mode)':
+  'j k': 'vim-mode:activate-normal-mode'
+  
 # remap cmd-shift-o to fuzzy finder, just preference
 '.platform-darwin':
   'shift-cmd-o': 'fuzzy-finder:toggle-file-finder'

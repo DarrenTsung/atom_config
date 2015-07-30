@@ -12,11 +12,8 @@ class Operator
   vimState: null
   motion: null
   complete: null
-  selectOptions: null
 
-  # selectOptions - The options object to pass through to the motion when
-  #                 selecting.
-  constructor: (@editor, @vimState, {@selectOptions}={}) ->
+  constructor: (@editor, @vimState) ->
     @complete = false
 
   # Public: Determines when the command can be executed.
@@ -76,14 +73,9 @@ class OperatorWithInput extends Operator
 #
 class Delete extends Operator
   register: null
-  allowEOL: null
 
-  # allowEOL - Determines whether the cursor should be allowed to rest on the
-  #            end of line character or not.
-  constructor: (@editor, @vimState, {@allowEOL, @selectOptions}={}) ->
+  constructor: (@editor, @vimState) ->
     @complete = false
-    @selectOptions ?= {}
-    @selectOptions.requireEOL ?= true
     @register = settings.defaultRegister()
 
   # Public: Deletes the text selected by the given motion.
@@ -92,7 +84,7 @@ class Delete extends Operator
   #
   # Returns nothing.
   execute: (count) ->
-    if _.contains(@motion.select(count, @selectOptions), true)
+    if _.contains(@motion.select(count), true)
       @setTextRegister(@register, @editor.getSelectedText())
       @editor.transact =>
         for selection in @editor.getSelections()
@@ -103,17 +95,17 @@ class Delete extends Operator
         else
           cursor.moveLeft() if cursor.isAtEndOfLine() and not cursor.isAtBeginningOfLine()
 
-    @vimState.activateCommandMode()
+    @vimState.activateNormalMode()
 
 #
 # It toggles the case of everything selected by the following motion
 #
 class ToggleCase extends Operator
-  constructor: (@editor, @vimState, {@complete, @selectOptions}={}) ->
+  constructor: (@editor, @vimState, {@complete}={}) ->
 
   execute: (count=1) ->
     if @motion?
-      if _.contains(@motion.select(count, @selectOptions), true)
+      if _.contains(@motion.select(count), true)
         @editor.replaceSelectedText {}, (text) ->
           text.split('').map((char) ->
             lower = char.toLowerCase()
@@ -141,35 +133,35 @@ class ToggleCase extends Operator
 
             cursor.moveRight() unless point.column >= lineLength - 1
 
-    @vimState.activateCommandMode()
+    @vimState.activateNormalMode()
 
 #
 # In visual mode or after `g` with a motion, it makes the selection uppercase
 #
 class UpperCase extends Operator
-  constructor: (@editor, @vimState, {@selectOptions}={}) ->
+  constructor: (@editor, @vimState) ->
     @complete = false
 
   execute: (count=1) ->
-    if _.contains(@motion.select(count, @selectOptions), true)
+    if _.contains(@motion.select(count), true)
       @editor.replaceSelectedText {}, (text) ->
         text.toUpperCase()
 
-    @vimState.activateCommandMode()
+    @vimState.activateNormalMode()
 
 #
 # In visual mode or after `g` with a motion, it makes the selection lowercase
 #
 class LowerCase extends Operator
-  constructor: (@editor, @vimState, {@selectOptions}={}) ->
+  constructor: (@editor, @vimState) ->
     @complete = false
 
   execute: (count=1) ->
-    if _.contains(@motion.select(count, @selectOptions), true)
+    if _.contains(@motion.select(count), true)
       @editor.replaceSelectedText {}, (text) ->
         text.toLowerCase()
 
-    @vimState.activateCommandMode()
+    @vimState.activateNormalMode()
 
 #
 # It copies everything selected by the following motion.
@@ -177,7 +169,7 @@ class LowerCase extends Operator
 class Yank extends Operator
   register: null
 
-  constructor: (@editor, @vimState, {@allowEOL, @selectOptions}={}) ->
+  constructor: (@editor, @vimState) ->
     @register = settings.defaultRegister()
 
   # Public: Copies the text selected by the given motion.
@@ -202,13 +194,13 @@ class Yank extends Operator
     @setTextRegister(@register, text)
 
     @editor.setSelectedBufferRanges(newPositions.map (p) -> new Range(p, p))
-    @vimState.activateCommandMode()
+    @vimState.activateNormalMode()
 
 #
 # It combines the current line with the following line.
 #
 class Join extends Operator
-  constructor: (@editor, @vimState, {@selectOptions}={}) -> @complete = true
+  constructor: (@editor, @vimState) -> @complete = true
 
   # Public: Combines the current with the following lines
   #
@@ -219,13 +211,13 @@ class Join extends Operator
     @editor.transact =>
       _.times count, =>
         @editor.joinLines()
-    @vimState.activateCommandMode()
+    @vimState.activateNormalMode()
 
 #
 # Repeat the last operation
 #
 class Repeat extends Operator
-  constructor: (@editor, @vimState, {@selectOptions}={}) -> @complete = true
+  constructor: (@editor, @vimState) -> @complete = true
 
   isRecordable: -> false
 
@@ -238,7 +230,7 @@ class Repeat extends Operator
 # It creates a mark at the current cursor position
 #
 class Mark extends OperatorWithInput
-  constructor: (@editor, @vimState, {@selectOptions}={}) ->
+  constructor: (@editor, @vimState) ->
     super(@editor, @vimState)
     @viewModel = new ViewModel(this, class: 'mark', singleChar: true, hidden: true)
 
@@ -248,7 +240,7 @@ class Mark extends OperatorWithInput
   # Returns nothing.
   execute: ->
     @vimState.setMark(@input.characters, @editor.getCursorBufferPosition())
-    @vimState.activateCommandMode()
+    @vimState.activateNormalMode()
 
 module.exports = {
   Operator, OperatorWithInput, OperatorError, Delete, ToggleCase,
