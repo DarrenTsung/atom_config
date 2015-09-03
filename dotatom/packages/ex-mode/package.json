@@ -1,14 +1,14 @@
 {
   "name": "ex-mode",
   "main": "./lib/ex-mode",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "description": "Ex for Atom's vim-mode",
   "activationCommands": {
     "atom-workspace": "ex-mode:open"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/lloeki/ex-mode"
+    "url": "git+https://github.com/lloeki/ex-mode.git"
   },
   "license": "MIT",
   "engines": {
@@ -36,22 +36,25 @@
       }
     }
   },
+  "devDependencies": {
+    "node-uuid": "^1.4.2"
+  },
   "readme": "# ex-mode package\n\nex-mode for Atom's vim-mode\n\n## Use\n\nInstall both [vim-mode](https://github.com/atom/vim-mode) and ex-mode. Type `:` in command mode. Enter `w` or `write`.\n\n## Extend\n\nUse the service to register commands, from your own package, or straight from `init.coffee`:\n\n```coffee\n# in Atom's init.coffee\natom.packages.onDidActivatePackage (pack) ->\n  if pack.name == 'ex-mode'\n    Ex = pack.mainModule.provideEx()\n    Ex.registerCommand 'z', -> console.log(\"Zzzzzz...\")\n```\n\nSee `lib/ex.coffee` for some examples commands. Contributions are very welcome!\n\n## Status\n\nGroundwork is done. More ex commands are easy to add and will be coming as time permits and contributions come in.\n\n## License\n\nMIT\n",
   "readmeFilename": "README.md",
   "bugs": {
     "url": "https://github.com/lloeki/ex-mode/issues"
   },
-  "homepage": "https://github.com/lloeki/ex-mode",
-  "_id": "ex-mode@0.6.2",
-  "_shasum": "04c8e7f0da46bc99fad05217fa1b9f896d7baa62",
-  "_resolved": "file:../d-115629-32923-1l6lbne/package.tgz",
-  "_from": "../d-115629-32923-1l6lbne/package.tgz",
+  "homepage": "https://github.com/lloeki/ex-mode#readme",
+  "_id": "ex-mode@0.7.0",
+  "_shasum": "afecba0f6a689e6d14f919493c5eb36450897552",
+  "_resolved": "file:../d-11583-91560-d2kl3p/package.tgz",
+  "_from": "../d-11583-91560-d2kl3p/package.tgz",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [
       {
         "name": "atom-space-pen-views",
-        "version": "2.0.5",
+        "version": "2.1.0",
         "path": "node_modules/atom-space-pen-views/lib/main.js"
       },
       {
@@ -136,33 +139,8 @@
       },
       {
         "name": "grim",
-        "version": "1.4.1",
+        "version": "1.4.2",
         "path": "node_modules/space-pen/node_modules/grim/lib/grim.js"
-      },
-      {
-        "name": "coffeestack",
-        "version": "1.1.2",
-        "path": "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/index.js"
-      },
-      {
-        "name": "coffee-script",
-        "version": "1.8.0",
-        "path": "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/coffee-script.js"
-      },
-      {
-        "name": "mkdirp",
-        "version": "0.3.5",
-        "path": "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/node_modules/mkdirp/index.js"
-      },
-      {
-        "name": "source-map",
-        "version": "0.1.43",
-        "path": "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map.js"
-      },
-      {
-        "name": "amdefine",
-        "version": "1.0.0",
-        "path": "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/node_modules/amdefine/amdefine.js"
       },
       {
         "name": "emissary",
@@ -224,8 +202,8 @@
       ".coffee": [
         "lib/command-error.coffee",
         "lib/command.coffee",
-        "lib/ex-command-mode-input-element.coffee",
         "lib/ex-mode.coffee",
+        "lib/ex-normal-mode-input-element.coffee",
         "lib/ex-state.coffee",
         "lib/ex-view-model.coffee",
         "lib/ex.coffee",
@@ -666,45 +644,6 @@
         "node_modules/space-pen/lib/space-pen.js",
         "node_modules/space-pen/node_modules/grim/lib/deprecation.js",
         "node_modules/space-pen/node_modules/grim/lib/grim.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/index.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/browser.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/cake.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/coffee-script.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/command.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/grammar.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/helpers.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/index.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/lexer.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/nodes.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/optparse.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/parser.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/register.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/repl.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/rewriter.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/scope.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/sourcemap.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/node_modules/mkdirp/examples/pow.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/node_modules/mkdirp/index.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/register.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/repl.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/Makefile.dryice.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/build/assert-shim.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/build/mini-require.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/build/suffix-browser.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/build/test-prefix.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/build/test-suffix.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/array-set.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/base64-vlq.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/base64.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/binary-search.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/mapping-list.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/source-map-consumer.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/source-map-generator.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/source-node.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/util.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/node_modules/amdefine/amdefine.js",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/node_modules/amdefine/intercept.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/lib/behavior.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/lib/emissary.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/lib/emitter.js",
@@ -1222,11 +1161,6 @@
         "node_modules/fs-plus/node_modules/rimraf/package.json",
         "node_modules/fs-plus/package.json",
         "node_modules/space-pen/api.json",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/node_modules/mkdirp/package.json",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/package.json",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/node_modules/amdefine/package.json",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/package.json",
-        "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/package.json",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/d/package.json",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/package.json",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es6-iterator/package.json",
@@ -1543,40 +1477,7 @@
           "node_modules/space-pen/node_modules/grim"
         ],
         "dependencies": {
-          "coffeestack": "^1",
           "emissary": "^1.2.0"
-        }
-      },
-      {
-        "paths": [
-          "node_modules/space-pen/node_modules/grim/node_modules/coffeestack"
-        ],
-        "dependencies": {
-          "coffee-script": "~1.8.0",
-          "fs-plus": "^2.5.0",
-          "source-map": "~0.1.43"
-        }
-      },
-      {
-        "paths": [
-          "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script",
-          "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/coffee-script"
-        ],
-        "dependencies": {
-          "mkdirp": "~0.3.5"
-        }
-      },
-      {
-        "paths": [
-          "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map",
-          "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/build",
-          "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map",
-          "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib",
-          "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/test",
-          "node_modules/space-pen/node_modules/grim/node_modules/coffeestack/node_modules/source-map/test/source-map"
-        ],
-        "dependencies": {
-          "amdefine": ">=0.0.4"
         }
       },
       {

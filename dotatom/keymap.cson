@@ -1,7 +1,7 @@
 ### UN-MAPPINGS ###
   
 ### MAPPINGS ###
-'atom-text-editor.vim-mode:not(.normal-mode)':
+'atom-text-editor.vim-mode.insert-mode':
   'j k': 'vim-mode:activate-normal-mode'
   
 # remap cmd-shift-o to fuzzy finder, just preference

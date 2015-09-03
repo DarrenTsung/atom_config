@@ -1,6 +1,7 @@
 {Range} = require 'atom'
 AllWhitespace = /^\s$/
 WholeWordRegex = /\S+/
+{mergeRanges} = require './utils'
 
 class TextObject
   constructor: (@editor, @state) ->
@@ -8,16 +9,19 @@ class TextObject
   isComplete: -> true
   isRecordable: -> false
 
+  execute: -> @select.apply(this, arguments)
+
 class SelectInsideWord extends TextObject
   select: ->
-    @editor.selectWordsContainingCursors()
+    for selection in @editor.getSelections()
+      selection.expandOverWord()
     [true]
 
 class SelectInsideWholeWord extends TextObject
   select: ->
     for selection in @editor.getSelections()
       range = selection.cursor.getCurrentWordBufferRange({wordRegex: WholeWordRegex})
-      selection.setBufferRange(range)
+      selection.setBufferRange(mergeRanges(selection.getBufferRange(), range))
       true
 
 # SelectInsideQuotes and the next class defined (SelectInsideBrackets) are
@@ -84,7 +88,7 @@ class SelectInsideQuotes extends TextObject
         ++ start.column # skip the opening quote
         end = @findClosingQuote(start)
         if end?
-          selection.setBufferRange([start, end])
+          selection.setBufferRange(mergeRanges(selection.getBufferRange(), [start, end]))
       not selection.isEmpty()
 
 # SelectInsideBrackets and the previous class defined (SelectInsideQuotes) are
@@ -134,13 +138,13 @@ class SelectInsideBrackets extends TextObject
         ++ start.column # skip the opening quote
         end = @findClosingBracket(start)
         if end?
-          selection.setBufferRange([start, end])
+          selection.setBufferRange(mergeRanges(selection.getBufferRange(), [start, end]))
       not selection.isEmpty()
 
 class SelectAWord extends TextObject
   select: ->
     for selection in @editor.getSelections()
-      selection.selectWord()
+      selection.expandOverWord()
       loop
         endPoint = selection.getBufferRange().end
         char = @editor.getTextInRange(Range.fromPointWithDelta(endPoint, 0, 1))
@@ -152,7 +156,7 @@ class SelectAWholeWord extends TextObject
   select: ->
     for selection in @editor.getSelections()
       range = selection.cursor.getCurrentWordBufferRange({wordRegex: WholeWordRegex})
-      selection.setBufferRange(range)
+      selection.setBufferRange(mergeRanges(selection.getBufferRange(), range))
       loop
         endPoint = selection.getBufferRange().end
         char = @editor.getTextInRange(Range.fromPointWithDelta(endPoint, 0, 1))
@@ -160,26 +164,44 @@ class SelectAWholeWord extends TextObject
         selection.selectRight()
       true
 
-class SelectInsideParagraph extends TextObject
-  constructor: (@editor, @inclusive) ->
-  select: ->
-    for selection in @editor.getSelections()
-      range = selection.cursor.getCurrentParagraphBufferRange()
-      if range?
-        selection.setBufferRange(range)
-        selection.selectToBeginningOfNextParagraph()
-      true
+class Paragraph extends TextObject
 
-class SelectAParagraph extends TextObject
-  constructor: (@editor, @inclusive) ->
   select: ->
     for selection in @editor.getSelections()
-      range = selection.cursor.getCurrentParagraphBufferRange()
-      if range?
-        selection.setBufferRange(range)
-        selection.selectToBeginningOfNextParagraph()
-        selection.selectDown()
-      true
+      @selectParagraph(selection)
+
+  # Return a range delimted by the start or the end of a paragraph
+  paragraphDelimitedRange: (startPoint) ->
+    inParagraph = @isParagraphLine(@editor.lineTextForBufferRow(startPoint.row))
+    upperRow = @searchLines(startPoint.row, -1, inParagraph)
+    lowerRow = @searchLines(startPoint.row, @editor.getLineCount(), inParagraph)
+    new Range([upperRow + 1, 0], [lowerRow, 0])
+
+  searchLines: (startRow, rowLimit, startedInParagraph) ->
+    for currentRow in [startRow..rowLimit]
+      line = @editor.lineTextForBufferRow(currentRow)
+      if startedInParagraph isnt @isParagraphLine(line)
+        return currentRow
+    rowLimit
+
+  isParagraphLine: (line) -> (/\S/.test(line))
+
+class SelectInsideParagraph extends Paragraph
+  selectParagraph: (selection) ->
+    oldRange = selection.getBufferRange()
+    startPoint = selection.cursor.getBufferPosition()
+    newRange = @paragraphDelimitedRange(startPoint)
+    selection.setBufferRange(mergeRanges(oldRange, newRange))
+    true
+
+class SelectAParagraph extends Paragraph
+  selectParagraph: (selection) ->
+    oldRange = selection.getBufferRange()
+    startPoint = selection.cursor.getBufferPosition()
+    newRange = @paragraphDelimitedRange(startPoint)
+    nextRange = @paragraphDelimitedRange(newRange.end)
+    selection.setBufferRange(mergeRanges(oldRange, [newRange.start, nextRange.end]))
+    true
 
 module.exports = {TextObject, SelectInsideWord, SelectInsideWholeWord, SelectInsideQuotes,
   SelectInsideBrackets, SelectAWord, SelectAWholeWord, SelectInsideParagraph, SelectAParagraph}

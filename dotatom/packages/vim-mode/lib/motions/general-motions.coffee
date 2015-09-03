@@ -85,17 +85,14 @@ class Motion
       if wasReversed and not wasEmpty and not isReversed
         selection.setBufferRange([[newStart.row, oldEnd.column - 1], newEnd])
 
+      # keep a single-character selection non-reversed
+      range = selection.getBufferRange()
+      [newStart, newEnd] = [range.start, range.end]
+      if selection.isReversed() and newStart.row is newEnd.row and newStart.column + 1 is newEnd.column
+        selection.setBufferRange(range, reversed: false)
+
   moveSelection: (selection, count, options) ->
     selection.modifySelection => @moveCursor(selection.cursor, count, options)
-
-  ensureCursorIsWithinLine: (cursor) ->
-    return if @vimState.mode is 'visual' or not cursor.selection.isEmpty()
-    {goalColumn} = cursor
-    {row, column} = cursor.getBufferPosition()
-    lastColumn = cursor.getCurrentLineBufferRange().end.column
-    if column >= lastColumn - 1
-      cursor.setBufferPosition([row, Math.max(lastColumn - 1, 0)])
-    cursor.goalColumn ?= goalColumn
 
   isComplete: -> true
 
@@ -113,14 +110,37 @@ class Motion
 class CurrentSelection extends Motion
   constructor: (@editor, @vimState) ->
     super(@editor, @vimState)
-    @selection = @editor.getSelectedBufferRanges()
+    @lastSelectionRange = @editor.getSelectedBufferRange()
+    @wasLinewise = @isLinewise()
 
   execute: (count=1) ->
     _.times(count, -> true)
 
   select: (count=1) ->
-    @editor.setSelectedBufferRanges(@selection)
+    # in visual mode, the current selections are already there
+    # if we're not in visual mode, we are repeating some operation and need to re-do the selections
+    unless @vimState.mode is 'visual'
+      if @wasLinewise
+        @selectLines()
+      else
+        @selectCharacters()
+
     _.times(count, -> true)
+
+  selectLines: ->
+    lastSelectionExtent = @lastSelectionRange.getExtent()
+    for selection in @editor.getSelections()
+      cursor = selection.cursor.getBufferPosition()
+      selection.setBufferRange [[cursor.row, 0], [cursor.row + lastSelectionExtent.row, 0]]
+    return
+
+  selectCharacters: ->
+    lastSelectionExtent = @lastSelectionRange.getExtent()
+    for selection in @editor.getSelections()
+      {start} = selection.getBufferRange()
+      newEnd = start.traverse(lastSelectionExtent)
+      selection.setBufferRange([start, newEnd])
+    return
 
 # Public: Generic class for motions that require extra input
 class MotionWithInput extends Motion
@@ -142,9 +162,8 @@ class MoveLeft extends Motion
   operatesInclusively: false
 
   moveCursor: (cursor, count=1) ->
-    _.times count, =>
+    _.times count, ->
       cursor.moveLeft() if not cursor.isAtBeginningOfLine() or settings.wrapLeftRightMotion()
-      @ensureCursorIsWithinLine(cursor)
 
 class MoveRight extends Motion
   operatesInclusively: false
@@ -159,16 +178,14 @@ class MoveRight extends Motion
 
       cursor.moveRight() unless cursor.isAtEndOfLine()
       cursor.moveRight() if wrapToNextLine and cursor.isAtEndOfLine()
-      @ensureCursorIsWithinLine(cursor)
 
 class MoveUp extends Motion
   operatesLinewise: true
 
   moveCursor: (cursor, count=1) ->
-    _.times count, =>
+    _.times count, ->
       unless cursor.getScreenRow() is 0
         cursor.moveUp()
-        @ensureCursorIsWithinLine(cursor)
 
 class MoveDown extends Motion
   operatesLinewise: true
@@ -177,7 +194,6 @@ class MoveDown extends Motion
     _.times count, =>
       unless cursor.getScreenRow() is @editor.getLastScreenRow()
         cursor.moveDown()
-        @ensureCursorIsWithinLine(cursor)
 
 class MoveToPreviousWord extends Motion
   operatesInclusively: false
@@ -328,10 +344,9 @@ class MoveToLastCharacterOfLine extends Motion
   operatesInclusively: false
 
   moveCursor: (cursor, count=1) ->
-    _.times count, =>
+    _.times count, ->
       cursor.moveToEndOfLine()
       cursor.goalColumn = Infinity
-      @ensureCursorIsWithinLine(cursor)
 
 class MoveToLastNonblankCharacterOfLineAndDown extends Motion
   operatesInclusively: true

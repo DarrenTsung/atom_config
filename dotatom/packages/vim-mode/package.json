@@ -1,13 +1,13 @@
 {
   "name": "vim-mode",
   "main": "./lib/vim-mode",
-  "version": "0.57.0",
+  "version": "0.59.0",
   "description": "Add vim modal control",
   "license": "MIT",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/atom/vim-mode"
+    "url": "git+https://github.com/atom/vim-mode.git"
   },
   "engines": {
     "atom": ">0.151.0"
@@ -35,16 +35,16 @@
   "devDependencies": {
     "coffeelint": "^1.10.1"
   },
-  "readme": "## Vim Mode package [![Build Status](https://travis-ci.org/atom/vim-mode.svg?branch=master)](https://travis-ci.org/atom/vim-mode)\n\nProvides vim modal control for Atom, ideally blending the best of vim\nand Atom.\n\n### Installing\n\nUse the Atom package manager, which can be found in the Settings view or\nrun `apm install vim-mode` from the command line.\n\n### Current Status\n\nSizable portions of Vim's normal mode work as you'd expect, including\nmany complex combinations. Even so, this package is far from finished (Vim\nwasn't built in a day).\n\nIf you want the vim ex line (for `:w`, `:s`, etc.), you can try [ex-mode](https://atom.io/packages/ex-mode)\nwhich works in conjuction with this plugin.\n\nCurrently, vim-mode requires soft line wraps to be disabled, and has some issues\nwith international keyboard layouts.\n\nIf there's a feature of Vim you're missing, it might just be that you use it\nmore often than other developers. Adding a feature can be quick and easy. Check\nout the [closed pull requests](https://github.com/atom/vim-mode/pulls?direction=desc&page=1&sort=created&state=closed)\nto see examples of community contributions. We're looking forward to yours, too.\n\n### Documentation\n\n* [Overview](https://github.com/atom/vim-mode/blob/master/docs/overview.md)\n* [Motions and Text Objects](https://github.com/atom/vim-mode/blob/master/docs/motions.md)\n* [Operators](https://github.com/atom/vim-mode/blob/master/docs/operators.md)\n* [Windows](https://github.com/atom/vim-mode/blob/master/docs/windows.md)\n* [Scrolling](https://github.com/atom/vim-mode/blob/master/docs/scrolling.md)\n\n### Development\n\n* Create a branch with your feature/fix.\n* Add a spec (take inspiration from the ones that are already there).\n* If you're adding a command be sure to update the appropriate file in\n  `docs/`\n* Create a PR.\n\nWhen in doubt, open a PR earlier rather than later so that you can receive\nfeedback from the community. We want to get your fix or feature included as much\nas you do.\n\nSee [the contribution guide](https://github.com/atom/vim-mode/blob/master/CONTRIBUTING.md).\n",
+  "readme": "## Vim Mode package [![Build Status](https://travis-ci.org/atom/vim-mode.svg?branch=master)](https://travis-ci.org/atom/vim-mode)\n\nProvides vim modal control for Atom, ideally blending the best of vim\nand Atom.\n\n### Installing\n\nUse the Atom package manager, which can be found in the Settings view or\nrun `apm install vim-mode` from the command line.\n\n### Current Status\n\nSizable portions of Vim's normal mode work as you'd expect, including\nmany complex combinations. Even so, this package is far from finished (Vim\nwasn't built in a day).\n\nIf you want the vim ex line (for `:w`, `:s`, etc.), you can try [ex-mode](https://atom.io/packages/ex-mode)\nwhich works in conjuction with this plugin.\n\nCurrently, vim-mode has some issues with international keyboard layouts.\n\nIf there's a feature of Vim you're missing, it might just be that you use it\nmore often than other developers. Adding a feature can be quick and easy. Check\nout the [closed pull requests](https://github.com/atom/vim-mode/pulls?direction=desc&page=1&sort=created&state=closed)\nto see examples of community contributions. We're looking forward to yours, too.\n\n### Documentation\n\n* [Overview](https://github.com/atom/vim-mode/blob/master/docs/overview.md)\n* [Motions and Text Objects](https://github.com/atom/vim-mode/blob/master/docs/motions.md)\n* [Operators](https://github.com/atom/vim-mode/blob/master/docs/operators.md)\n* [Windows](https://github.com/atom/vim-mode/blob/master/docs/windows.md)\n* [Scrolling](https://github.com/atom/vim-mode/blob/master/docs/scrolling.md)\n\n### Development\n\n* Create a branch with your feature/fix.\n* Add a spec (take inspiration from the ones that are already there).\n* If you're adding a command be sure to update the appropriate file in\n  `docs/`\n* Create a PR.\n\nWhen in doubt, open a PR earlier rather than later so that you can receive\nfeedback from the community. We want to get your fix or feature included as much\nas you do.\n\nSee [the contribution guide](https://github.com/atom/vim-mode/blob/master/CONTRIBUTING.md).\n",
   "readmeFilename": "README.md",
   "bugs": {
     "url": "https://github.com/atom/vim-mode/issues"
   },
-  "homepage": "https://github.com/atom/vim-mode",
-  "_id": "vim-mode@0.57.0",
-  "_shasum": "33df913c480e0f99f7a9d54be3091662976d3a0d",
-  "_resolved": "file:../d-115629-32951-1aioso9/package.tgz",
-  "_from": "../d-115629-32951-1aioso9/package.tgz",
+  "homepage": "https://github.com/atom/vim-mode#readme",
+  "_id": "vim-mode@0.59.0",
+  "_shasum": "ef0238060377289fd057f47607c03c12615d915f",
+  "_resolved": "file:../d-11583-91602-cbzuwh/package.tgz",
+  "_from": "../d-11583-91602-cbzuwh/package.tgz",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [
@@ -100,53 +100,8 @@
       },
       {
         "name": "grim",
-        "version": "1.4.1",
+        "version": "1.4.2",
         "path": "node_modules/grim/lib/grim.js"
-      },
-      {
-        "name": "coffeestack",
-        "version": "1.1.2",
-        "path": "node_modules/grim/node_modules/coffeestack/index.js"
-      },
-      {
-        "name": "coffee-script",
-        "version": "1.8.0",
-        "path": "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/coffee-script.js"
-      },
-      {
-        "name": "mkdirp",
-        "version": "0.3.5",
-        "path": "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/node_modules/mkdirp/index.js"
-      },
-      {
-        "name": "fs-plus",
-        "version": "2.8.1",
-        "path": "node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/lib/fs-plus.js"
-      },
-      {
-        "name": "async",
-        "version": "0.2.10",
-        "path": "node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/async/lib/async.js"
-      },
-      {
-        "name": "mkdirp",
-        "version": "0.3.5",
-        "path": "node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/mkdirp/index.js"
-      },
-      {
-        "name": "rimraf",
-        "version": "2.2.8",
-        "path": "node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/rimraf/rimraf.js"
-      },
-      {
-        "name": "source-map",
-        "version": "0.1.43",
-        "path": "node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map.js"
-      },
-      {
-        "name": "amdefine",
-        "version": "1.0.0",
-        "path": "node_modules/grim/node_modules/coffeestack/node_modules/source-map/node_modules/amdefine/amdefine.js"
       },
       {
         "name": "emissary",
@@ -213,16 +168,6 @@
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/package.json",
         "node_modules/event-kit/node_modules/grim/package.json",
         "node_modules/event-kit/package.json",
-        "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/node_modules/mkdirp/package.json",
-        "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/package.json",
-        "node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/async/component.json",
-        "node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/async/package.json",
-        "node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/mkdirp/package.json",
-        "node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/rimraf/package.json",
-        "node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/package.json",
-        "node_modules/grim/node_modules/coffeestack/node_modules/source-map/node_modules/amdefine/package.json",
-        "node_modules/grim/node_modules/coffeestack/node_modules/source-map/package.json",
-        "node_modules/grim/node_modules/coffeestack/package.json",
         "node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/d/package.json",
         "node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/package.json",
         "node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es6-iterator/package.json",
@@ -238,6 +183,7 @@
       ],
       ".coffee": [
         "lib/global-vim-state.coffee",
+        "lib/insert-mode.coffee",
         "lib/motions/find-motion.coffee",
         "lib/motions/general-motions.coffee",
         "lib/motions/index.coffee",
@@ -679,51 +625,6 @@
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/property-accessors/lib/property-accessors.js",
         "node_modules/grim/lib/deprecation.js",
         "node_modules/grim/lib/grim.js",
-        "node_modules/grim/node_modules/coffeestack/index.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/browser.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/cake.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/coffee-script.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/command.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/grammar.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/helpers.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/index.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/lexer.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/nodes.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/optparse.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/parser.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/register.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/repl.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/rewriter.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/scope.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script/sourcemap.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/node_modules/mkdirp/examples/pow.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/node_modules/mkdirp/index.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/register.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/repl.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/lib/fs-plus.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/async/lib/async.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/mkdirp/examples/pow.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/mkdirp/index.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/rimraf/bin.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/node_modules/rimraf/rimraf.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/source-map/Makefile.dryice.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/source-map/build/assert-shim.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/source-map/build/mini-require.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/source-map/build/suffix-browser.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/source-map/build/test-prefix.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/source-map/build/test-suffix.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/array-set.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/base64-vlq.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/base64.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/binary-search.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/mapping-list.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/source-map-consumer.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/source-map-generator.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/source-node.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map/util.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/source-map/node_modules/amdefine/amdefine.js",
-        "node_modules/grim/node_modules/coffeestack/node_modules/source-map/node_modules/amdefine/intercept.js",
         "node_modules/grim/node_modules/emissary/lib/behavior.js",
         "node_modules/grim/node_modules/emissary/lib/emissary.js",
         "node_modules/grim/node_modules/emissary/lib/emitter.js",
@@ -1404,52 +1305,7 @@
           "node_modules/grim"
         ],
         "dependencies": {
-          "coffeestack": "^1",
           "emissary": "^1.2.0"
-        }
-      },
-      {
-        "paths": [
-          "node_modules/grim/node_modules/coffeestack"
-        ],
-        "dependencies": {
-          "coffee-script": "~1.8.0",
-          "fs-plus": "^2.5.0",
-          "source-map": "~0.1.43"
-        }
-      },
-      {
-        "paths": [
-          "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script/lib/coffee-script",
-          "node_modules/grim/node_modules/coffeestack/node_modules/coffee-script"
-        ],
-        "dependencies": {
-          "mkdirp": "~0.3.5"
-        }
-      },
-      {
-        "paths": [
-          "node_modules/grim/node_modules/coffeestack/node_modules/fs-plus/lib",
-          "node_modules/grim/node_modules/coffeestack/node_modules/fs-plus"
-        ],
-        "dependencies": {
-          "underscore-plus": "1.x",
-          "mkdirp": "~0.3.5",
-          "rimraf": "~2.2.2",
-          "async": "~0.2.9"
-        }
-      },
-      {
-        "paths": [
-          "node_modules/grim/node_modules/coffeestack/node_modules/source-map",
-          "node_modules/grim/node_modules/coffeestack/node_modules/source-map/build",
-          "node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib/source-map",
-          "node_modules/grim/node_modules/coffeestack/node_modules/source-map/lib",
-          "node_modules/grim/node_modules/coffeestack/node_modules/source-map/test",
-          "node_modules/grim/node_modules/coffeestack/node_modules/source-map/test/source-map"
-        ],
-        "dependencies": {
-          "amdefine": ">=0.0.4"
         }
       },
       {

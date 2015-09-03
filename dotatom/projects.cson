@@ -1,0 +1,12 @@
+g2_dev:
+  title: "Dolphin"
+  paths: [
+    "/Users/darren/Projects/storm8/g2_dev"
+    "/Users/darren/Projects/storm8/phpdev"
+  ]
+casual:
+  title: "Casual"
+  paths: [
+    "/Users/darren/Projects/storm8/casualdev"
+    "/Users/darren/Projects/storm8/phpdev"
+  ]

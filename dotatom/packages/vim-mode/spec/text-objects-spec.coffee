@@ -18,8 +18,16 @@ describe "TextObjects", ->
     options.element ?= editorElement
     helpers.keydown(key, options)
 
-  normalModeInputKeydown = (key, opts = {}) ->
-    editor.normalModeInputView.editorElement.getModel().setText(key)
+  describe "Text Object commands in normal mode not preceded by an operator", ->
+    beforeEach ->
+      vimState.activateNormalMode()
+
+    it "selects the appropriate text", ->
+      editor.setText("<html> text </html>")
+      editor.setCursorScreenPosition([0, 7])
+      # Users could dispatch it via the command palette
+      atom.commands.dispatch(editorElement, "vim-mode:select-inside-tags")
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 6], [0, 12]]
 
   describe "the 'iw' text object", ->
     beforeEach ->
@@ -43,6 +51,16 @@ describe "TextObjects", ->
       keydown('w')
 
       expect(editor.getSelectedScreenRange()).toEqual [[0, 6], [0, 11]]
+
+    it "expands an existing selection in visual mode", ->
+      keydown('v')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('i')
+      keydown('w')
+
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 9], [0, 17]]
 
     it "works with multiple cursors", ->
       editor.addCursorAtBufferPosition([0, 1])
@@ -76,6 +94,16 @@ describe "TextObjects", ->
       keydown('W', shift: true)
 
       expect(editor.getSelectedScreenRange()).toEqual [[0, 6], [0, 11]]
+
+    it "expands an existing selection in visual mode", ->
+      keydown('v')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('i')
+      keydown('W', shift: true)
+
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 9], [0, 17]]
 
   describe "the 'i(' text object", ->
     beforeEach ->
@@ -115,6 +143,18 @@ describe "TextObjects", ->
         [[0, 13], [0, 20]]
       ]
 
+    it "expands an existing selection in visual mode", ->
+      editor.setCursorScreenPosition([0, 25])
+      keydown('v')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('i')
+      keydown('(')
+
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 25], [0, 32]]
+
   describe "the 'i{' text object", ->
     beforeEach ->
       editor.setText("{ something in here and in {here} }")
@@ -138,6 +178,18 @@ describe "TextObjects", ->
       expect(editor.getCursorScreenPosition()).toEqual [0, 28]
       expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
       expect(editorElement.classList.contains('normal-mode')).toBe(true)
+
+    it "expands an existing selection in visual mode", ->
+      editor.setCursorScreenPosition([0, 25])
+      keydown('v')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('i')
+      keydown('{')
+
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 25], [0, 32]]
 
   describe "the 'i<' text object", ->
     beforeEach ->
@@ -163,6 +215,18 @@ describe "TextObjects", ->
       expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
       expect(editorElement.classList.contains('normal-mode')).toBe(true)
 
+    it "expands an existing selection in visual mode", ->
+      editor.setCursorScreenPosition([0, 25])
+      keydown('v')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('i')
+      keydown('<')
+
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 25], [0, 32]]
+
   describe "the 'it' text object", ->
     beforeEach ->
       editor.setText("<something>here</something><again>")
@@ -187,13 +251,22 @@ describe "TextObjects", ->
       expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
       expect(editorElement.classList.contains('normal-mode')).toBe(true)
 
+    it "expands an existing selection in visual mode", ->
+      editor.setCursorScreenPosition([0, 7])
+      keydown('v')
+      keydown('6')
+      keydown('l')
+      keydown('i')
+      keydown('t')
+
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 7], [0, 15]]
+
   describe "the 'ip' text object", ->
     beforeEach ->
       editor.setText("\nParagraph-1\nParagraph-1\nParagraph-1\n\n")
-      editor.setCursorScreenPosition([2, 2])
+      editor.setCursorBufferPosition([2, 2])
 
     it "applies operators inside the current paragraph in operator-pending mode", ->
-
       keydown('y')
       keydown('i')
       keydown('p')
@@ -211,20 +284,55 @@ describe "TextObjects", ->
 
       expect(editor.getSelectedScreenRange()).toEqual [[1, 0], [4, 0]]
 
+    it "selects between paragraphs in visual mode if invoked on a empty line", ->
+      editor.setText("text\n\n\n\ntext\n")
+      editor.setCursorBufferPosition([1, 0])
+
+      keydown('v')
+      keydown('i')
+      keydown('p')
+
+      expect(editor.getSelectedScreenRange()).toEqual [[1, 0], [4, 0]]
+
+    it "selects all the lines", ->
+      editor.setText("text\ntext\ntext\n")
+      editor.setCursorBufferPosition([0, 0])
+
+      keydown('v')
+      keydown('i')
+      keydown('p')
+
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 0], [3, 0]]
+
+    it "expands an existing selection in visual mode", ->
+      editor.setText("\nParagraph-1\nParagraph-1\nParagraph-1\n\n\nParagraph-2\nParagraph-2\nParagraph-2\n")
+      editor.setCursorBufferPosition([2, 2])
+
+      keydown('v')
+      keydown('i')
+      keydown('p')
+
+      keydown('j')
+      keydown('j')
+      keydown('j')
+      keydown('i')
+      keydown('p')
+
+      expect(editor.getSelectedScreenRange()).toEqual [[1, 0], [9, 0]]
+
   describe "the 'ap' text object", ->
     beforeEach ->
-      editor.setText("text\n\nParagraph-1\nParagraph-1\nParagraph-1\n\nmoretext")
+      editor.setText("text\n\nParagraph-1\nParagraph-1\nParagraph-1\n\n\nmoretext")
       editor.setCursorScreenPosition([3, 2])
 
     it "applies operators around the current paragraph in operator-pending mode", ->
-
       keydown('y')
       keydown('a')
       keydown('p')
 
-      expect(editor.getText()).toBe "text\n\nParagraph-1\nParagraph-1\nParagraph-1\n\nmoretext"
+      expect(editor.getText()).toBe "text\n\nParagraph-1\nParagraph-1\nParagraph-1\n\n\nmoretext"
       expect(editor.getCursorScreenPosition()).toEqual [2, 0]
-      expect(vimState.getRegister('"').text).toBe "Paragraph-1\nParagraph-1\nParagraph-1\n\n"
+      expect(vimState.getRegister('"').text).toBe "Paragraph-1\nParagraph-1\nParagraph-1\n\n\n"
       expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
       expect(editorElement.classList.contains('normal-mode')).toBe(true)
 
@@ -233,7 +341,47 @@ describe "TextObjects", ->
       keydown('a')
       keydown('p')
 
-      expect(editor.getSelectedScreenRange()).toEqual [[2, 0], [6, 0]]
+      expect(editor.getSelectedScreenRange()).toEqual [[2, 0], [7, 0]]
+
+    it "applies operators around the next paragraph in operator-pending mode when started from a blank/only-whitespace line", ->
+      editor.setText("text\n\n\n\nParagraph-1\nParagraph-1\nParagraph-1\n\n\nmoretext")
+      editor.setCursorBufferPosition([1, 0])
+
+      keydown('y')
+      keydown('a')
+      keydown('p')
+
+      expect(editor.getText()).toBe "text\n\n\n\nParagraph-1\nParagraph-1\nParagraph-1\n\n\nmoretext"
+      expect(editor.getCursorScreenPosition()).toEqual [1, 0]
+      expect(vimState.getRegister('"').text).toBe "\n\n\nParagraph-1\nParagraph-1\nParagraph-1\n"
+      expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
+      expect(editorElement.classList.contains('normal-mode')).toBe(true)
+
+    it "selects around the next paragraph in visual mode when started from a blank/only-whitespace line", ->
+      editor.setText("text\n\n\n\nparagraph-1\nparagraph-1\nparagraph-1\n\n\nmoretext")
+      editor.setCursorBufferPosition([1, 0])
+
+      keydown('v')
+      keydown('a')
+      keydown('p')
+
+      expect(editor.getSelectedScreenRange()).toEqual [[1, 0], [7, 0]]
+
+    it "expands an existing selection in visual mode", ->
+      editor.setText("text\n\n\n\nparagraph-1\nparagraph-1\nparagraph-1\n\n\n\nparagraph-2\nparagraph-2\nparagraph-2\n\n\nmoretext")
+      editor.setCursorBufferPosition([5, 0])
+
+      keydown('v')
+      keydown('a')
+      keydown('p')
+
+      keydown('j')
+      keydown('j')
+      keydown('j')
+      keydown('i')
+      keydown('p')
+
+      expect(editor.getSelectedScreenRange()).toEqual [[4, 0], [13, 0]]
 
   describe "the 'i[' text object", ->
     beforeEach ->
@@ -258,6 +406,18 @@ describe "TextObjects", ->
       expect(editor.getCursorScreenPosition()).toEqual [0, 28]
       expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
       expect(editorElement.classList.contains('normal-mode')).toBe(true)
+
+    it "expands an existing selection in visual mode", ->
+      editor.setCursorScreenPosition([0, 25])
+      keydown('v')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('i')
+      keydown('[')
+
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 25], [0, 32]]
 
   describe "the 'i\'' text object", ->
     beforeEach ->
@@ -293,6 +453,18 @@ describe "TextObjects", ->
       expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
       expect(editorElement.classList.contains('normal-mode')).toBe(true)
 
+    it "expands an existing selection in visual mode", ->
+      editor.setCursorScreenPosition([0, 25])
+      keydown('v')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('i')
+      keydown('\'')
+
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 25], [0, 34]]
+
   describe "the 'i\"' text object", ->
     beforeEach ->
       editor.setText("\" something in here and in \"here\" \" and over here")
@@ -326,6 +498,18 @@ describe "TextObjects", ->
       expect(editor.getCursorScreenPosition()).toEqual [0, 39]
       expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
 
+    it "expands an existing selection in visual mode", ->
+      editor.setCursorScreenPosition([0, 25])
+      keydown('v')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('i')
+      keydown('"')
+
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 25], [0, 34]]
+
   describe "the 'aw' text object", ->
     beforeEach ->
       editor.setText("12345 abcde ABCDE")
@@ -348,6 +532,17 @@ describe "TextObjects", ->
       keydown('w')
 
       expect(editor.getSelectedScreenRange()).toEqual [[0, 6], [0, 12]]
+
+    it "expands an existing selection in visual mode", ->
+      editor.setCursorScreenPosition([0, 2])
+      keydown('v')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('a')
+      keydown('w')
+
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 2], [0, 12]]
 
     it "doesn't span newlines", ->
       editor.setText("12345\nabcde ABCDE")
@@ -392,6 +587,17 @@ describe "TextObjects", ->
 
       expect(editor.getSelectedScreenRange()).toEqual [[0, 6], [0, 12]]
 
+    it "expands an existing selection in visual mode", ->
+      editor.setCursorScreenPosition([0, 2])
+      keydown('v')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('a')
+      keydown('W', shift: true)
+
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 2], [0, 12]]
+
     it "doesn't span newlines", ->
       editor.setText("12(45\nab'de ABCDE")
       editor.setCursorBufferPosition([0, 4])
@@ -426,6 +632,18 @@ describe "TextObjects", ->
       expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
       expect(editorElement.classList.contains('normal-mode')).toBe(true)
 
+    it "expands an existing selection in visual mode", ->
+      editor.setCursorScreenPosition([0, 25])
+      keydown('v')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('a')
+      keydown('(')
+
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 25], [0, 33]]
+
   describe "the 'a{' text object", ->
     beforeEach ->
       editor.setText("{ something in here and in {here} }")
@@ -449,6 +667,18 @@ describe "TextObjects", ->
       expect(editor.getCursorScreenPosition()).toEqual [0, 27]
       expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
       expect(editorElement.classList.contains('normal-mode')).toBe(true)
+
+    it "expands an existing selection in visual mode", ->
+      editor.setCursorScreenPosition([0, 25])
+      keydown('v')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('a')
+      keydown('{')
+
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 25], [0, 33]]
 
   describe "the 'a<' text object", ->
     beforeEach ->
@@ -474,6 +704,18 @@ describe "TextObjects", ->
       expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
       expect(editorElement.classList.contains('normal-mode')).toBe(true)
 
+    it "expands an existing selection in visual mode", ->
+      editor.setCursorScreenPosition([0, 25])
+      keydown('v')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('a')
+      keydown('<')
+
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 25], [0, 33]]
+
   describe "the 'a[' text object", ->
     beforeEach ->
       editor.setText("[ something in here and in [here] ]")
@@ -497,6 +739,18 @@ describe "TextObjects", ->
       expect(editor.getCursorScreenPosition()).toEqual [0, 27]
       expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
       expect(editorElement.classList.contains('normal-mode')).toBe(true)
+
+    it "expands an existing selection in visual mode", ->
+      editor.setCursorScreenPosition([0, 25])
+      keydown('v')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('a')
+      keydown('[')
+
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 25], [0, 33]]
 
   describe "the 'a\'' text object", ->
     beforeEach ->
@@ -522,6 +776,18 @@ describe "TextObjects", ->
       expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
       expect(editorElement.classList.contains('normal-mode')).toBe(true)
 
+    it "expands an existing selection in visual mode", ->
+      editor.setCursorScreenPosition([0, 25])
+      keydown('v')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('a')
+      keydown('\'')
+
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 25], [0, 35]]
+
   describe "the 'a\"' text object", ->
     beforeEach ->
       editor.setText("\" something in here and in \"here\" \"")
@@ -545,3 +811,15 @@ describe "TextObjects", ->
       expect(editor.getCursorScreenPosition()).toEqual [0, 31]
       expect(editorElement.classList.contains('operator-pending-mode')).toBe(false)
       expect(editorElement.classList.contains('normal-mode')).toBe(true)
+
+    it "expands an existing selection in visual mode", ->
+      editor.setCursorScreenPosition([0, 25])
+      keydown('v')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('l')
+      keydown('a')
+      keydown('"')
+
+      expect(editor.getSelectedScreenRange()).toEqual [[0, 25], [0, 35]]

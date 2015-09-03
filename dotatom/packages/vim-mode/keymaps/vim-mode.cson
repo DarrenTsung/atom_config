@@ -13,6 +13,9 @@
 'atom-text-editor.vim-mode.insert-mode':
   'ctrl-w': 'editor:delete-to-beginning-of-word'
   'ctrl-u': 'editor:delete-to-beginning-of-line'
+  'ctrl-y': 'vim-mode:copy-from-line-above'
+  # disabled for compatibility with the common binding for going to the end of the line
+  # 'ctrl-e': 'vim-mode:copy-from-line-below'
 
   'ctrl-r a': 'vim-mode:insert-mode-put'
   'ctrl-r b': 'vim-mode:insert-mode-put'
@@ -71,6 +74,7 @@
   'ctrl-r %': 'vim-mode:insert-mode-put'
   'ctrl-r _': 'vim-mode:insert-mode-put'
   'ctrl-r "': 'vim-mode:insert-mode-put'
+  'ctrl-r escape': 'abort!'
 
 'atom-text-editor.vim-mode.replace-mode':
   'backspace': 'vim-mode:replace-mode-backspace'
@@ -226,7 +230,7 @@
   '.': 'vim-mode:repeat'
 
   'ctrl-]': 'symbols-view:go-to-declaration'
-  'ctrl-T': 'symbols-view:return-from-declaration'
+  'ctrl-t': 'symbols-view:return-from-declaration'
 
   'ctrl-a': 'vim-mode:increase'
   'ctrl-x': 'vim-mode:decrease'
