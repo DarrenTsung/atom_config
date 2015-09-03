@@ -19,6 +19,10 @@
       "*.meta"
       ".svn"
     ]
+    themes: [
+      "nucleus-dark-ui"
+      "one-dark-syntax"
+    ]
   editor:
     invisibles: {}
     fontSize: 12

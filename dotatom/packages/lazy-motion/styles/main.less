@@ -1,0 +1,58 @@
+@import "ui-variables";
+@import "syntax-variables";
+.lazy-motion {
+  &.round-box {
+    box-sizing: border-box;
+    border-radius: @component-border-radius;
+  }
+}
+atom-text-editor::shadow {
+  .lazy-motion-unmatch .region {
+    .lazy-motion.round-box;
+  }
+  .lazy-motion-match .region {
+    .lazy-motion.round-box;
+    background-color: transparent;
+    border: 2px solid @syntax-result-marker-color;
+  }
+  .lazy-motion-match.top .region {
+    border: 2px solid @syntax-color-renamed;
+  }
+  .lazy-motion-match.bottom .region {
+    border: 2px solid @syntax-color-removed;
+  }
+  .lazy-motion-match.current .region {
+    background-color: @syntax-selection-color;
+  }
+  .lazy-motion-flash .region {
+    .lazy-motion.round-box;
+    background-color: @syntax-selection-flash-color;
+  }
+  .lazy-motion-cursor .region {
+    background-color: @syntax-cursor-color;
+  }
+  .lazy-motion-hover {
+    z-index: 2147483647;
+    position: absolute;
+    color: @text-color-highlight;
+    background-color: @base-background-color;
+    border-radius: @component-border-radius;
+    box-shadow: 0 0 10px @syntax-text-color;
+    &.top {
+      background-color: @background-color-info;
+    }
+    &.bottom {
+      background-color: @background-color-error;
+    }
+  }
+}
+.lazy-motion-ui {
+  .editor-container {
+    padding: @component-padding/4 @component-padding;
+  }
+  .counter {
+    padding: @component-padding/2 @component-padding;
+    font-size: 1.3em;
+    color: @text-color;
+  }
+}

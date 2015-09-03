@@ -10,16 +10,16 @@
 
 'atom-text-editor.vim-mode:not(.insert-mode)':
   # remap panes to use space shift-hjkl
-  'space shift-h': 'pane:split-left'
-  'space shift-j': 'pane:split-down'
-  'space shift-k': 'pane:split-up'
-  'space shift-l': 'pane:split-right'
+  'ctrl-shift-cmd-h': 'pane:split-left'
+  'ctrl-shift-cmd-j': 'pane:split-down'
+  'ctrl-shift-cmd-k': 'pane:split-up'
+  'ctrl-shift-cmd-l': 'pane:split-right'
   
   # navigate panes by using space hjkl
-  'space h': 'window:focus-pane-on-left'
-  'space j': 'window:focus-pane-below'
-  'space k': 'window:focus-pane-above'
-  'space l': 'window:focus-pane-on-right'
+  'ctrl-cmd-h': 'window:focus-pane-on-left'
+  'ctrl-cmd-j': 'window:focus-pane-below'
+  'ctrl-cmd-k': 'window:focus-pane-above'
+  'ctrl-cmd-l': 'window:focus-pane-on-right'
   
   # I use cmd-(1-9) to switch between commonly used applications so remap folding to space N
   'space 0': 'editor:unfold-all'
@@ -31,6 +31,10 @@
   
   'space f': 'editor:toggle-current-row-folding'
   
+  # Move panes
+  'space l': 'pane:show-next-item'
+  'space h': 'pane:show-previous-item'
+  
   # Bookmarks
   'space m': 'bookmarks:view-all'
   'm': 'bookmarks:toggle-bookmark'
@@ -40,7 +44,7 @@
   'cmd-j': 'symbols-view:go-to-declaration'
   
   # Lazy-motion
-  's': 'lazy-motion:search-forward'
+  'space s': 'lazy-motion:forward'
   
   'shift-tab': 'snippets:next-tab-stop'
  

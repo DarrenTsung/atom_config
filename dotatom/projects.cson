@@ -10,3 +10,15 @@ casual:
     "/Users/darren/Projects/storm8/casualdev"
     "/Users/darren/Projects/storm8/phpdev"
   ]
+"iphonedev-dragon2":
+  title: "iphonedev-dragon2"
+  paths: [
+    "/Users/darren/Projects/storm8/iphonedev/dolphin/dragon2"
+    "/Users/darren/Projects/storm8/iphonedev/dolphin/base"
+    "/Users/darren/Projects/storm8/iphonedev/base"
+  ]
+"iphonedev-dragon2-1.0":
+  title: "iphonedev-dragon2-1.0"
+  paths: [
+    "/Users/darren/Projects/storm8/iphonedev-Dragon2-1.0"
+  ]

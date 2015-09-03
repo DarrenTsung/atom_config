@@ -1,0 +1,192 @@
+// linter ----------------------------------------------------------------------
+.linter-tab {
+  background: transparent;
+  transition: color @transition-time ease, background @transition-time ease;
+
+  &:hover,
+  &.active {
+    color: @text-color-selected;
+    background: @button-background-color-selected;
+  }
+
+  &:first-child {
+    border-top-left-radius: @component-border-radius;
+    border-bottom-left-radius: @component-border-radius;
+  }
+
+  &:last-of-type {
+    border-top-right-radius: @component-border-radius;
+    border-bottom-right-radius: @component-border-radius;
+    margin-right: @component-padding;
+  }
+}
+
+.linter-list {
+  padding-left: @component-padding;
+  padding-right: @component-padding;
+}
+
+linter-panel:empty {
+  display: none;
+}
+
+// deprecation-cop -------------------------------------------------------------
+.deprecation-cop .deprecation-info:hover {
+  background: transparent !important;
+}
+
+// timecop ---------------------------------------------------------------------
+.timecop .timecop-panel .tool-panel {
+  background: @app-background-color;
+}
+
+// tool-panel-background-color -------------------------------------------------
+.tool-bar {
+  border: 0;
+  background: @tool-panel-background-color;
+
+  button {
+    font-weight: 100;
+  }
+  button:before {
+    font-weight: 100;
+  }
+}
+
+.tool-bar button.tool-bar-btn {
+  border-color: transparent !important;
+  background: transparent;
+}
+
+.tool-bar-spacer {
+  border-left-color: transparent !important;
+  border-top-color: transparent !important;
+}
+
+
+// markdown-preview ------------------------------------------------------------
+.markdown-preview {
+  color: @markdown-preview-color;
+  background-color: @markdown-preview-background-color;
+
+
+  h1, h2 {
+    color: inherit;
+    border-color: @markdown-preview-border-color;
+  }
+
+  a {
+    color: @text-color-info;
+  }
+
+  hr {
+    background-color: @markdown-preview-background-color;
+    border-color: @markdown-preview-border-color;
+  }
+
+  blockquote {
+    color: @text-color;
+    border-left-color: @text-color-subtle;
+  }
+
+  table {
+    th,
+    td {
+      border-color: @markdown-preview-border-color;
+    }
+    th {
+      background-color: lighten(@markdown-preview-background-color, 3%);
+    }
+    tr {
+      background-color: @markdown-preview-background-color;
+      &:nth-child(2n) {
+        background-color: darken(@markdown-preview-background-color, 3%);
+      }
+    }
+  }
+
+  code {
+    color: @markdown-preview-color; //@markdown-preview-code-color;
+    border-color: @markdown-preview-border-color;
+    background-color: @markdown-preview-background-color; //@markdown-preview-code-background-color;
+    background-clip: padding-box;
+  }
+
+  atom-text-editor::shadow {
+    .line.cursor-line {
+      background-color: transparent;
+    }
+  }
+}
+
+// Expose ----------------------------------------------------------------------
+atom-panel.modal.overlay.from-top.expose-panel {
+  top: 0 !important;
+  border: 0 !important;
+}
+
+.expose-top {
+  height: 32px;
+
+  a {
+    display: none;
+  }
+}
+
+.expose-view .tab-list  .tab {
+  border-radius: @component-border-radius !important;
+  border: 1px solid @base-border-color !important;
+  .overlay-shadow();
+
+  &:hover {
+    .tab-header {
+      background: @tab-background-color-hover;
+      .title {
+        color: @text-color-highlight;
+      }
+    }
+    .tab-body {
+      box-shadow: none;
+    }
+  }
+
+  .tab-header {
+      transition: background @transition-time ease;
+
+    .title {
+      transition: color @transition-time ease;
+      margin-top: -4px;
+    }
+
+    .close-icon {
+      float: left;
+      transition-duration: @transition-time;
+      cursor: default;
+      position: relative;
+      left: 4px;
+      right: auto;
+      height: 16px;
+      width: 16px;
+      border-radius: 2px;
+
+      &:hover {
+        background: @tab-background-color;
+      }
+
+      &:before {
+        color: @text-color-highlight;
+        content:'✕';
+        position: absolute;
+        font-size: 12px;
+        width: 13px;
+        height: 12px;
+        top: 2px;
+        left: 2px;
+      }
+    }
+  }
+
+  .tab-body {
+    border-top: 1px solid @base-border-color !important;
+  }
+}
