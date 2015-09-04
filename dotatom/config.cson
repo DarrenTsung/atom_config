@@ -39,6 +39,18 @@
       "*.html"
       "tags"
       ".meta"
+      "*.prefab"
+      "*.asset"
+      "*.unity"
+      "*.controller"
+      "*.anim"
+      "*.psd"
+      "*.pdf"
+      ".DS_Store"
+      "*.rtf"
+      "*.mat"
+      "*.png"
+      "*.git*"
     ]
   tabs: {}
   "one-dark-ui": {}

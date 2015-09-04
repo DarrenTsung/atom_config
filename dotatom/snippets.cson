@@ -76,4 +76,11 @@
         ${5:set {}
       }
       """
-  
+      
+  'Summary':
+    'prefix': 'summary'
+    'body': '/**\n * ${1:summary text}\n *\n */'
+    
+  'ParamComment':
+    'prefix': 'paramComment'
+    'body': '* @param \{${1:paramName}\} - ${2:parameter description}'

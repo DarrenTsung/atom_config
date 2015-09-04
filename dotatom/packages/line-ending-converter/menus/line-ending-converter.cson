@@ -1,0 +1,43 @@
+# See https://atom.io/docs/latest/creating-a-package#menus for more details
+'context-menu':
+  'atom-text-editor': [
+    {
+      'label': 'Convert Line Endings To'
+      'submenu': [
+        {
+          'label': 'Unix Format'
+          'command': 'line-ending-converter:convert-to-unix-format'
+        }
+        {
+          'label': 'Windows Format'
+          'command': 'line-ending-converter:convert-to-windows-format'
+        }
+        {
+          'label': 'Old Mac Format'
+          'command': 'line-ending-converter:convert-to-old-mac-format'
+        }
+      ]
+    }
+  ]
+'menu': [
+  {
+    'label': 'Packages'
+    'submenu': [
+      'label': 'Convert Line Endings To'
+      'submenu': [
+        {
+          'label': 'Unix Format'
+          'command': 'line-ending-converter:convert-to-unix-format'
+        }
+        {
+          'label': 'Windows Format'
+          'command': 'line-ending-converter:convert-to-windows-format'
+        }
+        {
+          'label': 'Old Mac Format'
+          'command': 'line-ending-converter:convert-to-old-mac-format'
+        }
+      ]
+    ]
+  }
+]

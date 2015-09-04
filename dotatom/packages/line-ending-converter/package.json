@@ -1,0 +1,47 @@
+{
+  "name": "line-ending-converter",
+  "main": "./lib/main",
+  "version": "1.2.0",
+  "description": "A very simple package that converts line endings (EOL's) to Windows/Unix/Old Mac format.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/williampuk/line-ending-converter.git"
+  },
+  "license": "MIT",
+  "engines": {
+    "atom": ">=0.174.0 <2.0.0"
+  },
+  "consumedServices": {
+    "status-bar": {
+      "versions": {
+        "^1.0.0": "consumeStatusBar"
+      }
+    }
+  },
+  "readme": "# Line Ending Converter package [![Build Status](https://travis-ci.org/williampuk/line-ending-converter.svg)](https://travis-ci.org/williampuk/line-ending-converter)\n\n### Features\n- Show the line ending (EOL) format of the current file in the status bar (see the note below for details)\n- Convert the line endings to Unix/Windows/Old Mac format.\n\n### How to use\n#### Status View Display:\nIt is enabled by default. You can disable it in the package setting.\n\n**Notes:** The EOL format being shown is the EOL format of the first row of the file. It cannot detect if the file is having inconsistent EOL formats.\n\n#### Perform conversion:\nIn Menu,\n> `Packages` -> `Convert Line Endings To` -> `Unix Format` / `Windows Format` / `Old Mac Format`\n\nOr, in Context Menu (inside an active editor),\n> `Convert Line Endings To` ->\n> `Unix Format` / `Windows Format` / `Old Mac Format`\n\nOr, in Command Palette (`cmd-shift-p` or `ctrl-shift-p`), type\n> `Convert To Unix Format`, or `Convert To Windows Format`, or `Convert to Old Mac Format`\n\n(Note: This will convert the line endings of the text in the active editor.)\n\n**Notes:** The conversion works only when the file has at least one EOL. If the file does not have any EOL's, the conversion would not persist, as the current implementation of Atom uses a default EOL (which appears to be the UNIX format) if there is no EOL found in the file.\n\nYou can try to use the **experimental** feature \"Normalize On Save\" if you really need to have a consistent line ending across all files.\n",
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/williampuk/line-ending-converter/issues"
+  },
+  "homepage": "https://github.com/williampuk/line-ending-converter",
+  "_id": "line-ending-converter@1.2.0",
+  "_shasum": "26a6320c051a7c4e9c9975a57d3ff083295989b0",
+  "_resolved": "file:../d-115627-49988-1km3z5g/package.tgz",
+  "_from": "../d-115627-49988-1km3z5g/package.tgz",
+  "_atomModuleCache": {
+    "version": 1,
+    "dependencies": [],
+    "extensions": {
+      ".json": [
+        "coffeelint.json",
+        "package.json"
+      ],
+      ".coffee": [
+        "lib/line-ending-converter-status-view.coffee",
+        "lib/line-ending-converter.coffee",
+        "lib/main.coffee"
+      ]
+    },
+    "folders": []
+  }
+}
