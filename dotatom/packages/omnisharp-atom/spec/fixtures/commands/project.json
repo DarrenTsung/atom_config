@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0-*",
+  "compilationOptions": {
+    "warningsAsErrors": true
+  },
+  "commands": {
+    "run": "",
+    "web": "Microsoft.AspNet.Hosting--server Microsoft.AspNet.Server.WebListener",
+    "kestrel": "Microsoft.AspNet.Hosting--server Kestrel"
+  },
+  "frameworks": {
+    "dnx451": {}
+  }
+}

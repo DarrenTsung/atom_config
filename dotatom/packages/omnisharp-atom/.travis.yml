@@ -1,0 +1,23 @@
+language: objective-c
+
+notifications:
+  email:
+    on_success: never
+    on_failure: change
+
+before_install:
+  - brew tap aspnet/dnx
+  - brew update
+  - brew install dnvm
+  - source dnvm.sh
+  - dnvm install 1.0.0-beta4
+  - dnvm upgrade
+
+script:
+  - ./build-package.sh
+
+git:
+  depth: 10
+
+env:
+  - APM_TEST_PACKAGES='atom-yeoman linter json-schema advanced-open-file'

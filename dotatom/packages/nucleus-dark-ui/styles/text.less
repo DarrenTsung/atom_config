@@ -1,37 +1,71 @@
 body {
-  font-weight: 300;
+  font-weight: 400;
 }
 
-h1, h2, h3, h4, h5, h6,
-.h1, .h2, .h3, .h4, .h5, .h6 {
-  font-weight: 100;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
+  color: @text-color-highlight;
+  font-weight: 200;
 
   small {
-    font-weight: 100;
+    font-weight: 200;
   }
 }
 
+.text-subtle {
+  .text(subtle);
+}
 
-.text-subtle { .text(subtle); }
-.text-highlight { .text(highlight); }
-.text-selected { .text(selected); }
-.text-info { .text(info); }
-.text-success { .text(success); }
-.text-warning { .text(warning); }
-.text-error { .text(error); }
+.text-highlight {
+  .text(highlight);
+}
+
+.text-selected {
+  .text(selected);
+}
+
+.text-info {
+  .text(info);
+}
+
+.text-success {
+  .text(success);
+}
+
+.text-warning {
+  .text(warning);
+}
+
+.text-error {
+  .text(error);
+}
 
 .highlight {
   .highlight-type(@text-color);
 }
+
 .highlight-info {
   .highlight-type(@text-color-info);
 }
+
 .highlight-success {
   .highlight-type(@text-color-success);
 }
+
 .highlight-warning {
   .highlight-type(@text-color-warning);
 }
+
 .highlight-error {
   .highlight-type(@text-color-error);
 }

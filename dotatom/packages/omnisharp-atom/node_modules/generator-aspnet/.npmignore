@@ -1,0 +1,7 @@
+node_modules
+.DS_Store
+npm-debug.log
+.npmignore
+.tmp
+typings
+**/project.lock.json

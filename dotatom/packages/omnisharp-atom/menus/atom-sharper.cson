@@ -1,0 +1,32 @@
+# See https://atom.io/docs/latest/creating-a-package#menus for more details
+'context-menu':
+  'atom-text-editor': [
+    {
+      label: 'OmniSharp'
+      submenu: [
+        { "label": "Settings", "command": "omnisharp-atom:settings" }
+        { 'label': 'Toggle', 'command': 'omnisharp-atom:toggle' }
+        { 'label': 'Find Usages', 'command': 'omnisharp-atom:find-usages' }
+        { 'label': 'Go to Definition', 'command': 'omnisharp-atom:go-to-definition' }
+        { 'label': 'Go to Implementation', 'command': 'omnisharp-atom:go-to-implementation' }
+        { 'label': 'Rename', 'command': 'omnisharp-atom:rename'}
+        { 'label': 'Code Format', 'command': 'omnisharp-atom:code-format' }
+        { 'label': 'Lookup type', 'command': 'omnisharp-atom:type-lookup' }
+        { "label": "Find Symbols", "command": "omnisharp-atom:find-symbols" }
+      ]
+    }
+  ]
+
+'menu': [
+  {
+    'label': 'Packages'
+    'submenu': [
+      'label': 'OmniSharp'
+      'submenu': [
+        { "label": "Settings", "command": "omnisharp-atom:settings" }
+        { "label": "Toggle", "command": "omnisharp-atom:toggle" }
+        { 'label': 'New Application', 'command': 'omnisharp-atom:new-project' }
+      ]
+    ]
+  }
+]

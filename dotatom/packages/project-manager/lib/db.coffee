@@ -1,6 +1,7 @@
 {Emitter} = require 'atom'
 CSON = require 'season'
 fs = require 'fs'
+path = require 'path'
 _ = require 'underscore-plus'
 
 module.exports =
@@ -87,8 +88,19 @@ class DB
 
   subscribeToProjectsFile: =>
     @fileWatcher.close() if @fileWatcher?
-    @fileWatcher = fs.watch @file(), (event, filename) =>
-      @emitter.emit 'db-updated'
+
+    try
+      @fileWatcher = fs.watch @file(), (event, filename) =>
+        @emitter.emit 'db-updated'
+    catch error
+      watchErrorUrl = 'https://github.com/atom/atom/blob/master/docs/build-instructions/linux.md#typeerror-unable-to-watch-path'
+      atom.notifications?.addError """
+        <b>Project Manager</b><br>
+        Could not watch for changes to `#{path.basename(@file())}`.
+        Make sure you have permissions to `#{@file()}`. On linux there
+        can be problems with watch sizes. See <a href='#{watchErrorUrl}'>
+        this document</a> for more info.""",
+        dismissable: true
 
   updateFile: ->
     fs.exists @file(true), (exists) =>
@@ -119,8 +131,16 @@ class DB
   readFile: (callback) ->
     fs.exists @file(), (exists) =>
       if exists
-        projects = CSON.readFileSync(@file()) || {}
-        callback?(projects)
+        try
+          projects = CSON.readFileSync(@file()) || {}
+          callback?(projects)
+        catch error
+          message = "Failed to load #{path.basename(this.file())}"
+          detail = if error.location?
+            error.stack
+          else
+            error.message
+          @notifyFailure message, detail
       else
         fs.writeFile @file(), '{}', (error) ->
           callback?({})
@@ -128,3 +148,6 @@ class DB
   writeFile: (projects, callback) ->
     CSON.writeFileSync @file(), projects
     callback?()
+
+  notifyFailure: (message, detail) ->
+    atom.notifications.addError(message, {detail, dismissable: true})
