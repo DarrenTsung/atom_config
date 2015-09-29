@@ -44,7 +44,7 @@
   'cmd-j': 'symbols-view:go-to-declaration'
   
   # Lazy-motion
-  'space s': 'lazy-motion:forward'
+  's': 'lazy-motion:forward'
   
   'shift-tab': 'snippets:next-tab-stop'
  
