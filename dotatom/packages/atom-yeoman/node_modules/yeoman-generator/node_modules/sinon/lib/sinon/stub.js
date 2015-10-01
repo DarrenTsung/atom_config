@@ -54,7 +54,6 @@
                     // is not Object.prototype
                     if (
                         propOwner !== Object.prototype &&
-                        prop !== "constructor" &&
                         typeof sinon.getPropertyDescriptor(propOwner, prop).value === "function"
                     ) {
                         stub(object, prop);

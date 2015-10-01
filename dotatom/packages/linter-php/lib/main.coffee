@@ -8,7 +8,6 @@ module.exports =
       default: 'php' # Let OS's $PATH handle the rest
 
   activate: ->
-    require('atom-package-deps').install('linter-php')
     @subscriptions = new CompositeDisposable
     @subscriptions.add atom.config.observe 'linter-php.executablePath',
       (executablePath) =>

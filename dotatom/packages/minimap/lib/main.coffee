@@ -268,7 +268,7 @@ class Main
 
     Minimap ?= require './minimap'
     new Minimap({
-      textEditor: textEditor
+      textEditor: atom.workspace.getActiveTextEditor()
       standAlone: true
     })
 

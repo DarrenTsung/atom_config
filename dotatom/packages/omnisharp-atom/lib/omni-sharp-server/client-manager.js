@@ -298,10 +298,6 @@ var SolutionManager = (function () {
             // Text editor not saved yet?
             return rx_1.Observable.empty();
         }
-        if (editor._metadataEditor) {
-            // client / server doesn't work currently for metadata documents.
-            return rx_1.Observable.empty();
-        }
         var _a = this.getSolutionForUnderlyingPath(location, isCsx), intersect = _a[0], solutionValue = _a[1];
         p = editor.omniProject = intersect;
         editor.__omniClient__ = solutionValue;

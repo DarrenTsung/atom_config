@@ -2,14 +2,11 @@ var _ = require('./lodash');
 var path_1 = require('path');
 var fs = require('fs');
 var loophole = require("loophole");
-function allowUnsafe(fn) {
-    return loophole.allowUnsafeEval(function () { return loophole.allowUnsafeNewFunction(function () { return fn(); }); });
-}
 // Loophole the loophole...
 loophole.Function.prototype = Function.prototype;
 var Environment = (function () {
     var referencingPackages;
-    allowUnsafe(function () {
+    loophole.allowUnsafeNewFunction(function () {
         var template = require('lodash/string/template');
         var path = require('path');
         referencingPackages = _(atom.packages.getLoadedPackages())
@@ -50,7 +47,7 @@ var Environment = (function () {
         });
     });
     var res;
-    allowUnsafe(function () {
+    loophole.allowUnsafeNewFunction(function () {
         res = require('yeoman-environment');
         require('yeoman-generator');
     });
@@ -84,7 +81,7 @@ var Environment = (function () {
                 options.cwd = this.cwd;
             }
         }
-        allowUnsafe(function () { return result = defaultCreate.apply(_this, args); });
+        loophole.allowUnsafeNewFunction(function () { return result = defaultCreate.apply(_this, args); });
         return result;
     };
     function getAllConsumingPackages() {
@@ -222,7 +219,7 @@ var Generator = (function () {
         }
         return this.listGenerators(path).then(function (generators) {
             return new Promise(function (resolve) {
-                allowUnsafe(function () {
+                loophole.allowUnsafeNewFunction(function () {
                     process.chdir(path);
                     try {
                         _this.runGenerator(generator, path, resolve);
@@ -249,7 +246,7 @@ var Generator = (function () {
     };
     Generator.prototype.runGenerator = function (args, path, resolve) {
         var _this = this;
-        allowUnsafe(function () {
+        loophole.allowUnsafeNewFunction(function () {
             var genny = _this.env.run(args, { cwd: path }, function () {
                 _this.adapter.messages.cwd = process.cwd();
                 process.chdir(_this.startPath);

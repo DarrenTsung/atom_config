@@ -1,7 +1,3 @@
-@import "ui-variables.less";
-@import "ui-mixins.less";
-@import "octicon-mixins";
-
 .settings-view {
   .breadcrumb {
     .text(light);
@@ -9,11 +5,6 @@
 
   .alert {
     border: 0;
-  }
-
-  .alert-info {
-    color: @text-color-info;
-    background: mix(@text-color-info, @base-background-color, 32%);
   }
 
   .text(normal);
@@ -87,8 +78,7 @@
     background: transparent;
   }
 
-  .package-container .row:not(:first-child),
-  .package-container > .package-card:not(:first-child) {
+  .package-container .row:not(:first-child) {
     border-top: 1px solid @indent-guide-color;
   }
 
@@ -112,10 +102,6 @@
 
   .package-readme {
     font-size: 1em;
-
-    h1, h2, h3, h4 {
-      .text(heading);
-    }
   }
 
   button.uninstall-button.is-uninstalling {

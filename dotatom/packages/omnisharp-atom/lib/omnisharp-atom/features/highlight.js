@@ -213,11 +213,7 @@ function Grammar(editor, base) {
         value: responses
     });
     var disposable = editor.getBuffer().preemptDidChange(function (e) {
-        var oldRange = e.oldRange, newRange = e.newRange, start = oldRange.start.row, delta = newRange.end.row - oldRange.end.row;
-        start = start - 5;
-        if (start < 0)
-            start = 0;
-        var end = editor.buffer.getLineCount() - 1;
+        var oldRange = e.oldRange, newRange = e.newRange, start = oldRange.start.row, end = oldRange.end.row, delta = newRange.end.row - oldRange.end.row;
         var lines = lodash_1.range(start, end + 1);
         if (!responses.keys().next().done) {
             (_a = _this.linesToFetch).push.apply(_a, lines);
@@ -385,21 +381,6 @@ Grammar.prototype.getCsTokensForLine = function (highlights, line, row, ruleStac
                     forwardtrackIndex = i - 1;
                     break;
                 }
-                // Handles case where there is a closing tag
-                // but no opening tag here.
-                if (tags[i] % 2 === 0) {
-                    var openFound = false;
-                    for (var h = i; h >= 0; h--) {
-                        if (tags[h] === tags[i] + 1) {
-                            openFound = true;
-                            break;
-                        }
-                    }
-                    if (!openFound) {
-                        forwardtrackIndex = i - 1;
-                        break;
-                    }
-                }
             }
             if (i === tags.length) {
                 forwardtrackIndex = tags.length - 1;
@@ -435,59 +416,16 @@ var getIdForScope = (function () {
     return method;
 })();
 /// NOTE: best way I have found for these is to just look at theme "less" files
-// Alternatively just inspect the token for a .cs file
+// Alternatively just inspect the token for a .js file
 function getAtomStyleForToken(tags, token, index, indexEnd, str) {
     var previousScopes = [];
     for (var i = index - 1; i >= 0; i--) {
         if (tags[i] > 0)
             break;
+        //if (tags[i] % 2 === -1)
         previousScopes.push(tags[i]);
     }
-    var replacements = [];
-    var opens = [];
-    var closes = [];
-    // Scan for any unclosed or unopened tags
-    for (var i = index; i < indexEnd; i++) {
-        if (tags[i] > 0)
-            continue;
-        if (tags[i] % 2 === 0) {
-            var openIndex = lodash_1.findIndex(opens, function (x) { return x.tag == (tags[i] + 1); });
-            if (openIndex > -1) {
-                opens.splice(openIndex, 1);
-            }
-            else {
-                closes.push({ tag: tags[i], index: i });
-            }
-        }
-        else {
-            opens.unshift({ tag: tags[i], index: i });
-        }
-    }
-    var unfullfilled = lodash_1.sortBy(opens.concat(closes), function (x) { return x.index; });
-    var internalIndex = index;
-    for (var i = 0; i < unfullfilled.length; i++) {
-        var v = unfullfilled[i];
-        replacements.unshift({
-            start: internalIndex,
-            end: v.index - 1,
-            replacement: tags.slice(internalIndex, v.index)
-        });
-        internalIndex = v.index + 1;
-    }
-    if (replacements.length === 0) {
-        replacements.unshift({
-            start: index,
-            end: indexEnd,
-            replacement: tags.slice(index, indexEnd + 1)
-        });
-    }
-    else {
-        replacements.unshift({
-            start: internalIndex,
-            end: indexEnd,
-            replacement: tags.slice(internalIndex, indexEnd + 1)
-        });
-    }
+    var replacement = tags.slice(index, indexEnd + 1);
     function add(scope) {
         var id = getIdForScope(scope);
         if (id === -1)
@@ -495,11 +433,8 @@ function getAtomStyleForToken(tags, token, index, indexEnd, str) {
         if (!lodash_1.any(previousScopes, function (z) { return z === id; })) {
             previousScopes.push(id);
         }
-        lodash_1.each(replacements, function (ctx) {
-            var replacement = ctx.replacement;
-            replacement.unshift(id);
-            replacement.push(getIdForScope.end(id));
-        });
+        replacement.unshift(id);
+        replacement.push(getIdForScope.end(id));
     }
     switch (token.Kind) {
         case "number":
@@ -533,10 +468,9 @@ function getAtomStyleForToken(tags, token, index, indexEnd, str) {
             console.log("unhandled Kind " + token.Kind);
             break;
     }
-    lodash_1.each(replacements, function (ctx) {
-        var replacement = ctx.replacement, end = ctx.end, start = ctx.start;
-        tags.splice.apply(tags, [start, end - start + 1].concat(replacement));
-    });
+    if (replacement.length > indexEnd - index + 1) {
+        tags.splice.apply(tags, [index, indexEnd - index + 1].concat(replacement));
+    }
 }
 function setGrammar(grammar) {
     if (!grammar['omnisharp'] && (grammar.name === 'C#' || grammar.name === 'C# Script File')) {

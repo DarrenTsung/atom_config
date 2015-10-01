@@ -53,10 +53,6 @@
   '[':      'lazy-motion:backward'
   ';':      'core:confirm'
   'ctrl-g': 'core:cancel'
-  
-'.platform-darwin atom-text-editor:not([mini])[data-grammar~="cs"], atom-text-editor:not([mini])[data-grammar~="csx"]':
-  'cmd-e': 'omnisharp-atom:go-to-definition'
-  'cmd-d': 'unset!'
 
 # disable auto formatting for omnisharp
 'atom-text-editor:not([mini])[data-grammar~="cs"], atom-text-editor:not([mini])[data-grammar~="csx"]':

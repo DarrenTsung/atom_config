@@ -19,7 +19,7 @@ var FindUsages = (function () {
         Omni.listener.observeFindusages, 
         // We also want find implementations, where we found more than one
         Omni.listener.observeFindimplementations
-            .where(function (z) { return z.response.QuickFixes && z.response.QuickFixes.length > 1; }))
+            .where(function (z) { return z.response.QuickFixes.length > 1; }))
             .map(function (z) { return z.response.QuickFixes || []; })
             .share();
         var updated = rx_1.Observable.ofObjectChanges(this);

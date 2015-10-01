@@ -148,7 +148,7 @@ function getSuggestions(options: RequestOptions): Rx.IPromise<Suggestion[]> {
                     schema = schema.properties[s]
                 } else if (schema.additionalProperties) {
                     schema = schema.additionalProperties;
-                } else if (schema !== rootSchema) {
+                } else {
                     schema = <any>{};
                 }
                 if (schema.$ref) {

@@ -1,7 +1,3 @@
-@import "ui-variables.less";
-@import "ui-mixins.less";
-@import "octicon-mixins";
-
 status-bar {
   .text(subtle);
   background: @base-background-color;
@@ -27,10 +23,6 @@ atom-workspace {
 }
 
 .platform-darwin .icon-x:before {
-  content: '✕' !important;
-}
-
-.platform-darwin .icon.x:before {
   content: '✕' !important;
 }
 
@@ -153,30 +145,41 @@ kbd {
   }
 
   /deep/ ::-webkit-scrollbar-thumb {
-    border-radius: 5px;
+    border-radius: 1px;
     background: @scrollbar-color;
-    border: 1px solid transparent;
+    border: 1px solid @scrollbar-border;
     background-clip: content-box;
+    border-right: 0;
+  }
 
-    &:active,
-    &:hover {
-      background: @scrollbar-color-active;
-      border: 1px solid @scrollbar-border-color;
-    }
+  /deep/::-webkit-scrollbar-thumb:vertical:active {
+    border-radius: 0;
+    border-left-width: 0;
+    border-right-width: 0;
+  }
+
+  /deep/::-webkit-scrollbar-thumb:horizontal:active {
+    border-radius: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
   }
 
   atom-text-editor,
   .settings-view {
     /deep/ ::-webkit-scrollbar-track,
     /deep/ ::-webkit-scrollbar-corner {
-      background: @base-background-color;
+      background: @scrollbar-track-color;
     }
 
     /deep/ ::-webkit-scrollbar-thumb {
-      border: 1px solid @base-background-color;
-      background: fade(@scrollbar-color, 32%);
+      border-right: 1px solid @scrollbar-border;
     }
   }
+}
+
+pre {
+  border-color: @base-border-color;
+  .text(normal);
 }
 
 .well {

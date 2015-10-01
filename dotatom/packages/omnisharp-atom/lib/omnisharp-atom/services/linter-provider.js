@@ -38,14 +38,14 @@ function mapValues(editor, error) {
 function showLinter() {
     _.each(document.querySelectorAll('linter-bottom-tab'), function (element) { return element.style.display = ''; });
     _.each(document.querySelectorAll('linter-bottom-status'), function (element) { return element.style.display = ''; });
-    var panel = document.querySelector('linter-panel');
+    var panel = document.getElementById('#linter-panel');
     if (panel)
         panel.style.display = '';
 }
 function hideLinter() {
     _.each(document.querySelectorAll('linter-bottom-tab'), function (element) { return element.style.display = 'none'; });
     _.each(document.querySelectorAll('linter-bottom-status'), function (element) { return element.style.display = 'none'; });
-    var panel = document.querySelector('linter-panel');
+    var panel = document.getElementById('#linter-panel');
     if (panel)
         panel.style.display = 'none';
 }

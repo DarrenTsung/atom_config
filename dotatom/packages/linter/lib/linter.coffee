@@ -4,6 +4,7 @@ LinterViews = require './linter-views'
 EditorLinter = require './editor-linter'
 Helpers = require './helpers'
 Commands = require './commands'
+{deprecate} = require 'grim'
 
 class Linter
   # State is an object by default; never null or undefined
@@ -61,14 +62,31 @@ class Linter
   onDidUpdateMessages: (callback) ->
     @messages.onDidUpdateMessages(callback)
 
+  onDidChangeMessages: (callback) ->
+    deprecate("Linter::onDidChangeMessages is deprecated, use Linter::onDidUpdateMessages instead")
+    @onDidUpdateMessages(callback)
+
+  onDidChangeProjectMessages: (callback) ->
+    deprecate("Linter::onDidChangeProjectMessages is deprecated, use Linter::onDidChangeMessages instead")
+    @onDidChangeMessages(callback)
+
+  getProjectMessages: ->
+    deprecate("Linter::getProjectMessages is deprecated, use Linter::getMessages instead")
+    @getMessages()
+
+  setProjectMessages: (linter, messages) ->
+    deprecate("Linter::setProjectMessages is deprecated, use Linter::setMessages instead")
+    @setMessages(linter, messages)
+
+  deleteProjectMessages: (linter) ->
+    deprecate("Linter::deleteProjectMessages is deprecated, use Linter::deleteMessages instead")
+    @deleteMessages(linter)
+
   getActiveEditorLinter: ->
     @editors.ofActiveTextEditor()
 
   getEditorLinter: (editor) ->
     @editors.ofTextEditor(editor)
-
-  getEditorLinterByPath: (path) ->
-    @editors.ofPath(path)
 
   eachEditorLinter: (callback) ->
     @editors.forEach(callback)
@@ -86,7 +104,6 @@ class Linter
       @linters.lint({onChange, editorLinter})
     editorLinter.onDidDestroy =>
       @messages.deleteEditorMessages(editor)
-    @views.notifyEditor(editorLinter)
 
   deactivate: ->
     @subscriptions.dispose()

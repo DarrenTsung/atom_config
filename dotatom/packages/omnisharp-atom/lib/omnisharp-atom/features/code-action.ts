@@ -22,11 +22,9 @@ class CodeAction implements OmniSharp.IFeature {
                     this.view = codeActionsView({
                         items: response.CodeActions,
                         confirmed: (item) => {
-                            if (editor && !editor.isDestroyed()) {
-                                var range = editor.getSelectedBufferRange();
-                                Omni.request(editor, client => client.runcodeaction(this.getRequest(client, item.Identifier)))
-                                    .subscribe((response) => this.applyAllChanges(response.Changes));
-                            }
+                            var range = editor.getSelectedBufferRange();
+                            Omni.request(editor, client => client.runcodeaction(this.getRequest(client, item.Identifier)))
+                                .subscribe((response) => this.applyAllChanges(response.Changes));
                         }
                     }, editor);
                 });

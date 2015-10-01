@@ -1,11 +1,4 @@
-var validator;
-(function () {
-    var loophole = require("loophole");
-    function allowUnsafe(fn) {
-        return loophole.allowUnsafeEval(function () { return loophole.allowUnsafeNewFunction(function () { return fn(); }); });
-    }
-    allowUnsafe(function () { return validator = require('is-my-json-valid'); });
-})();
+var validator = require('is-my-json-valid');
 var Range = require('atom').Range;
 var _ = require('lodash');
 var schema_provider_1 = require("./schema-provider");
