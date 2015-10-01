@@ -25,8 +25,8 @@
   'debugLogVar':
     'prefix': 'logVar'
     'body': 'debugLogVar(\$$1, "$1", false);'
-  'callStack':
-    'prefix': 'callStack'
+  'logCallStack':
+    'prefix': 'logCallStack'
     'body': 'debugLog(getCallStack(), false);'
   'trackingErrorEmpty':
     'prefix': 'trackErrorEmpty'
