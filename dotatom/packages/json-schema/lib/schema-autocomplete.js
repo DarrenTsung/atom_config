@@ -126,7 +126,7 @@ function getSuggestions(options) {
             else if (schema.additionalProperties) {
                 schema = schema.additionalProperties;
             }
-            else {
+            else if (schema !== rootSchema) {
                 schema = {};
             }
             if (schema.$ref) {

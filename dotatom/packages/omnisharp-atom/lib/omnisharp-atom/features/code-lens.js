@@ -65,6 +65,8 @@ var CodeLens = (function () {
         }));
     };
     CodeLens.prototype.updateDecoratorVisiblility = function (editor) {
+        if (!this.decorations.has(editor))
+            this.decorations.set(editor, new Set());
         var decorations = this.decorations.get(editor);
         decorations.forEach(function (decoration) { return decoration.updateVisible(); });
     };

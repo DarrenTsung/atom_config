@@ -48,7 +48,7 @@ var nugetName = {
     },
     fileMatchs: ['project.json'],
     pathMatch: function (path) {
-        return !!path.match(nameRegex);
+        return path && !!path.match(nameRegex);
     },
     dispose: function () { }
 };
@@ -63,7 +63,7 @@ var nugetVersion = {
     },
     fileMatchs: ['project.json'],
     pathMatch: function (path) {
-        return !!path.match(versionRegex);
+        return path && !!path.match(versionRegex);
     },
     dispose: function () { }
 };

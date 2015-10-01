@@ -1,7 +1,7 @@
 {
   "name": "nucleus-dark-ui",
   "theme": "ui",
-  "version": "0.5.3",
+  "version": "0.5.8",
   "description": "An adaptable UI with your favorite syntax theme at its core!",
   "keywords": [
     "dark",
@@ -23,10 +23,10 @@
     "url": "https://github.com/ignism/nucleus-dark-ui/issues"
   },
   "homepage": "https://github.com/ignism/nucleus-dark-ui#readme",
-  "_id": "nucleus-dark-ui@0.5.3",
-  "_shasum": "9934bdfe1341462ffea4da43b3275cd3123875ab",
-  "_resolved": "file:../d-115824-16157-14k6tlo/package.tgz",
-  "_from": "../d-115824-16157-14k6tlo/package.tgz",
+  "_id": "nucleus-dark-ui@0.5.8",
+  "_shasum": "1add53ef13e21decb79f69f739361d99d510fe98",
+  "_resolved": "file:../d-115830-65451-im0wr/package.tgz",
+  "_from": "../d-115830-65451-im0wr/package.tgz",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [],

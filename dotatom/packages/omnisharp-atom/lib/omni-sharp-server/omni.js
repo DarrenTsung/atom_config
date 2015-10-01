@@ -411,6 +411,7 @@ function makeOpener() {
             editor.__omniClient__ = solution;
             editor.save = function () { };
             editor.saveAs = function () { };
+            editor._metadataEditor = true;
             return editor;
         }
         return manager.activeClient

@@ -21,9 +21,11 @@ var CodeAction = (function () {
                 _this.view = code_actions_view_1["default"]({
                     items: response.CodeActions,
                     confirmed: function (item) {
-                        var range = editor.getSelectedBufferRange();
-                        Omni.request(editor, function (client) { return client.runcodeaction(_this.getRequest(client, item.Identifier)); })
-                            .subscribe(function (response) { return _this.applyAllChanges(response.Changes); });
+                        if (editor && !editor.isDestroyed()) {
+                            var range = editor.getSelectedBufferRange();
+                            Omni.request(editor, function (client) { return client.runcodeaction(_this.getRequest(client, item.Identifier)); })
+                                .subscribe(function (response) { return _this.applyAllChanges(response.Changes); });
+                        }
                     }
                 }, editor);
             });

@@ -1,7 +1,7 @@
 {
   "name": "atom-yeoman",
   "main": "./lib/bootstrapper",
-  "version": "0.3.14",
+  "version": "0.3.15",
   "description": "Yeoman Adapter for Atom.io",
   "repository": {
     "type": "git",
@@ -47,10 +47,10 @@
     "url": "https://github.com/david-driscoll/atom-yeoman/issues"
   },
   "homepage": "https://github.com/david-driscoll/atom-yeoman#readme",
-  "_id": "atom-yeoman@0.3.14",
-  "_shasum": "a481c849ce926db314ac251c1e5d0cda40f9e826",
-  "_resolved": "file:../d-115824-14773-oxd6lp/package.tgz",
-  "_from": "../d-115824-14773-oxd6lp/package.tgz",
+  "_id": "atom-yeoman@0.3.15",
+  "_shasum": "53f5fc0528ac5b4f5eafeac28892a287b58ef5a8",
+  "_resolved": "file:../d-11591-72710-19q3714/package.tgz",
+  "_from": "../d-11591-72710-19q3714/package.tgz",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [
@@ -171,7 +171,7 @@
       },
       {
         "name": "glob",
-        "version": "5.0.14",
+        "version": "5.0.15",
         "path": "node_modules/del/node_modules/globby/node_modules/glob/glob.js"
       },
       {
@@ -191,12 +191,12 @@
       },
       {
         "name": "minimatch",
-        "version": "2.0.10",
+        "version": "3.0.0",
         "path": "node_modules/del/node_modules/globby/node_modules/glob/node_modules/minimatch/minimatch.js"
       },
       {
         "name": "brace-expansion",
-        "version": "1.1.0",
+        "version": "1.1.1",
         "path": "node_modules/del/node_modules/globby/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion/index.js"
       },
       {
@@ -256,7 +256,7 @@
       },
       {
         "name": "glob",
-        "version": "5.0.14",
+        "version": "5.0.15",
         "path": "node_modules/del/node_modules/rimraf/node_modules/glob/glob.js"
       },
       {
@@ -276,12 +276,12 @@
       },
       {
         "name": "minimatch",
-        "version": "2.0.10",
+        "version": "3.0.0",
         "path": "node_modules/del/node_modules/rimraf/node_modules/glob/node_modules/minimatch/minimatch.js"
       },
       {
         "name": "brace-expansion",
-        "version": "1.1.0",
+        "version": "1.1.1",
         "path": "node_modules/del/node_modules/rimraf/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion/index.js"
       },
       {
@@ -446,7 +446,7 @@
       },
       {
         "name": "glob",
-        "version": "5.0.14",
+        "version": "5.0.15",
         "path": "node_modules/gulp/node_modules/liftoff/node_modules/findup-sync/node_modules/glob/glob.js"
       },
       {
@@ -466,12 +466,12 @@
       },
       {
         "name": "minimatch",
-        "version": "2.0.10",
+        "version": "3.0.0",
         "path": "node_modules/gulp/node_modules/liftoff/node_modules/findup-sync/node_modules/glob/node_modules/minimatch/minimatch.js"
       },
       {
         "name": "brace-expansion",
-        "version": "1.1.0",
+        "version": "1.1.1",
         "path": "node_modules/gulp/node_modules/liftoff/node_modules/findup-sync/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion/index.js"
       },
       {
@@ -551,7 +551,7 @@
       },
       {
         "name": "pretty-hrtime",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "path": "node_modules/gulp/node_modules/pretty-hrtime/index.js"
       },
       {
@@ -646,7 +646,7 @@
       },
       {
         "name": "brace-expansion",
-        "version": "1.1.0",
+        "version": "1.1.1",
         "path": "node_modules/gulp/node_modules/vinyl-fs/node_modules/glob-stream/node_modules/minimatch/node_modules/brace-expansion/index.js"
       },
       {
@@ -1366,7 +1366,7 @@
       },
       {
         "name": "brace-expansion",
-        "version": "1.1.0",
+        "version": "1.1.1",
         "path": "node_modules/tsd/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion/index.js"
       },
       {
@@ -1501,7 +1501,7 @@
       },
       {
         "name": "request",
-        "version": "2.63.0",
+        "version": "2.64.0",
         "path": "node_modules/tsd/node_modules/request/index.js"
       },
       {
@@ -2086,7 +2086,7 @@
       },
       {
         "name": "uri-templates",
-        "version": "0.1.7",
+        "version": "0.1.8",
         "path": "node_modules/tsd/node_modules/uri-templates/uri-templates.js"
       },
       {
@@ -2191,7 +2191,7 @@
       },
       {
         "name": "glob",
-        "version": "5.0.14",
+        "version": "5.0.15",
         "path": "node_modules/yeoman-environment/node_modules/globby/node_modules/glob/glob.js"
       },
       {
@@ -2211,12 +2211,12 @@
       },
       {
         "name": "minimatch",
-        "version": "2.0.10",
+        "version": "3.0.0",
         "path": "node_modules/yeoman-environment/node_modules/globby/node_modules/glob/node_modules/minimatch/minimatch.js"
       },
       {
         "name": "brace-expansion",
-        "version": "1.1.0",
+        "version": "1.1.1",
         "path": "node_modules/yeoman-environment/node_modules/globby/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion/index.js"
       },
       {
@@ -2686,7 +2686,7 @@
       },
       {
         "name": "diff",
-        "version": "2.1.2",
+        "version": "2.1.3",
         "path": "node_modules/yeoman-generator/node_modules/diff/lib/index.js"
       },
       {
@@ -2921,7 +2921,7 @@
       },
       {
         "name": "file-type",
-        "version": "2.11.0",
+        "version": "2.12.0",
         "path": "node_modules/yeoman-generator/node_modules/download/node_modules/gulp-decompress/node_modules/archive-type/node_modules/file-type/index.js"
       },
       {
@@ -2991,7 +2991,7 @@
       },
       {
         "name": "file-type",
-        "version": "2.11.0",
+        "version": "2.12.0",
         "path": "node_modules/yeoman-generator/node_modules/download/node_modules/gulp-decompress/node_modules/decompress/node_modules/buffer-to-vinyl/node_modules/file-type/index.js"
       },
       {
@@ -3746,7 +3746,7 @@
       },
       {
         "name": "brace-expansion",
-        "version": "1.1.0",
+        "version": "1.1.1",
         "path": "node_modules/yeoman-generator/node_modules/download/node_modules/vinyl-fs/node_modules/glob-stream/node_modules/minimatch/node_modules/brace-expansion/index.js"
       },
       {
@@ -3956,7 +3956,7 @@
       },
       {
         "name": "brace-expansion",
-        "version": "1.1.0",
+        "version": "1.1.1",
         "path": "node_modules/yeoman-generator/node_modules/findup-sync/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion/index.js"
       },
       {
@@ -4206,7 +4206,7 @@
       },
       {
         "name": "glob",
-        "version": "5.0.14",
+        "version": "5.0.15",
         "path": "node_modules/yeoman-generator/node_modules/glob/glob.js"
       },
       {
@@ -4226,12 +4226,12 @@
       },
       {
         "name": "minimatch",
-        "version": "2.0.10",
+        "version": "3.0.0",
         "path": "node_modules/yeoman-generator/node_modules/glob/node_modules/minimatch/minimatch.js"
       },
       {
         "name": "brace-expansion",
-        "version": "1.1.0",
+        "version": "1.1.1",
         "path": "node_modules/yeoman-generator/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion/index.js"
       },
       {
@@ -4581,7 +4581,7 @@
       },
       {
         "name": "brace-expansion",
-        "version": "1.1.0",
+        "version": "1.1.1",
         "path": "node_modules/yeoman-generator/node_modules/mem-fs-editor/node_modules/multimatch/node_modules/minimatch/node_modules/brace-expansion/index.js"
       },
       {
@@ -4741,7 +4741,7 @@
       },
       {
         "name": "sinon",
-        "version": "1.17.0",
+        "version": "1.17.1",
         "path": "node_modules/yeoman-generator/node_modules/sinon/lib/sinon.js"
       },
       {
@@ -5303,7 +5303,6 @@
         "node_modules/del/node_modules/globby/node_modules/glob/node_modules/inherits/inherits.js",
         "node_modules/del/node_modules/globby/node_modules/glob/node_modules/inherits/inherits_browser.js",
         "node_modules/del/node_modules/globby/node_modules/glob/node_modules/inherits/test.js",
-        "node_modules/del/node_modules/globby/node_modules/glob/node_modules/minimatch/browser.js",
         "node_modules/del/node_modules/globby/node_modules/glob/node_modules/minimatch/minimatch.js",
         "node_modules/del/node_modules/globby/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion/example.js",
         "node_modules/del/node_modules/globby/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion/index.js",
@@ -5329,7 +5328,6 @@
         "node_modules/del/node_modules/rimraf/node_modules/glob/node_modules/inherits/inherits.js",
         "node_modules/del/node_modules/rimraf/node_modules/glob/node_modules/inherits/inherits_browser.js",
         "node_modules/del/node_modules/rimraf/node_modules/glob/node_modules/inherits/test.js",
-        "node_modules/del/node_modules/rimraf/node_modules/glob/node_modules/minimatch/browser.js",
         "node_modules/del/node_modules/rimraf/node_modules/glob/node_modules/minimatch/minimatch.js",
         "node_modules/del/node_modules/rimraf/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion/example.js",
         "node_modules/del/node_modules/rimraf/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion/index.js",
@@ -5793,7 +5791,6 @@
         "node_modules/gulp/node_modules/liftoff/node_modules/findup-sync/node_modules/glob/node_modules/inherits/inherits.js",
         "node_modules/gulp/node_modules/liftoff/node_modules/findup-sync/node_modules/glob/node_modules/inherits/inherits_browser.js",
         "node_modules/gulp/node_modules/liftoff/node_modules/findup-sync/node_modules/glob/node_modules/inherits/test.js",
-        "node_modules/gulp/node_modules/liftoff/node_modules/findup-sync/node_modules/glob/node_modules/minimatch/browser.js",
         "node_modules/gulp/node_modules/liftoff/node_modules/findup-sync/node_modules/glob/node_modules/minimatch/minimatch.js",
         "node_modules/gulp/node_modules/liftoff/node_modules/findup-sync/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion/example.js",
         "node_modules/gulp/node_modules/liftoff/node_modules/findup-sync/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion/index.js",
@@ -7477,7 +7474,6 @@
         "node_modules/yeoman-environment/node_modules/globby/node_modules/glob/node_modules/inherits/inherits.js",
         "node_modules/yeoman-environment/node_modules/globby/node_modules/glob/node_modules/inherits/inherits_browser.js",
         "node_modules/yeoman-environment/node_modules/globby/node_modules/glob/node_modules/inherits/test.js",
-        "node_modules/yeoman-environment/node_modules/globby/node_modules/glob/node_modules/minimatch/browser.js",
         "node_modules/yeoman-environment/node_modules/globby/node_modules/glob/node_modules/minimatch/minimatch.js",
         "node_modules/yeoman-environment/node_modules/globby/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion/example.js",
         "node_modules/yeoman-environment/node_modules/globby/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion/index.js",
@@ -8684,7 +8680,6 @@
         "node_modules/yeoman-generator/node_modules/glob/node_modules/inherits/inherits.js",
         "node_modules/yeoman-generator/node_modules/glob/node_modules/inherits/inherits_browser.js",
         "node_modules/yeoman-generator/node_modules/glob/node_modules/inherits/test.js",
-        "node_modules/yeoman-generator/node_modules/glob/node_modules/minimatch/browser.js",
         "node_modules/yeoman-generator/node_modules/glob/node_modules/minimatch/minimatch.js",
         "node_modules/yeoman-generator/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion/example.js",
         "node_modules/yeoman-generator/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion/index.js",
@@ -9405,11 +9400,14 @@
         "node_modules/yeoman-generator/node_modules/sinon/node_modules/util/util.js",
         "node_modules/yeoman-generator/node_modules/sinon/pkg/sinon-1.16.1.js",
         "node_modules/yeoman-generator/node_modules/sinon/pkg/sinon-1.17.0.js",
+        "node_modules/yeoman-generator/node_modules/sinon/pkg/sinon-1.17.1.js",
         "node_modules/yeoman-generator/node_modules/sinon/pkg/sinon-ie-1.16.1.js",
         "node_modules/yeoman-generator/node_modules/sinon/pkg/sinon-ie-1.17.0.js",
+        "node_modules/yeoman-generator/node_modules/sinon/pkg/sinon-ie-1.17.1.js",
         "node_modules/yeoman-generator/node_modules/sinon/pkg/sinon-ie.js",
         "node_modules/yeoman-generator/node_modules/sinon/pkg/sinon-server-1.16.1.js",
         "node_modules/yeoman-generator/node_modules/sinon/pkg/sinon-server-1.17.0.js",
+        "node_modules/yeoman-generator/node_modules/sinon/pkg/sinon-server-1.17.1.js",
         "node_modules/yeoman-generator/node_modules/sinon/pkg/sinon-server.js",
         "node_modules/yeoman-generator/node_modules/sinon/pkg/sinon.js",
         "node_modules/yeoman-generator/node_modules/text-table/example/align.js",
@@ -10887,7 +10885,7 @@
         "dependencies": {
           "inflight": "^1.0.4",
           "inherits": "2",
-          "minimatch": "^2.0.1",
+          "minimatch": "2 || 3",
           "once": "^1.3.0",
           "path-is-absolute": "^1.0.0"
         }
@@ -10911,8 +10909,7 @@
       },
       {
         "paths": [
-          "node_modules/del/node_modules/globby/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion",
-          "node_modules/del/node_modules/globby/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion/test"
+          "node_modules/del/node_modules/globby/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion"
         ],
         "dependencies": {
           "balanced-match": "^0.2.0",
@@ -10959,7 +10956,7 @@
         "dependencies": {
           "inflight": "^1.0.4",
           "inherits": "2",
-          "minimatch": "^2.0.1",
+          "minimatch": "2 || 3",
           "once": "^1.3.0",
           "path-is-absolute": "^1.0.0"
         }
@@ -10983,8 +10980,7 @@
       },
       {
         "paths": [
-          "node_modules/del/node_modules/rimraf/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion",
-          "node_modules/del/node_modules/rimraf/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion/test"
+          "node_modules/del/node_modules/rimraf/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion"
         ],
         "dependencies": {
           "balanced-match": "^0.2.0",
@@ -11332,7 +11328,7 @@
         "dependencies": {
           "inflight": "^1.0.4",
           "inherits": "2",
-          "minimatch": "^2.0.1",
+          "minimatch": "2 || 3",
           "once": "^1.3.0",
           "path-is-absolute": "^1.0.0"
         }
@@ -11356,8 +11352,7 @@
       },
       {
         "paths": [
-          "node_modules/gulp/node_modules/liftoff/node_modules/findup-sync/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion",
-          "node_modules/gulp/node_modules/liftoff/node_modules/findup-sync/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion/test"
+          "node_modules/gulp/node_modules/liftoff/node_modules/findup-sync/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion"
         ],
         "dependencies": {
           "balanced-match": "^0.2.0",
@@ -11513,8 +11508,7 @@
       },
       {
         "paths": [
-          "node_modules/gulp/node_modules/vinyl-fs/node_modules/glob-stream/node_modules/minimatch/node_modules/brace-expansion",
-          "node_modules/gulp/node_modules/vinyl-fs/node_modules/glob-stream/node_modules/minimatch/node_modules/brace-expansion/test"
+          "node_modules/gulp/node_modules/vinyl-fs/node_modules/glob-stream/node_modules/minimatch/node_modules/brace-expansion"
         ],
         "dependencies": {
           "balanced-match": "^0.2.0",
@@ -12091,8 +12085,7 @@
       },
       {
         "paths": [
-          "node_modules/tsd/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion",
-          "node_modules/tsd/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion/test"
+          "node_modules/tsd/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion"
         ],
         "dependencies": {
           "balanced-match": "^0.2.0",
@@ -12752,7 +12745,7 @@
         "dependencies": {
           "inflight": "^1.0.4",
           "inherits": "2",
-          "minimatch": "^2.0.1",
+          "minimatch": "2 || 3",
           "once": "^1.3.0",
           "path-is-absolute": "^1.0.0"
         }
@@ -12776,8 +12769,7 @@
       },
       {
         "paths": [
-          "node_modules/yeoman-environment/node_modules/globby/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion",
-          "node_modules/yeoman-environment/node_modules/globby/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion/test"
+          "node_modules/yeoman-environment/node_modules/globby/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion"
         ],
         "dependencies": {
           "balanced-match": "^0.2.0",
@@ -14141,8 +14133,7 @@
       },
       {
         "paths": [
-          "node_modules/yeoman-generator/node_modules/download/node_modules/vinyl-fs/node_modules/glob-stream/node_modules/minimatch/node_modules/brace-expansion",
-          "node_modules/yeoman-generator/node_modules/download/node_modules/vinyl-fs/node_modules/glob-stream/node_modules/minimatch/node_modules/brace-expansion/test"
+          "node_modules/yeoman-generator/node_modules/download/node_modules/vinyl-fs/node_modules/glob-stream/node_modules/minimatch/node_modules/brace-expansion"
         ],
         "dependencies": {
           "balanced-match": "^0.2.0",
@@ -14323,8 +14314,7 @@
       },
       {
         "paths": [
-          "node_modules/yeoman-generator/node_modules/findup-sync/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion",
-          "node_modules/yeoman-generator/node_modules/findup-sync/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion/test"
+          "node_modules/yeoman-generator/node_modules/findup-sync/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion"
         ],
         "dependencies": {
           "balanced-match": "^0.2.0",
@@ -14507,7 +14497,7 @@
         "dependencies": {
           "inflight": "^1.0.4",
           "inherits": "2",
-          "minimatch": "^2.0.1",
+          "minimatch": "2 || 3",
           "once": "^1.3.0",
           "path-is-absolute": "^1.0.0"
         }
@@ -14531,8 +14521,7 @@
       },
       {
         "paths": [
-          "node_modules/yeoman-generator/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion",
-          "node_modules/yeoman-generator/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion/test"
+          "node_modules/yeoman-generator/node_modules/glob/node_modules/minimatch/node_modules/brace-expansion"
         ],
         "dependencies": {
           "balanced-match": "^0.2.0",
@@ -14875,8 +14864,7 @@
       },
       {
         "paths": [
-          "node_modules/yeoman-generator/node_modules/mem-fs-editor/node_modules/multimatch/node_modules/minimatch/node_modules/brace-expansion",
-          "node_modules/yeoman-generator/node_modules/mem-fs-editor/node_modules/multimatch/node_modules/minimatch/node_modules/brace-expansion/test"
+          "node_modules/yeoman-generator/node_modules/mem-fs-editor/node_modules/multimatch/node_modules/minimatch/node_modules/brace-expansion"
         ],
         "dependencies": {
           "balanced-match": "^0.2.0",

@@ -13,6 +13,7 @@
       "language-toml"
       "language-yaml"
       "link"
+      "omnisharp-atom"
     ]
     ignoredNames: [
       ".git"
