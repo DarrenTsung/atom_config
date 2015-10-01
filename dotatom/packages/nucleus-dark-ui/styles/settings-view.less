@@ -1,12 +1,4 @@
 .settings-view {
-  .breadcrumb {
-    .text(light);
-  }
-
-  .alert {
-    border: 0;
-  }
-
   .text(normal);
 
   .setting-title,
@@ -18,41 +10,38 @@
     .text(normal);
 
     &.control-label {
-      .theme-description {
-        min-height: 36px;
+      .setting-description {
+        min-height: 3em;
       }
     }
+
   }
 
   .section {
     background-color: @app-background-color;
 
     .section-heading {
-      .text(heading);
-      font-size: 24px;
+      .text(light);
+      font-size: 2em;
     }
 
     .sub-section-heading {
-      .text(heading);
-      font-size: 16px;
+      .text(light);
+      font-size: 1.5em;
     }
   }
-
   .section:first-of-type {
     border-top: 0;
   }
 
   .config-menu {
     background-color: @app-background-color;
-
     .nav > li > a {
       transition: color @transition-time ease;
     }
-
     .nav > li > a:hover {
       background: transparent;
     }
-
     .nav > li.active > a:hover {
       background: @background-color-selected;
     }
@@ -63,75 +52,39 @@
   }
 
   .package-card {
-    .text(normal);
-    background: transparent;
-    border: 0;
-    border-radius: 0;
-    padding: @component-padding 0 @component-padding 0;
-
-    .card-name {
-      .text(highlight);
-    }
-  }
-  .package-card:hover,
-  .package-detail .package-card:hover {
-    background: transparent;
+    background-color: @tool-panel-background-color !important;
   }
 
-  .package-container .row:not(:first-child) {
-    border-top: 1px solid @indent-guide-color;
+  .package-update-view .thumbnail {
+    background-color: @tool-panel-background-color !important;
   }
 
-  .collapsed .package-container .row {
-    border: 0;
+  .package-update-view .package-status.icon-check {
+    color: @text-color-success;
   }
 
-  .package-update-view {
-    .thumbnail {
-      background-color: @tool-panel-background-color !important;
-    }
-
-    .package-status.icon-check {
-      color: @text-color-success;
-    }
-
-    .package-status.icon-cloud-download {
-      color: @text-color-info;
-    }
+  .package-update-view .package-status.icon-cloud-download {
+    color: @text-color-info;
   }
 
-  .package-readme {
-    font-size: 1em;
-  }
+  // atom-text-editor {
+  //   background-color: @input-background-color !important;
+  //   color: @text-color !important;
+  //   opacity: 1.0 !important;
+  // }
 
-  button.uninstall-button.is-uninstalling {
-    color: @text-color-highlight !important;
-    border-color: @button-border-color !important;
-    background: @button-border-color;
-  }
-
-  button.install-button.is-installing {
-    color: @text-color-highlight !important;
-    border-color: @background-color-info !important;
-    background: @background-color-info;
-  }
-
-  input[type="checkbox"] {
-    &:focus {
-      box-shadow: none;
-    }
-    &:before,
-    &:after {
-      background: @base-background-color;
-    }
+  input[type="checkbox"]:before,
+  input[type="checkbox"]:after {
+    background: @base-background-color;
   }
 
   select.form-control {
     .button(@button-border-color);
-    .text(normal);
-    height: @input-height;
-    line-height: @input-height;
+    font-size: 13px;
+    height: 40px;
+    line-height: 40px;
     text-transform: none;
+    letter-spacing: 0.04em;
 
     &:focus,
     &:hover {

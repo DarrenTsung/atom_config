@@ -26,7 +26,6 @@ class Commands
       editorLinter.destroy()
     else
       @linter.createEditorLinter(activeEditor)
-      @lint()
 
 
   setBubbleTransparent: ->

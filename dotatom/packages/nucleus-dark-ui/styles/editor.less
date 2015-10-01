@@ -11,7 +11,7 @@ atom-text-editor::shadow,
 
   .indent-guide {
     color: @indent-guide-color;
-    box-shadow: inset 1px 0;
+    box-shadow: inset 1px 0 @indent-guide-color;
   }
 
   .bracket-matcher .region {
@@ -48,58 +48,39 @@ atom-text-editor::shadow,
     .line-numbers {
       background: transparent !important;
     }
-
     .line-number {
       background: transparent;
       opacity: 1.0;
+
       color: @gutter-text-color;
       border-left: 2px solid transparent;
       padding-left: @component-padding !important;
       padding-right: 0;
 
       &.git-line-added {
-        color: mix(@syntax-background-color, @text-color-added, 48%);
-        border-left-color: mix(@syntax-background-color, @text-color-added, 48%);
-
-        &.cursor-line,
-        &.cursor-line-no-selection {
-          color: @text-color-added;
-          border-left-color: @text-color-added;
-        }
+        font-weight: 600;
+        color: @text-color-added;
+        border-left-color: @text-color-added;
       }
-
       &.git-line-modified {
-        color: mix(@syntax-background-color, @text-color-modified, 48%);
-        border-left-color: mix(@syntax-background-color, @text-color-modified, 48%);
-
-        &.cursor-line,
-        &.cursor-line-no-selection {
-          color: @text-color-modified;
-          border-left-color: @text-color-modified;
-        }
+        font-weight: 600;
+        color: @text-color-modified;
+        border-left-color: @text-color-modified;
       }
-
       &.git-line-removed {
-        color: mix(@syntax-background-color, @text-color-removed, 48%);
-        border-left-color: mix(@syntax-background-color, @text-color-removed, 48%);
-
-        &.cursor-line,
-        &.cursor-line-no-selection {
-          color: @text-color-removed;
-          border-left-color: @text-color-removed;
-        }
+        font-weight: 600;
+        color: @text-color-removed;
+        border-left-color: @text-color-removed;
       }
 
       &.cursor-line {
         background-color: @theme-background-color-lighter;
         color: @gutter-text-color-selected;
-        font-weight: 600;
       }
 
       &.cursor-line-no-selection {
         background-color: @theme-background-color-light;
         color: @text-color-highlight;
-        font-weight: 600;
       }
 
       .icon-right {
@@ -115,24 +96,14 @@ atom-text-editor::shadow,
 
   .gutter .line-number.folded,
   .gutter .line-number.folded .icon-right,
-  .gutter .line-number:after {
-    color: mix(@syntax-background-color, @text-color-info, 48%);
-    border-left-color: mix(@syntax-background-color, @text-color-info, 48%);
-  }
-
-  .gutter .line-number.folded.cursor-line,
-  .gutter .line-number.folded.cursor-line-no-selection {
+  .gutter .line-number.folded .cursor-line,
+  .gutter .line-number:after,
+  .fold-marker:after {
+    font-weight: 600;
     color: @text-color-info;
     border-left-color: @text-color-info;
-
-    .icon-right {
-      color: @text-color-info;
-      border-left-color: @text-color-info;
-    }
   }
-
   .fold-marker:after {
-    color: @text-color-info;
     background: transparent;
   }
 }

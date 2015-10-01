@@ -66,7 +66,7 @@ class InsertAtBeginningOfLine extends Insert
     super
 
 class InsertAboveWithNewline extends Insert
-  execute: ->
+  execute: (count=1) ->
     @vimState.setInsertionCheckpoint() unless @typingCompleted
     @editor.insertNewlineAbove()
     @editor.getLastCursor().skipLeadingWhitespace()
@@ -81,7 +81,7 @@ class InsertAboveWithNewline extends Insert
     @typingCompleted = true
 
 class InsertBelowWithNewline extends Insert
-  execute: ->
+  execute: (count=1) ->
     @vimState.setInsertionCheckpoint() unless @typingCompleted
     @editor.insertNewlineBelow()
     @editor.getLastCursor().skipLeadingWhitespace()

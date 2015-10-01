@@ -105,4 +105,3 @@ class LineEndingConverter
             buffer.setTextInRange lineEndingRange, format,
               { normalizeLineEndings: false }
           return
-    return

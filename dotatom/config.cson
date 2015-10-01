@@ -62,7 +62,3 @@
     hideIgnoredNames: true
   "autocomplete-plus": {}
   "git-plus": {}
-  "omnisharp-atom":
-    codeLens: false
-    enhancedHighlighting: true
-  "vim-surround": {}

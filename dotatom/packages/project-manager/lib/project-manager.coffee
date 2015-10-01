@@ -1,5 +1,3 @@
-{CompositeDisposable} = require 'atom'
-
 Projects = null
 Project = null
 SaveDialog = null
@@ -38,9 +36,7 @@ module.exports =
   projectsListView: null
 
   activate: (state) ->
-    @subscriptions = new CompositeDisposable
-
-    @subscriptions.add atom.commands.add 'atom-workspace',
+    atom.commands.add 'atom-workspace',
       'project-manager:list-projects': ->
         ProjectsListView ?= require './projects-list-view'
         projectsListView = new ProjectsListView()
@@ -78,6 +74,3 @@ module.exports =
 
   provideProjects: ->
     projects: new Projects()
-
-  deactivate: ->
-    @subscriptions.dispose()

@@ -5,15 +5,12 @@ atom-panel {
   &.left:not(:empty) {
     border-right: 1px solid @tool-panel-border-color;
   }
-
   &.right:not(:empty) {
     border-left: 1px solid @tool-panel-border-color;
   }
-
   &.top:not(:empty) {
     border-bottom: 1px solid @tool-panel-border-color;
   }
-
   &.bottom > *:not(:empty) {
     border-top: 1px solid @tool-panel-border-color;
     z-index: 3;
@@ -34,8 +31,8 @@ atom-panel-container,
 
 .inset-panel .panel-heading,
 .panel-heading {
-  .text(heading);
-  font-size: 24px;
+  .text(light);
+  font-size: 2em;
   border-radius: 0;
 }
 

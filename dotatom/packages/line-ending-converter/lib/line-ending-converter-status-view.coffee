@@ -1,15 +1,13 @@
-{Disposable} = require 'atom'
-
 [WINDOWS_FORMAT, UNIX_FORMAT, OLD_MAC_FORMAT] = ['\r\n', '\n', '\r']
-[WIN_TEXT, UNIX_TEXT, OLD_MAC_TEXT] = ['CRLF', 'LF', 'CR']
+[WIN_TEXT, UNIX_TEXT, OLD_MAC_TEXT] = ['Win(CRLF)', 'Unix(LF)', 'Old Mac(CR)']
 #Default is '\n'. Solely by observation and subject to change. Need docs to support this.
 DEFAULT_TEXT = UNIX_TEXT
 # EOL status view in the status Bar
 class LineEndingConverterStatusView extends HTMLDivElement
   initialize: (@statusBar) ->
-    @classList.add('line-ending-status', 'inline-block')
-    @eolLink = document.createElement('a')
-    @eolLink.href = '#'
+    @classList.add('eol-status', 'inline-block')
+    @eolLink = document.createElement('span')
+    # @eolLink.href = '#'  #TODO make it a link <a> tag and support click to change
     @appendChild(@eolLink)
     @initConfigSubscriptions()
     this
@@ -23,8 +21,8 @@ class LineEndingConverterStatusView extends HTMLDivElement
     return
 
   initConfigSubscriptions: ->
-    @showConfigSubscription =
-      atom.config.onDidChange 'line-ending-converter.showEolInStatusBar', () => @attach()
+    @showConfigSubscription = atom.config.onDidChange 'line-ending-converter.showEolInStatusBar', ()=>
+      @attach()
 
   attach: ->
     @tile?.destroy()
@@ -40,20 +38,12 @@ class LineEndingConverterStatusView extends HTMLDivElement
     @activeItemSubscription = null
     @eolSubscription?.dispose()
     @eolSubscription = null
-    @clickSubscription?.dispose()
-    @clickSubscription = null
     return
 
   initViewSubscriptions: ->
     @disposeViewSubscriptions()
-    @activeItemSubscription =
-      atom.workspace.onDidChangeActivePaneItem(=> @subscribeToActiveTextEditor())
-
-    clickHandler =
-      => atom.commands.dispatch(atom.views.getView(@getActiveTextEditor()), 'line-ending-converter-list-view:show')
-    @addEventListener 'click', clickHandler
-    @clickSubscription = new Disposable(=> @removeEventListener('click', clickHandler))
-
+    @activeItemSubscription = atom.workspace.onDidChangeActivePaneItem =>
+      @subscribeToActiveTextEditor()
     @subscribeToActiveTextEditor()
     return
 

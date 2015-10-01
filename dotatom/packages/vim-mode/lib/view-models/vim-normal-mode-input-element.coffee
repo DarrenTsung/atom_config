@@ -28,11 +28,8 @@ class VimNormalModeInputElement extends HTMLDivElement
 
   handleEvents: ->
     if @singleChar?
-      compositing = false
       @editorElement.getModel().getBuffer().onDidChange (e) =>
-        @confirm() if e.newText and not compositing
-      @editorElement.addEventListener 'compositionstart', -> compositing = true
-      @editorElement.addEventListener 'compositionend', -> compositing = false
+        @confirm() if e.newText
     else
       atom.commands.add(@editorElement, 'editor:newline', @confirm.bind(this))
 

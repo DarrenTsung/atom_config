@@ -1,34 +1,39 @@
-atom-panel.modal,
-.overlay {
+atom-panel.modal, .overlay {
   .overlay-shadow();
   .text(normal);
-  color: @text-color;
-  background-color: @overlay-background-color;
-  border-radius: @component-border-radius !important;
-  border: 1px solid @base-border-color !important;
-  padding: @component-padding @component-padding*2;
-  width: 680px;
-  margin-left: -340px;
 
   label,
   p {
     .text(light);
   }
 
-  atom-text-editor[mini],
-  atom-text-editor[mini]::shadow {
-    .text(heading);
-    font-size: 24px;
-    line-height: 32px;
-    height: auto;
-    max-height: none;
+  color: @text-color;
+  background-color: @overlay-background-color;
+  border-radius: @component-border-radius !important;
+  border: 1px solid @base-border-color !important;
+  padding-top: @component-padding;
+  padding-bottom: @component-padding;
+  padding-left: @component-padding*2;
+  padding-right: @component-padding*2;
+
+  atom-text-editor[mini] {
+    .text(light);
+    color: @text-color-highlight;
     background-color: transparent;
-    margin: 0 -@component-padding*2;
-    padding: 0 @component-padding*2 @component-padding @component-padding*2;
+    margin: 0;
+    margin-left: -@component-padding*2;
+    margin-right: -@component-padding*2;
+    padding: 0;
+    padding-left: @component-padding*2;
+    padding-right: @component-padding*2;
     border: 0;
     border-radius: 0;
     border-bottom: 1px solid @base-border-color;
-
+    max-height: 32px + @component-padding;
+    height: 32px + @component-padding;
+    line-height: 32px;
+    font-size: 24px;
+    font-weight: 300 !important;
 
     &.is-focused:hover,
     &:hover {
@@ -51,27 +56,27 @@ atom-panel.modal,
   ul.list-group,
   .select-list ol.list-group,
   &.select-list ol.list-group {
-    margin: 0 -@component-padding*2 -@component-padding;
+    margin-top: 0;
+    margin-bottom: -@component-padding;
+    margin-left: -@component-padding*2;
+    margin-right: -@component-padding*2;
 
     li .character-match {
       .text(normal);
     }
-
     li.selected .character-match {
       .text(selected);
     }
 
     li {
-      padding: @component-padding/2 @component-padding*2;
+      padding: @component-padding / 2 @component-padding * 2;
+      &.two-lines { padding: @component-padding / 4 @component-padding; }
+      :before {
 
-      &.two-lines {
-        padding: @component-padding/2 @component-padding*2;
       }
-
       .status.icon {
         float: right;
         margin-left: @component-icon-padding;
-
         &:before {
           margin-right: 0;
         }
@@ -79,7 +84,6 @@ atom-panel.modal,
 
       &.selected {
         border-radius: 0 !important;
-
         .status.icon {
           color: @text-color-selected;
         }
@@ -89,35 +93,26 @@ atom-panel.modal,
 }
 
 atom-panel.modal {
-  & > div > atom-text-editor[mini]:before {
+	  & > div > atom-text-editor[mini]:before {
     color: @text-color-subtle;
     font-family: "Octicons Regular";
     padding-right: @component-padding;
     -webkit-font-smoothing: antialiased;
     content: "\f011";
   }
-
   & > .command-palette > atom-text-editor[mini]:before {
     content: "\f0c8";
   }
-
   & > .encoding-selector > atom-text-editor[mini]:before {
     content: "\f094";
   }
-
   & > .grammar-selector > atom-text-editor[mini]:before {
     content: "\f010";
   }
-
   & > .symbols-view > atom-text-editor[mini]:before {
     content: "\f0c0";
   }
-
   & > .fuzzy-finder > atom-text-editor[mini]:before {
     content: "\f02e";
-  }
-
-  & > .diff-list-view > atom-text-editor[mini]:before {
-    content: "\f0d6";
   }
 }

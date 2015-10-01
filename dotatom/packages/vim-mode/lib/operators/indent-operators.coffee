@@ -2,14 +2,14 @@ _ = require 'underscore-plus'
 {Operator} = require './general-operators'
 
 class AdjustIndentation extends Operator
-  execute: (count) ->
+  execute: (count=1) ->
     mode = @vimState.mode
     @motion.select(count)
     originalRanges = @editor.getSelectedBufferRanges()
 
     if mode is 'visual'
       @editor.transact =>
-        _.times(count ? 1, => @indent())
+        _.times(count, => @indent())
     else
       @indent()
 
