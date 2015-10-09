@@ -61,6 +61,12 @@
   'Snippets \'log\'/\'logVar\'!':
     'prefix': 'debugLog'
     'body': 'lo'
+    
+# Unity Snippets
+'.source.coffee':
+  'LogVariable':
+    'prefix': 'logVariable'
+    'body': 'console.log("$1: " + $1)'
   
 # Unity Snippets
 '.source.cs':
@@ -69,20 +75,40 @@
     'body': 'Time.deltaTime'
   'Debug.Log':
     'prefix': 'log'
-    'body': 'Locator.Logger.Log("$1");'
+    'body': 'Debug.Log("$1");'
   'Debug.LogVariable':
     'prefix': 'logVariable'
-    'body': 'Locator.Logger.Log("$1: " + $1);'
+    'body': 'Debug.Log("$1: " + $1);'
   'Debug.LogWarning':
     'prefix': 'logWarn'
-    'body': 'Locator.Logger.LogWarning("$1");'
+    'body': 'Debug.LogWarning("$1");'
   'Debug.LogError':
     'prefix': 'logError'
-    'body': 'Locator.Logger.LogError("$1");'
+    'body': 'Debug.LogError("$1");'
     
   'Pragma Mark':
     'prefix': 'pragma'
     'body': '// PRAGMA MARK - $1'
+    
+  'Notification Event':
+    'prefix': 'notif'
+    'body': 'public static UnityEvent ${2:PlayerChanged} = new UnityEvent();'
+  'Notification Event With Arguments':
+    'prefix': 'notifArgs'
+    'body': 'public static UnityEvents.${1:Type} ${2:PlayerChanged} = new UnityEvents.${1:Type}();'
+    
+  'Summary':
+    'prefix': 'summary'
+    'body': """
+      /// <summary>
+      /// ${1:summary}
+      /// </summary>
+      """
+  'Param':
+    'prefix': 'param'
+    'body': """
+      /// <param name="${2:paramName}">${3:paramInformation}</param>
+      """
     
   'Method':
     'prefix': 'm'

@@ -97,3 +97,16 @@ atom.commands.add 'atom-text-editor', 'replace-selected-double-quotes-with-singl
   editor.scanInBufferRange(regex, selectedBufferRange, ({match, replace}) ->
     replace("'");
   )
+  
+atom.commands.add 'atom-text-editor', 'insert-inherited-functions': (e) ->
+  editor = @getModel()
+  allText = editor.getText()
+  
+  console.log(allText)
+  classPattern = /^[\w ]+class (\w+)\W+(\w+).*{.*$/m
+  [_, className, baseClassName] = allText.match(classPattern)
+  
+  console.log("class name: " + className)
+  console.log("baseClassName: " + baseClassName)
+  
+  
