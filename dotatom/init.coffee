@@ -25,6 +25,7 @@
 #   else
 #     editor.backspace()
 #     atom.commands.dispatch(e.currentTarget, 'vim-mode:activate-command-mode')
+{File} = require 'atom'
     
 atom.commands.add 'atom-text-editor',
   'editor:toggle-current-row-folding': (event) ->
@@ -102,11 +103,54 @@ atom.commands.add 'atom-text-editor', 'insert-inherited-functions': (e) ->
   editor = @getModel()
   allText = editor.getText()
   
-  console.log(allText)
   classPattern = /^[\w ]+class (\w+)\W+(\w+).*{.*$/m
   [_, className, baseClassName] = allText.match(classPattern)
   
-  console.log("class name: " + className)
-  console.log("baseClassName: " + baseClassName)
+  title = editor.getTitle()
+  [_, extension] = title.match(/^.*?\.(\w+)$/)
+  if !extension?
+    atom.notifications.addError("Failed to get extension for title: " + title, {dismissable: true})
+    return
   
-  
+  baseClassPattern = new RegExp("class " + baseClassName, "g")
+  results = []
+  atom.workspace.scan(baseClassPattern, paths: ["*\." + extension], (result) -> 
+    results.push(result)
+  ).then (res) -> (
+    if results.length == 0
+      atom.notifications.addError("Couldn't find file for: " + baseClassPattern + " with extension: " + extension, {dismissable: true})
+      return
+    else if results.length != 1
+      atom.notifications.addError("TODO (darren): need support multiple file paths returning", {dismissable: true})
+      return
+      
+    filePath = results[0].filePath
+    
+    baseClassFile = new File(filePath)
+    baseClassFile.read().then (baseClassText) -> (
+      overridableFunctionsPattern = /^\ *(\w+ (virtual|override).*{).*$/gm
+      allMatches = []
+      baseClassText.replace overridableFunctionsPattern, (m, g1) ->
+        allMatches.push(g1)
+      
+      if allMatches.length == 0
+        atom.notifications.addWarning("Couldn't find any matches inside file: " + filePath, {dismissable: true})
+        return
+      
+      editor.moveDown(1)
+      editor.insertNewline()
+      editor.moveUp(1)
+      
+      firstMatchPassed = false
+      pasteText = ""
+      for match in allMatches
+        newFunctionText = match.replace("virtual", "override")
+        
+        if firstMatchPassed
+          pasteText += "\n"
+        pasteText += "\n" + newFunctionText + "\n\n}"
+        
+        firstMatchPassed = true
+      editor.insertText(pasteText, autoIndent: true)
+    )
+  )
