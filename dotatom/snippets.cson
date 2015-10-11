@@ -68,6 +68,13 @@
     'prefix': 'logVariable'
     'body': 'console.log("$1: " + $1)'
   
+  'LogObject':
+    'prefix': 'logObject'
+    'body': """
+      for k, v of ${1:variableName}
+        console.log("${1:variableName}: " + k + ": " + v)
+    """
+  
 # Unity Snippets
 '.source.cs':
   'deltaTime':
