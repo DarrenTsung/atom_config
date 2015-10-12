@@ -1,5 +1,7 @@
 ### UN-MAPPINGS ###
-  
+'atom-workspace atom-text-editor:not([mini])':
+  'cmd-j': 'lazy-unity-helper:jump-to-definition'
+
 ### MAPPINGS ###
 # remap cmd-shift-o to fuzzy finder, just preference
 '.platform-darwin':
@@ -36,9 +38,6 @@
   'space m': 'bookmarks:view-all'
   'm': 'bookmarks:toggle-bookmark'
   'shift-cmd-m': 'bookmarks:clear-bookmarks'
-  
-  # go to declaration
-  'cmd-j': 'symbols-view:go-to-declaration'
   
   # Lazy-motion
   's': 'lazy-motion:forward'

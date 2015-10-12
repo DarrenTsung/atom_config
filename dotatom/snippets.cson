@@ -62,18 +62,32 @@
     'prefix': 'debugLog'
     'body': 'lo'
     
-# Unity Snippets
+    
+# CoffeeScript Snippets
 '.source.coffee':
   'LogVariable':
     'prefix': 'logVariable'
     'body': 'console.log("$1: " + $1)'
-  
   'LogObject':
     'prefix': 'logObject'
     'body': """
+      paramStrings = []
       for k, v of ${1:variableName}
-        console.log("${1:variableName}: " + k + ": " + v)
+        paramStrings.push(k + " => " + v)
+      console.log("${1:variableName}: {\\\\n" + paramStrings.reduceRight((x, y) -> x + "\\\\n" + y) + "\\\\n}")
     """
+    
+  'Region Mark':
+    'prefix': 'region'
+    'body': '#region mark - $1'
+  'End Region':
+    'prefix': 'endregion'
+    'body': '#endregion'
+    
+  'Add Notification Error':
+    'prefix': 'notifError'
+    'body': 'atom.notifications.addError("${1:Failed to do something!}", {dismissable: true})'
+  
   
 # Unity Snippets
 '.source.cs':
@@ -93,9 +107,12 @@
     'prefix': 'logError'
     'body': 'Debug.LogError("$1");'
     
-  'Pragma Mark':
-    'prefix': 'pragma'
-    'body': '// PRAGMA MARK - $1'
+  'Region Mark':
+    'prefix': 'region'
+    'body': '#region mark - $1'
+  'End Region':
+    'prefix': 'endregion'
+    'body': '#endregion'
     
   'Notification Event':
     'prefix': 'notif'
