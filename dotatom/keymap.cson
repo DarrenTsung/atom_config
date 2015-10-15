@@ -1,6 +1,8 @@
 ### UN-MAPPINGS ###
 'atom-workspace atom-text-editor:not([mini])':
   'cmd-j': 'lazy-unity-helper:jump-to-definition'
+  'shift-cmd-h': 'pane:show-previous-item'
+  'shift-cmd-l': 'pane:show-next-item'
 
 ### MAPPINGS ###
 'body':
@@ -20,10 +22,6 @@
   'space 5': 'editor:fold-at-indent-level-5'
   
   'space f': 'editor:toggle-current-row-folding'
-  
-  # Move panes
-  'space l': 'pane:show-next-item'
-  'space h': 'pane:show-previous-item'
   
   # Bookmarks
   'space m': 'bookmarks:view-all'
