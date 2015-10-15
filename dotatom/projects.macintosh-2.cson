@@ -1,0 +1,41 @@
+g2_dev:
+  title: "Dolphin"
+  paths: [
+    "/Users/darren/Projects/storm8/phpdev"
+    "/Users/darren/Projects/storm8/g2_dev"
+  ]
+dragon2:
+  title: "server-dragon2"
+  paths: [
+    "/Users/darren/Projects/storm8/phpdev"
+    "/Users/darren/Projects/storm8/g2_dev/base"
+    "/Users/darren/Projects/storm8/g2_dev/dragon2"
+  ]
+casual:
+  title: "Casual"
+  paths: [
+    "/Users/darren/Projects/storm8/casualdev"
+    "/Users/darren/Projects/storm8/phpdev"
+  ]
+"iphonedev-dragon2":
+  title: "iphonedev-dragon2"
+  paths: [
+    "/Users/darren/Projects/storm8/iphonedev/dolphin/dragon2"
+    "/Users/darren/Projects/storm8/iphonedev/dolphin/base"
+    "/Users/darren/Projects/storm8/iphonedev/base"
+  ]
+"iphonedev-dragon2-1.0":
+  title: "iphonedev-dragon2-1.0"
+  paths: [
+    "/Users/darren/Projects/storm8/iphonedev-Dragon2-1.0"
+  ]
+"lazyunityhelper":
+  title: "LazyUnityHelper"
+  paths: [
+    "/Users/darren/Documents/Coding/lazy-unity-helper/"
+  ]
+"historytracker":
+  title: "HistoryTracker"
+  paths: [
+    "/Users/darren/Documents/Coding/AtomPackages/history-tracker/"
+  ]

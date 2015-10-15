@@ -17,7 +17,7 @@
 # If you are unfamiliar with CSON, you can read more about it here:
 # https://github.com/bevry/cson#what-is-cson
 
-# Storm8 Snippets
+# Storm8 Snippets (php)
 '.text.html.php':
   'debugLog':
     'prefix': 'log'
@@ -141,21 +141,5 @@
     'prefix': 'param'
     'body': """
       /// <param name="${2:paramName}">${3:paramInformation}</param>
-      """
-    
-  'Method':
-    'prefix': 'm'
-    'body': '${1:protected} ${2:void} ${3:Method}($4) {\n\t$5\n}'
-  'Virtual Method':
-    'prefix': 'vm'
-    'body': '${1:protected} virtual ${2:void} ${3:Method}($4) {\n\t$5\n}'
-    
-  'Property':
-    'prefix': 'prop'
-    'body': """
-      ${1:public} ${2:string} ${3:Property} {
-        ${4:get {}
-        ${5:set {}
-      }
       """
   

@@ -62,3 +62,27 @@
     hideIgnoredNames: true
   "autocomplete-plus": {}
   "git-plus": {}
+  "bracket-matcher":
+    autocompleteBrackets: false
+    autocompleteSmartQuotes: false
+    wrapSelectionsInBrackets: false
+  "project-manager":
+    environmentSpecificProjects: true
+".html.php.text":
+  "wrapper-snippets":
+    if:
+      name: "if"
+      body: '''
+        if (${cursor}) {
+        ${selection}
+        }
+      '''
+".coffee.source":
+  "wrapper-snippets":
+    if:
+      name: "if"
+      body: '''
+        if (${cursor}) {
+        ${selection}
+        }
+      '''

@@ -1,0 +1,20 @@
+# Wrapper Snippets
+#
+# '.source.coffee':
+#   'Console log':
+#     'prefix': 'log'
+#     'body': 'console.log $1'
+#
+# This file uses CoffeeScript Object Notation (CSON).
+# If you are unfamiliar with CSON, you can read more about it here:
+# https://github.com/bevry/cson#what-is-cson
+
+# Storm8 Snippets (php)
+'.text.html.php':
+  'if':
+    'body': 'if (${cursor}) {\n${selection}\n}'
+
+# CoffeeScript Snippets
+'.source.coffee':
+  'if':
+    'body': 'if (${cursor}) {\n${selection}\n}'
