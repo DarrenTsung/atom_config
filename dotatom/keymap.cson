@@ -3,23 +3,14 @@
   'cmd-j': 'lazy-unity-helper:jump-to-definition'
 
 ### MAPPINGS ###
-# remap cmd-shift-o to fuzzy finder, just preference
-'.platform-darwin':
-  'shift-cmd-o': 'fuzzy-finder:toggle-file-finder'
+'body':
+  'ctrl-[': 'core:cancel'
+  
+'atom-workspace':
+  'ctrl-cmd-h': 'history-tracker:go-backwards-in-history'
+  'ctrl-cmd-l': 'history-tracker:go-forward-in-history'
 
 'atom-text-editor.vim-mode:not(.insert-mode)':
-  # remap panes to use space shift-hjkl
-  'ctrl-shift-cmd-h': 'pane:split-left'
-  'ctrl-shift-cmd-j': 'pane:split-down'
-  'ctrl-shift-cmd-k': 'pane:split-up'
-  'ctrl-shift-cmd-l': 'pane:split-right'
-  
-  # navigate panes by using space hjkl
-  'ctrl-cmd-h': 'window:focus-pane-on-left'
-  'ctrl-cmd-j': 'window:focus-pane-below'
-  'ctrl-cmd-k': 'window:focus-pane-above'
-  'ctrl-cmd-l': 'window:focus-pane-on-right'
-  
   # I use cmd-(1-9) to switch between commonly used applications so remap folding to space N
   'space 0': 'editor:unfold-all'
   'space 1': 'editor:fold-at-indent-level-1'

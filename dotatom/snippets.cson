@@ -84,6 +84,15 @@
     'prefix': 'endregion'
     'body': '#endregion'
     
+  'Add Notification Success':
+    'prefix': 'notifSuccess'
+    'body': 'atom.notifications.addSuccess("${1:Succeeded at something!}", {dismissable: true})'
+  'Add Notification Info':
+    'prefix': 'notifInfo'
+    'body': 'atom.notifications.addInfo("${1:Information!}", {dismissable: true})'
+  'Add Notification Warning':
+    'prefix': 'notifWarn'
+    'body': 'atom.notifications.addWarning("${1:Warning: thing happened!}", {dismissable: true})'
   'Add Notification Error':
     'prefix': 'notifError'
     'body': 'atom.notifications.addError("${1:Failed to do something!}", {dismissable: true})'
