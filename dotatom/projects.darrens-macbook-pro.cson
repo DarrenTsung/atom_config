@@ -1,1 +1,15 @@
-{}
+"lazyunityhelper":
+  title: "LazyUnityHelper"
+  paths: [
+    "/Users/darrentsung/github/lazy-unity-helper"
+  ]
+"historytracker":
+  title: "HistoryTracker"
+  paths: [
+    "/Users/darrentsung/github/history-tracker/"
+  ]
+"selectionwrapper":
+  title: "SelectionWrapper"
+  paths: [
+    "/Users/darrentsung/github/selection-wrapper/"
+  ]
