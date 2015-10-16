@@ -82,6 +82,14 @@
     if:
       name: "if"
       body: '''
+        if ${cursor}
+        ${selection}
+      '''
+".cs.source":
+  "wrapper-snippets":
+    if:
+      name: "if"
+      body: '''
         if (${cursor}) {
         ${selection}
         }

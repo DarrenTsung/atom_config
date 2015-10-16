@@ -13,8 +13,13 @@
 '.text.html.php':
   'if':
     'body': 'if (${cursor}) {\n${selection}\n}'
+    
+# Unity Snippets
+'.source.cs':
+  'if':
+    'body': 'if (${cursor}) {\n${selection}\n}'
 
 # CoffeeScript Snippets
 '.source.coffee':
   'if':
-    'body': 'if (${cursor}) {\n${selection}\n}'
+    'body': 'if ${cursor}\n${selection}'
