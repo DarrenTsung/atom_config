@@ -142,4 +142,11 @@
     'body': """
       /// <param name="${2:paramName}">${3:paramInformation}</param>
       """
+      
+  'SerializeField':
+    'prefix': 'serial'
+    'body': '[SerializeField]'
+  'SerializeFieldReadyOnly':
+    'prefix': 'readonly'
+    'body': '[SerializeField, ReadOnly]'
   
