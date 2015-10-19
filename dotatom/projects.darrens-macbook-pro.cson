@@ -1,15 +1,20 @@
-"lazyunityhelper":
+lazyunityhelper:
   title: "LazyUnityHelper"
   paths: [
     "/Users/darrentsung/github/lazy-unity-helper"
   ]
-"historytracker":
+historytracker:
   title: "HistoryTracker"
   paths: [
     "/Users/darrentsung/github/history-tracker/"
   ]
-"selectionwrapper":
+selectionwrapper:
   title: "SelectionWrapper"
   paths: [
     "/Users/darrentsung/github/selection-wrapper/"
+  ]
+localmultiplayertest:
+  title: "Local Multiplayer Test"
+  paths: [
+    "/Users/darrentsung/Documents/Projects/Unity Projects/LocalMultiplayerTest/Local Multiplayer Test"
   ]

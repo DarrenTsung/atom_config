@@ -101,3 +101,10 @@
         ${selection}
         }
       '''
+    namespace:
+      name: "namespace"
+      body: '''
+        namespace ${cursor} {
+        ${selection}
+        }
+      '''

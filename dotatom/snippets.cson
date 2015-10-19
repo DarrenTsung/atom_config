@@ -116,12 +116,9 @@
     'prefix': 'logError'
     'body': 'Debug.LogError("$1");'
     
-  'Region Mark':
-    'prefix': 'region'
-    'body': '#region mark - $1'
-  'End Region':
-    'prefix': 'endregion'
-    'body': '#endregion'
+  'Pragma Mark':
+    'prefix': 'pragma'
+    'body': '// PRAGMA MARK - $1'
     
   'Notification Event':
     'prefix': 'notif'
@@ -149,4 +146,16 @@
   'SerializeFieldReadyOnly':
     'prefix': 'readonly'
     'body': '[SerializeField, ReadOnly]'
+    
+  'PlayerNotificationWrapper':
+    'prefix': 'playerNotificationWrapper'
+    'body': """
+    protected void ${1:HandlePrimaryDirection}Wrapper(int playerIndex, ${2:Vector2} ${3:primaryDirection}) {
+      if (playerIndex == _playerIndex) this.${1:HandlePrimaryDirection}(${3:primaryDirection});
+    }
+    
+    protected virtual void ${1:HandlePrimaryDirection}(Vector2 ${3:primaryDirection}) {
+      // do nothing for now
+    }
+    """
   

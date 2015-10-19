@@ -18,6 +18,8 @@
 '.source.cs':
   'if':
     'body': 'if (${cursor}) {\n${selection}\n}'
+  'namespace':
+    'body': 'namespace ${cursor} {\n${selection}\n}'
 
 # CoffeeScript Snippets
 '.source.coffee':
