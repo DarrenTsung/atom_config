@@ -1,7 +1,7 @@
 helpers = require './spec-helper'
 
 describe "Motions", ->
-  [editor, editorElement, vimState] = []
+  [editor, editorElement, parentElement, vimState] = []
 
   beforeEach ->
     vimMode = atom.packages.loadPackage('vim-mode')
@@ -315,6 +315,54 @@ describe "Motions", ->
 
         it "selects to the end of the current word", ->
           expect(vimState.getRegister('"').text).toBe 'ab  cde1+-'
+
+  describe "the ) keybinding", ->
+    beforeEach ->
+      editor.setText "This is a sentence. This is a second sentence.\nThis is a third sentence.\n\nThis sentence is past the paragraph boundary."
+      editor.setCursorBufferPosition [0, 0]
+
+    describe "as a motion", ->
+      it "moves the cursor to the beginning of the next sentence", ->
+        keydown ')'
+        expect(editor.getCursorBufferPosition()).toEqual [0, 20]
+
+        keydown ')'
+        expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+
+        keydown ')'
+        expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+
+    describe "as a selection", ->
+      beforeEach ->
+        keydown('y')
+        keydown(')')
+
+      it 'selects to the start of the next sentence', ->
+        expect(vimState.getRegister('"').text).toBe "This is a sentence. "
+
+  describe "the ( keybinding", ->
+    beforeEach ->
+      editor.setText "This first sentence is in its own paragraph.\n\nThis is a sentence. This is a second sentence.\nThis is a third sentence"
+      editor.setCursorBufferPosition [3, 0]
+
+    describe "as a motion", ->
+      it "moves the cursor to the beginning of the previous sentence", ->
+        keydown '('
+        expect(editor.getCursorBufferPosition()).toEqual [2, 20]
+
+        keydown '('
+        expect(editor.getCursorBufferPosition()).toEqual [2, 0]
+
+        keydown '('
+        expect(editor.getCursorBufferPosition()).toEqual [1, 0]
+
+    describe "as a selection", ->
+      beforeEach ->
+        keydown('y')
+        keydown('(')
+
+      it 'selects to the end of the previous sentence', ->
+        expect(vimState.getRegister('"').text).toBe "This is a second sentence.\n"
 
   describe "the } keybinding", ->
     beforeEach ->
@@ -1378,17 +1426,17 @@ describe "Motions", ->
       spyOn(editor.getLastCursor(), 'setScreenPosition')
 
     it "moves the cursor to the first row if visible", ->
-      spyOn(editor, 'getFirstVisibleScreenRow').andReturn(0)
+      spyOn(editorElement, 'getFirstVisibleScreenRow').andReturn(0)
       keydown('H', shift: true)
       expect(editor.getLastCursor().setScreenPosition).toHaveBeenCalledWith([0, 0])
 
     it "moves the cursor to the first visible row plus offset", ->
-      spyOn(editor, 'getFirstVisibleScreenRow').andReturn(2)
+      spyOn(editorElement, 'getFirstVisibleScreenRow').andReturn(2)
       keydown('H', shift: true)
       expect(editor.getLastCursor().setScreenPosition).toHaveBeenCalledWith([4, 0])
 
     it "respects counts", ->
-      spyOn(editor, 'getFirstVisibleScreenRow').andReturn(0)
+      spyOn(editorElement, 'getFirstVisibleScreenRow').andReturn(0)
       keydown('3')
       keydown('H', shift: true)
       expect(editor.getLastCursor().setScreenPosition).toHaveBeenCalledWith([2, 0])
@@ -1400,17 +1448,17 @@ describe "Motions", ->
       spyOn(editor.getLastCursor(), 'setScreenPosition')
 
     it "moves the cursor to the first row if visible", ->
-      spyOn(editor, 'getLastVisibleScreenRow').andReturn(10)
+      spyOn(editorElement, 'getLastVisibleScreenRow').andReturn(10)
       keydown('L', shift: true)
       expect(editor.getLastCursor().setScreenPosition).toHaveBeenCalledWith([10, 0])
 
     it "moves the cursor to the first visible row plus offset", ->
-      spyOn(editor, 'getLastVisibleScreenRow').andReturn(6)
+      spyOn(editorElement, 'getLastVisibleScreenRow').andReturn(6)
       keydown('L', shift: true)
       expect(editor.getLastCursor().setScreenPosition).toHaveBeenCalledWith([4, 0])
 
     it "respects counts", ->
-      spyOn(editor, 'getLastVisibleScreenRow').andReturn(10)
+      spyOn(editorElement, 'getLastVisibleScreenRow').andReturn(10)
       keydown('3')
       keydown('L', shift: true)
       expect(editor.getLastCursor().setScreenPosition).toHaveBeenCalledWith([8, 0])
@@ -1420,8 +1468,8 @@ describe "Motions", ->
       editor.setText("1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n")
       editor.setCursorScreenPosition([8, 0])
       spyOn(editor.getLastCursor(), 'setScreenPosition')
-      spyOn(editor, 'getLastVisibleScreenRow').andReturn(10)
-      spyOn(editor, 'getFirstVisibleScreenRow').andReturn(0)
+      spyOn(editorElement, 'getLastVisibleScreenRow').andReturn(10)
+      spyOn(editorElement, 'getFirstVisibleScreenRow').andReturn(0)
 
     it "moves the cursor to the first row if visible", ->
       keydown('M', shift: true)
@@ -1564,6 +1612,36 @@ describe "Motions", ->
       expect(editor.getText()).toBe("abcabcabcabc\n")
       expect(editor.getCursorScreenPosition()).toEqual [0, 0]
       expect(vimState.mode).toBe "normal"
+
+    describe 'with accented characters', ->
+      buildIMECompositionEvent = (event, {data, target}={}) ->
+        event = new Event(event)
+        event.data = data
+        Object.defineProperty(event, 'target', get: -> target)
+        event
+
+      buildTextInputEvent = ({data, target}) ->
+        event = new Event('textInput')
+        event.data = data
+        Object.defineProperty(event, 'target', get: -> target)
+        event
+
+      beforeEach ->
+        editor.setText("abcébcabcébc\n")
+        editor.setCursorScreenPosition([0, 0])
+
+      it 'works with IME composition', ->
+        keydown('f')
+        normalModeEditor = editor.normalModeInputView.editorElement
+        jasmine.attachToDOM(normalModeEditor)
+        domNode = normalModeEditor.component.domNode
+        inputNode = domNode.querySelector('.hidden-input')
+        domNode.dispatchEvent(buildIMECompositionEvent('compositionstart', target: inputNode))
+        domNode.dispatchEvent(buildIMECompositionEvent('compositionupdate', data: "´", target: inputNode))
+        expect(normalModeEditor.getModel().getText()).toEqual '´'
+        domNode.dispatchEvent(buildIMECompositionEvent('compositionend', data: "é", target: inputNode))
+        domNode.dispatchEvent(buildTextInputEvent(data: 'é', target: inputNode))
+        expect(editor.getCursorScreenPosition()).toEqual [0, 3]
 
   describe 'the t/T keybindings', ->
     beforeEach ->
@@ -1890,16 +1968,21 @@ describe "Motions", ->
 
   describe "scrolling screen and keeping cursor in the same screen position", ->
     beforeEach ->
+      jasmine.attachToDOM(editorElement)
+
       editor.setText([0...80].join("\n"))
-      editor.setHeight(20 * 10)
-      editor.setLineHeightInPixels(10)
-      editor.setScrollTop(40 * 10)
+
+      editorElement.setHeight(20 * 10)
+      editorElement.style.lineHeight = "10px"
+      atom.views.performDocumentPoll()
+
+      editorElement.setScrollTop(40 * 10)
       editor.setCursorBufferPosition([42, 0])
 
     describe "the ctrl-u keybinding", ->
-      it "moves the screen down by half screen size and keeps cursor onscreen", ->
+      it "moves the screen up by half screen size and keeps cursor onscreen", ->
         keydown('u', ctrl: true)
-        expect(editor.getScrollTop()).toEqual 300
+        expect(editorElement.getScrollTop()).toEqual 300
         expect(editor.getCursorBufferPosition()).toEqual [32, 0]
 
       it "selects on visual mode", ->
@@ -1908,15 +1991,15 @@ describe "Motions", ->
         keydown('u', ctrl: true)
         expect(editor.getSelectedText()).toEqual [32..42].join("\n")
 
-      it "selects on linewise mode", ->
+      it "selects in linewise mode", ->
         vimState.activateVisualMode('linewise')
         keydown('u', ctrl: true)
-        expect(editor.getSelectedText()).toEqual [32..42].join("\n").concat("\n")
+        expect(editor.getSelectedText()).toEqual [33..42].join("\n").concat("\n")
 
     describe "the ctrl-b keybinding", ->
       it "moves screen up one page", ->
         keydown('b', ctrl: true)
-        expect(editor.getScrollTop()).toEqual 200
+        expect(editorElement.getScrollTop()).toEqual 200
         expect(editor.getCursorScreenPosition()).toEqual [22, 0]
 
       it "selects on visual mode", ->
@@ -1925,16 +2008,15 @@ describe "Motions", ->
         keydown('b', ctrl: true)
         expect(editor.getSelectedText()).toEqual [22..42].join("\n")
 
-      it "selects on linewise mode", ->
+      it "selects in linewise mode", ->
         vimState.activateVisualMode('linewise')
         keydown('b', ctrl: true)
-        expect(editor.getSelectedText()).toEqual [22..42].join("\n").concat("\n")
-
+        expect(editor.getSelectedText()).toEqual [23..42].join("\n").concat("\n")
 
     describe "the ctrl-d keybinding", ->
       it "moves the screen down by half screen size and keeps cursor onscreen", ->
         keydown('d', ctrl: true)
-        expect(editor.getScrollTop()).toEqual 500
+        expect(editorElement.getScrollTop()).toEqual 500
         expect(editor.getCursorBufferPosition()).toEqual [52, 0]
 
       it "selects on visual mode", ->
@@ -1943,15 +2025,15 @@ describe "Motions", ->
         keydown('d', ctrl: true)
         expect(editor.getSelectedText()).toEqual [42..52].join("\n").slice(1, -1)
 
-      it "selects on linewise mode", ->
+      it "selects in linewise mode", ->
         vimState.activateVisualMode('linewise')
         keydown('d', ctrl: true)
-        expect(editor.getSelectedText()).toEqual [42..52].join("\n").concat("\n")
+        expect(editor.getSelectedText()).toEqual [42..53].join("\n").concat("\n")
 
     describe "the ctrl-f keybinding", ->
       it "moves screen down one page", ->
         keydown('f', ctrl: true)
-        expect(editor.getScrollTop()).toEqual 600
+        expect(editorElement.getScrollTop()).toEqual 600
         expect(editor.getCursorScreenPosition()).toEqual [62, 0]
 
       it "selects on visual mode", ->
@@ -1960,7 +2042,7 @@ describe "Motions", ->
         keydown('f', ctrl: true)
         expect(editor.getSelectedText()).toEqual [42..62].join("\n").slice(1, -1)
 
-      it "selects on linewise mode", ->
+      it "selects in linewise mode", ->
         vimState.activateVisualMode('linewise')
         keydown('f', ctrl: true)
-        expect(editor.getSelectedText()).toEqual [42..62].join("\n").concat("\n")
+        expect(editor.getSelectedText()).toEqual [42..63].join("\n").concat("\n")

@@ -1,5 +1,35 @@
 # Changelog
 
+## 2.6.5
+Fixes [#163](https://github.com/danielbrodin/atom-project-manager/issues/163)
+
+## 2.6.4
+[#161](https://github.com/danielbrodin/atom-project-manager/issues/161) should now be fixed for real thanks to [@douggr](https://github.com/douggr) :)
+
+## 2.6.3
+Should fix [#161](https://github.com/danielbrodin/atom-project-manager/issues/161)
+
+## 2.6.2
+Fixed [#160](https://github.com/danielbrodin/atom-project-manager/issues/160)
+
+## 2.6.1
+Fixed bug that happened when there where no settings on a project
+
+## 2.6.0
+Package now use ES6 mostly. Still some views done in CoffeeScript.
+A restart of Atom could be needed for it to work after the update.
+
+## 2.5.2
+Now shows a notification if the `projects.cson` file isn't correctly formatted.
+
+## 2.5.1
+- Fixes a bug that would not update a project if the key had changed manually in the `projects.cson`. Not a 100% fix, but will hopefully work for now until a prettier one is around :)
+- Added a notification with a link to a fix for when the `projects.cson` file can't be watched.
+
+## 2.5.0
+- Updated READ ME to be a bit more clear
+- Added cleaning of package commands on deactivation.
+
 ## 2.4.0
 Now automatically updates a project and its settings if it's the active project when it has been updated in the `projects.cson` file
 

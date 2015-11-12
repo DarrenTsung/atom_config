@@ -7,7 +7,7 @@ describe 'BottomPanelMount', ->
         statusBar = workspaceElement.querySelector('status-bar')
         statusBarService = pack.mainModule.provideStatusBar()
     waitsForPromise ->
-      atom.packages.activatePackage('linter').then (pack) ->
+      atom.packages.activatePackage('linter').then ->
         atom.packages.getActivePackage('linter').mainModule.consumeStatusBar(statusBar)
     waitsForPromise ->
       atom.workspace.open()
@@ -20,3 +20,7 @@ describe 'BottomPanelMount', ->
     atom.config.set('linter.statusIconPosition', 'Right')
     tile = statusBar.getRightTiles()[0]
     expect(tile.item.localName).toBe('linter-bottom-container')
+
+  it 'defaults to visible', ->
+    tile = statusBar.getLeftTiles()[0]
+    expect(tile.item.visibility).toBe(true)

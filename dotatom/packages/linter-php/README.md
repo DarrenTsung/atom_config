@@ -1,35 +1,41 @@
 # linter-php
-=========================
+[![Build Status](https://travis-ci.org/AtomLinter/linter-php.svg)](https://travis-ci.org/AtomLinter/linter-php)
+[![Dependency Status](https://david-dm.org/AtomLinter/linter-php.svg)](https://david-dm.org/AtomLinter/linter-php)
+[![apm](https://img.shields.io/apm/v/linter-php.svg)](https://atom.io/packages/linter-php)
+[![apm](https://img.shields.io/apm/dm/linter-php.svg)](https://atom.io/packages/linter-php)
 
-This package will lint your `.php` opened filed in Atom through [php -l](http://www.php.net/manual/en/features.commandline.options.php).
+This package will lint PHP files and embedded PHP within HTML files in Atom through
+[php -l](http://www.php.net/manual/en/features.commandline.options.php).
 
 ## Installation
-Linter package must be installed in order to use this plugin. If Linter is not installed, please follow the instructions [here](https://github.com/AtomLinter/Linter).
+You will need to have [php](http://php.net) installed on your system before trying
+to use this package, please follow the instructions on their site to accomplish this.
 
-* Install [php](http://php.net).
-* `$ apm install linter-php`
+After installing `php` on your system you can install this package by either searching
+for it within Atom's package installation section of the settings or by running the
+following command in a terminal:
+```ShellSession
+apm install linter-php
+```
 
-## Settings
-You can configure linter-php by editing ~/.atom/config.cson (choose Open Your Config in Atom menu):
+_As this package only provides a service, you will need something to run it. As
+such, the [Linter](https://atom.io/packages/linter) package will be installed
+automatically for you if it isn't already installed. This will provide the user interface and run the linter for you._
+
+### Setup
+Once the package is installed you may need to specify the path to the `php`
+executable if Atom is not able to find it automatically. You can do this from
+Atom's settings menu or by editing your `~/.atom/config.cson` file (choose Open Your Config in Atom's menu). If editing the file by hand you should modify/create a
+section like the following:
 ```cson
 'linter-php':
   # php path. run 'which php' to find the path
-  'executablePath': null
+  'executablePath': /usr/bin/php
 ```
 
-## Contributing
-If you would like to contribute enhancements or fixes, please do the following:
+## Maintainers
 
-1. Fork the plugin repository.
-1. Hack on a separate topic branch created from the latest `master`.
-1. Commit and push the topic branch.
-1. Make a pull request.
-1. Welcome to the club!
+The following people have stepped up to take responsibility for this repository and should be consulted on any releases or major changes.
 
-Please note that modifications should follow these coding guidelines:
-
-- Indent is 2 spaces.
-- Code should pass [CoffeeLint](http://www.coffeelint.org/) with the provided `coffeelint.json`
-- Vertical whitespace helps readability, don’t be afraid to use it.
-
-**Thank you for helping out!**
+* [steelbrain](http://github.com/steelbrain) - Release Maintainer
+* [Arcanemagus](http://github.com/Arcanemagus)

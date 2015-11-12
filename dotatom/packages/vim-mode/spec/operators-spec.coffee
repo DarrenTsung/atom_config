@@ -737,8 +737,7 @@ describe "Operators", ->
           keydown('c')
           keydown('%')
           editor.insertText('x')
-          # this differs from VIM, which deletes the character originally under cursor
-          expect(editor.getText()).toBe("12345x67)8\nabcx)e\nAx)BCDE")
+          expect(editor.getText()).toBe("12345x7)8\nabcxe\nAxBCDE")
           expect(vimState.mode).toBe "insert"
 
       describe "after or without brackets", ->
@@ -774,15 +773,13 @@ describe "Operators", ->
         it "repeats correctly inside brackets", ->
           editor.setCursorScreenPosition([1, 4])
           keydown('.')
-          # this differs from VIM, which deletes the character originally under cursor
-          expect(editor.getText()).toBe("1x8\nabcxd)e\nA()BCDE")
+          expect(editor.getText()).toBe("1x8\nabcx)e\nA()BCDE")
           expect(vimState.mode).toBe "normal"
 
         it "repeats correctly on the closing bracket", ->
           editor.setCursorScreenPosition([1, 5])
           keydown('.')
-          # this differs from VIM, which deletes the character originally under cursor
-          expect(editor.getText()).toBe("1x8\nabcx)e\nA()BCDE")
+          expect(editor.getText()).toBe("1x8\nabcxe\nA()BCDE")
           expect(vimState.mode).toBe "normal"
 
         it "does nothing when repeated after a bracket", ->
@@ -1134,9 +1131,12 @@ describe "Operators", ->
 
     describe "in a long file", ->
       beforeEach ->
-        editor.setHeight(400)
-        editor.setLineHeightInPixels(10)
-        editor.setDefaultCharWidth(10)
+        jasmine.attachToDOM(editorElement)
+        editorElement.setHeight(400)
+        editorElement.style.lineHeight = "10px"
+        editorElement.style.font = "16px monospace"
+        atom.views.performDocumentPoll()
+
         text = ""
         for i in [1..200]
           text += "#{i}\n"
@@ -1145,7 +1145,7 @@ describe "Operators", ->
       describe "yanking many lines forward", ->
         it "does not scroll the window", ->
           editor.setCursorBufferPosition [40, 1]
-          previousScrollTop = editor.getScrollTop()
+          previousScrollTop = editorElement.getScrollTop()
 
           # yank many lines
           keydown('y')
@@ -1154,14 +1154,14 @@ describe "Operators", ->
           keydown('0')
           keydown('G', shift: true)
 
-          expect(editor.getScrollTop()).toEqual(previousScrollTop)
+          expect(editorElement.getScrollTop()).toEqual(previousScrollTop)
           expect(editor.getCursorBufferPosition()).toEqual [40, 1]
           expect(vimState.getRegister('"').text.split('\n').length).toBe 121
 
       describe "yanking many lines backwards", ->
         it "scrolls the window", ->
           editor.setCursorBufferPosition [140, 1]
-          previousScrollTop = editor.getScrollTop()
+          previousScrollTop = editorElement.getScrollTop()
 
           # yank many lines
           keydown('y')
@@ -1169,7 +1169,7 @@ describe "Operators", ->
           keydown('0')
           keydown('G', shift: true)
 
-          expect(editor.getScrollTop()).toNotEqual previousScrollTop
+          expect(editorElement.getScrollTop()).toNotEqual previousScrollTop
           expect(editor.getCursorBufferPosition()).toEqual [59, 1]
           expect(vimState.getRegister('"').text.split('\n').length).toBe 83
 
@@ -1713,6 +1713,16 @@ describe "Operators", ->
         it "indents the current line", ->
           expect(editor.indentationForBufferRow(1)).toBe 0
 
+      describe "when followed by a G", ->
+        beforeEach ->
+          editor.setCursorScreenPosition([0, 0])
+          keydown('=')
+          keydown('G', shift: true)
+
+        it "uses the default count", ->
+          expect(editor.indentationForBufferRow(1)).toBe 0
+          expect(editor.indentationForBufferRow(2)).toBe 0
+
       describe "when followed by a repeating =", ->
         beforeEach ->
           keydown('2')
@@ -1807,6 +1817,34 @@ describe "Operators", ->
         normalModeInputKeydown('x')
         expect(editor.getCursorBufferPositions()).toEqual [[0, 0], [1, 0]]
 
+    describe 'with accented characters', ->
+      buildIMECompositionEvent = (event, {data, target}={}) ->
+        event = new Event(event)
+        event.data = data
+        Object.defineProperty(event, 'target', get: -> target)
+        event
+
+      buildTextInputEvent = ({data, target}) ->
+        event = new Event('textInput')
+        event.data = data
+        Object.defineProperty(event, 'target', get: -> target)
+        event
+
+      it 'works with IME composition', ->
+        keydown('r')
+        normalModeEditor = editor.normalModeInputView.editorElement
+        jasmine.attachToDOM(normalModeEditor)
+        domNode = normalModeEditor.component.domNode
+        inputNode = domNode.querySelector('.hidden-input')
+        domNode.dispatchEvent(buildIMECompositionEvent('compositionstart', target: inputNode))
+        domNode.dispatchEvent(buildIMECompositionEvent('compositionupdate', data: 's', target: inputNode))
+        expect(normalModeEditor.getModel().getText()).toEqual 's'
+        domNode.dispatchEvent(buildIMECompositionEvent('compositionupdate', data: 'sd', target: inputNode))
+        expect(normalModeEditor.getModel().getText()).toEqual 'sd'
+        domNode.dispatchEvent(buildIMECompositionEvent('compositionend', target: inputNode))
+        domNode.dispatchEvent(buildTextInputEvent(data: '速度', target: inputNode))
+        expect(editor.getText()).toBe '速度2\n速度4\n\n'
+
   describe 'the m keybinding', ->
     beforeEach ->
       editor.setText('12\n34\n56\n')
@@ -1859,6 +1897,13 @@ describe "Operators", ->
         keydown("l")
         expect(editor.getText()).toBe 'Abc\nXyZ'
 
+      it "uses default count", ->
+        editor.setCursorBufferPosition([0, 0])
+        keydown("g")
+        keydown("~")
+        keydown("G", shift: true)
+        expect(editor.getText()).toBe 'AbC\nxYz'
+
   describe 'the U keybinding', ->
     beforeEach ->
       editor.setText('aBc\nXyZ')
@@ -1882,6 +1927,13 @@ describe "Operators", ->
       expect(editor.getText()).toBe 'ABC\nXYZ'
       expect(editor.getCursorScreenPosition()).toEqual [1, 2]
 
+    it "uses default count", ->
+      editor.setCursorBufferPosition([0, 0])
+      keydown("g")
+      keydown("U", shift: true)
+      keydown("G", shift: true)
+      expect(editor.getText()).toBe 'ABC\nXYZ'
+
     it "makes the selected text uppercase in visual mode", ->
       keydown("V", shift: true)
       keydown("U", shift: true)
@@ -1898,6 +1950,13 @@ describe "Operators", ->
       keydown("$")
       expect(editor.getText()).toBe 'abc\nXyZ'
       expect(editor.getCursorScreenPosition()).toEqual [0, 2]
+
+    it "uses default count", ->
+      editor.setCursorBufferPosition([0, 0])
+      keydown("g")
+      keydown("u")
+      keydown("G", shift: true)
+      expect(editor.getText()).toBe 'abc\nxyz'
 
     it "makes the selected text lowercase in visual mode", ->
       keydown("V", shift: true)

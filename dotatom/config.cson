@@ -13,11 +13,13 @@
       "language-toml"
       "language-yaml"
       "link"
+      "minimap"
     ]
     ignoredNames: [
       ".git"
       "*.meta"
       ".svn"
+      ".DS_STORE"
     ]
     themes: [
       "nucleus-dark-ui"
@@ -58,6 +60,8 @@
       "*.userprefs"
       "Library/*"
       "Temp/*"
+      "*.txt"
+      "*.cginc"
     ]
   tabs: {}
   "one-dark-ui": {}

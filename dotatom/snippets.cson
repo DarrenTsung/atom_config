@@ -127,6 +127,10 @@
     'prefix': 'notifArgs'
     'body': 'public static UnityEvents.${1:Type} ${2:PlayerChanged} = new UnityEvents.${1:Type}();'
     
+  'Toolbox Instance':
+    'prefix': 'tinstance'
+    'body': 'Toolbox.GetInstance<${1:GameManager}>()'
+    
   'Summary':
     'prefix': 'summary'
     'body': """
@@ -140,6 +144,9 @@
       /// <param name="${2:paramName}">${3:paramInformation}</param>
       """
       
+  'Header':
+    'prefix': 'header'
+    'body': '[Header("$1")]'
   'SerializeField':
     'prefix': 'serial'
     'body': '[SerializeField]'

@@ -18,3 +18,13 @@ localmultiplayertest:
   paths: [
     "/Users/darrentsung/Documents/Projects/Unity Projects/LocalMultiplayerTest/Local Multiplayer Test"
   ]
+cloudfaceprototype1:
+  title: "Cloudface Prototype 1"
+  paths: [
+    "/Users/darrentsung/Documents/Projects/cloudface-unity/cloudface-prototype-01/"
+  ]
+unitybuildinshaders:
+  title: "Unity Built-in Shaders"
+  paths: [
+    "/Users/darrentsung/Downloads/UNITY-builtin_shaders-5.2.0f3"
+  ]

@@ -103,7 +103,7 @@ class Delete extends Operator
 class ToggleCase extends Operator
   constructor: (@editor, @vimState, {@complete}={}) ->
 
-  execute: (count=1) ->
+  execute: (count) ->
     if @motion?
       if _.contains(@motion.select(count), true)
         @editor.replaceSelectedText {}, (text) ->
@@ -119,7 +119,7 @@ class ToggleCase extends Operator
         for cursor in @editor.getCursors()
           point = cursor.getBufferPosition()
           lineLength = @editor.lineTextForBufferRow(point.row).length
-          cursorCount = Math.min(count, lineLength - point.column)
+          cursorCount = Math.min(count ? 1, lineLength - point.column)
 
           _.times cursorCount, =>
             point = cursor.getBufferPosition()
@@ -142,7 +142,7 @@ class UpperCase extends Operator
   constructor: (@editor, @vimState) ->
     @complete = false
 
-  execute: (count=1) ->
+  execute: (count) ->
     if _.contains(@motion.select(count), true)
       @editor.replaceSelectedText {}, (text) ->
         text.toUpperCase()
@@ -156,7 +156,7 @@ class LowerCase extends Operator
   constructor: (@editor, @vimState) ->
     @complete = false
 
-  execute: (count=1) ->
+  execute: (count) ->
     if _.contains(@motion.select(count), true)
       @editor.replaceSelectedText {}, (text) ->
         text.toLowerCase()
@@ -170,6 +170,7 @@ class Yank extends Operator
   register: null
 
   constructor: (@editor, @vimState) ->
+    @editorElement = atom.views.getView(@editor)
     @register = settings.defaultRegister()
 
   # Public: Copies the text selected by the given motion.
@@ -178,8 +179,8 @@ class Yank extends Operator
   #
   # Returns nothing.
   execute: (count) ->
-    oldTop = @editor.getScrollTop()
-    oldLeft = @editor.getScrollLeft()
+    oldTop = @editorElement.getScrollTop()
+    oldLeft = @editorElement.getScrollLeft()
     oldLastCursorPosition = @editor.getCursorBufferPosition()
 
     originalPositions = @editor.getCursorBufferPositions()
@@ -203,8 +204,8 @@ class Yank extends Operator
     @editor.setSelectedBufferRanges(newPositions.map (p) -> new Range(p, p))
 
     if oldLastCursorPosition.isEqual(@editor.getCursorBufferPosition())
-      @editor.setScrollLeft(oldLeft)
-      @editor.setScrollTop(oldTop)
+      @editorElement.setScrollLeft(oldLeft)
+      @editorElement.setScrollTop(oldTop)
 
     @vimState.activateNormalMode()
 
