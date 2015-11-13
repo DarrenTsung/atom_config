@@ -135,7 +135,7 @@
     'prefix': 'summary'
     'body': """
       /// <summary>
-      /// ${1:summary}
+      /// ${1:This is a function that does X}
       /// </summary>
       """
   'Param':
@@ -143,6 +143,10 @@
     'body': """
       /// <param name="${2:paramName}">${3:paramInformation}</param>
       """
+      
+  'Throw Generic Exception':
+    'prefix': 'gthrow'
+    'body': 'throw new Exception(string.Format("${1:Some error message here}", ${2:arguments}));'
       
   'Header':
     'prefix': 'header'
