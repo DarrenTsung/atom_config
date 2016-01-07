@@ -154,7 +154,6 @@
     'body': """
       /// <param name="${2:paramName}">${3:paramInformation}</param>
       """
-<<<<<<< HEAD
 
   'Throw Generic Exception':
     'prefix': 'gthrow'
@@ -163,7 +162,6 @@
   'Header':
     'prefix': 'header'
     'body': '[Header("$1")]'
-=======
 
   'Interface Region':
     'prefix': 'iregion'
@@ -179,7 +177,6 @@
       #endregion
     """
 
->>>>>>> Latest config for atom config
   'SerializeField':
     'prefix': 'serial'
     'body': '[SerializeField]'
