@@ -55,8 +55,13 @@
   "homepage": "https://github.com/atom-minimap/minimap#readme",
   "_id": "minimap@4.16.0",
   "_shasum": "b013640e4635108022e038ade0af3f48a064ddd5",
+<<<<<<< HEAD
   "_resolved": "file:../d-1151012-81291-bvlrxb/package.tgz",
   "_from": "../d-1151012-81291-bvlrxb/package.tgz",
+=======
+  "_resolved": "file:../d-115102-40235-1eumu0y/package.tgz",
+  "_from": "../d-115102-40235-1eumu0y/package.tgz",
+>>>>>>> Latest config for atom config
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [

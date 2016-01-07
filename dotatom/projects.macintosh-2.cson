@@ -29,13 +29,42 @@ casual:
   paths: [
     "/Users/darren/Projects/storm8/iphonedev-Dragon2-1.0"
   ]
-"lazyunityhelper":
+lazyunityhelper:
   title: "LazyUnityHelper"
   paths: [
     "/Users/darren/Documents/Coding/lazy-unity-helper/"
   ]
-"historytracker":
+historytracker:
   title: "HistoryTracker"
   paths: [
     "/Users/darren/Documents/Coding/AtomPackages/history-tracker/"
+  ]
+"selection-wrapper":
+  title: "Selection-Wrapper"
+  paths: [
+    "/Users/darren/Documents/Coding/AtomPackages/selection-wrapper"
+  ]
+storm8bot:
+  title: "storm8bot"
+  paths: [
+    "/Users/darren/Documents/Coding/storm8bot"
+  ]
+jsonanimationparser:
+  title: "JSONAnimationParser"
+  paths: [
+    "/Users/darren/Documents/Coding/storm8unity/json-animation-parser/JSONAnimationParser"
+  ]
+bakery2:
+  title: "bakery2"
+  paths: [
+    "/Users/darren/Projects/storm8/bakery2"
+    "/Users/darren/Projects/storm8/s8unity_shared"
+  ]
+"server-bakery2":
+  title: "server-bakery2"
+  paths: [
+    "/Users/darren/Projects/storm8/phpdev"
+    "/Users/darren/Projects/storm8/g2_dev/base"
+    "/Users/darren/Projects/storm8/g2_dev/bakery2"
+    "/Users/darren/Projects/storm8/g2_dev/citynext"
   ]

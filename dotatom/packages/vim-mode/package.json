@@ -43,8 +43,13 @@
   "homepage": "https://github.com/atom/vim-mode#readme",
   "_id": "vim-mode@0.63.0",
   "_shasum": "4ec31220547f0c6e4741b315273c5f09b7fff74e",
+<<<<<<< HEAD
   "_resolved": "file:../d-1151012-81330-dehxkm/package.tgz",
   "_from": "../d-1151012-81330-dehxkm/package.tgz",
+=======
+  "_resolved": "file:../d-115103-6004-1om4ugi/package.tgz",
+  "_from": "../d-115103-6004-1om4ugi/package.tgz",
+>>>>>>> Latest config for atom config
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [

@@ -29,8 +29,13 @@
   "homepage": "https://github.com/williampuk/line-ending-converter#readme",
   "_id": "line-ending-converter@1.3.2",
   "_shasum": "1729022c0fbd8a344e9235da9b4397a6d6fde43b",
+<<<<<<< HEAD
   "_resolved": "file:../d-1151012-81270-jck6f7/package.tgz",
   "_from": "../d-1151012-81270-jck6f7/package.tgz",
+=======
+  "_resolved": "file:../d-115102-40213-1ebhvln/package.tgz",
+  "_from": "../d-115102-40213-1ebhvln/package.tgz",
+>>>>>>> Latest config for atom config
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [

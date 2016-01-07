@@ -28,8 +28,13 @@
   "homepage": "https://github.com/gepoch/vim-surround#readme",
   "_id": "vim-surround@0.8.1",
   "_shasum": "928b1078fb6aa1d68b2fb3802ae2acacb0d96d97",
+<<<<<<< HEAD
   "_resolved": "file:../d-1151012-81333-y6c36/package.tgz",
   "_from": "../d-1151012-81333-y6c36/package.tgz",
+=======
+  "_resolved": "file:../d-1151016-16633-zodn69/package.tgz",
+  "_from": "../d-1151016-16633-zodn69/package.tgz",
+>>>>>>> Latest config for atom config
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [],

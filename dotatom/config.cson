@@ -25,12 +25,17 @@
       "nucleus-dark-ui"
       "one-dark-syntax"
     ]
+    packagesWithKeymapsDisabled: [
+      "highlight-selected"
+    ]
+    followSymlinks: false
   editor:
     invisibles: {}
-    fontSize: 12
     fontFamily: "Monaco"
+    tabType: "soft"
+    fontSize: 13
+    scrollPastEnd: true
   whitespace:
-    removeTrailingWhitespace: false
     ensureSingleTrailingNewline: false
     ignoreWhitespaceOnCurrentLine: false
   "vim-mode": {}
@@ -63,6 +68,7 @@
       "*.txt"
       "*.cginc"
     ]
+    useAlternateScoring: true
   tabs: {}
   "one-dark-ui": {}
   minimap: {}
@@ -79,22 +85,25 @@
     wrapSelectionsInBrackets: false
   "project-manager":
     environmentSpecificProjects: true
+  "highlight-selected": {}
 ".html.php.text":
   "wrapper-snippets":
     if:
       name: "if"
       body: '''
         if (${cursor}) {
-        ${selection}
+        ${selection, indent:1}
         }
       '''
+  whitespace:
+    removeTrailingWhitespace: false
 ".coffee.source":
   "wrapper-snippets":
     if:
       name: "if"
       body: '''
         if ${cursor}
-        ${selection}
+        ${selection, indent:1}
       '''
 ".cs.source":
   "wrapper-snippets":
@@ -102,13 +111,21 @@
       name: "if"
       body: '''
         if (${cursor}) {
-        ${selection}
+        ${selection, indent:1}
         }
       '''
     namespace:
       name: "namespace"
       body: '''
         namespace ${cursor} {
-        ${selection}
+        ${selection, indent:1}
         }
       '''
+  editor:
+    tabLength: 4
+".nant-build.source":
+  editor:
+    tabLength: 4
+".cake.source":
+  editor:
+    tabLength: 4

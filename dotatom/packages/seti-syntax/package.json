@@ -19,8 +19,13 @@
   "homepage": "https://github.com/jesseweed/seti-syntax#readme",
   "_id": "seti-syntax@0.4.1",
   "_shasum": "dbc16407970ace74bdab8c5773ed245128ccf1ba",
+<<<<<<< HEAD
   "_resolved": "file:../d-1151012-81318-15yiksg/package.tgz",
   "_from": "../d-1151012-81318-15yiksg/package.tgz",
+=======
+  "_resolved": "file:../d-115103-5997-vb4891/package.tgz",
+  "_from": "../d-115103-5997-vb4891/package.tgz",
+>>>>>>> Latest config for atom config
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [],

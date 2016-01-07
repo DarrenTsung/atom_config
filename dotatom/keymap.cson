@@ -13,6 +13,8 @@
   'ctrl-cmd-l': 'history-tracker:go-forward-in-history'
 
 'atom-text-editor.vim-mode:not(.insert-mode)':
+  'ctrl-i': 'vim-mode:auto-indent'  
+  
   # I use cmd-(1-9) to switch between commonly used applications so remap folding to space N
   'space 0': 'editor:unfold-all'
   'space 1': 'editor:fold-at-indent-level-1'
@@ -20,6 +22,16 @@
   'space 3': 'editor:fold-at-indent-level-3'
   'space 4': 'editor:fold-at-indent-level-4'
   'space 5': 'editor:fold-at-indent-level-5'
+  
+  'space ctrl-h': 'pane:split-left'
+  'space ctrl-l': 'pane:split-right'
+  'space ctrl-j': 'pane:split-down'
+  'space ctrl-k': 'pane:split-up'
+  
+  'shift-ctrl-cmd-h': 'window:focus-pane-on-left'
+  'shift-ctrl-cmd-l': 'window:focus-pane-on-right'
+  'shift-ctrl-cmd-j': 'window:focus-pane-below'
+  'shift-ctrl-cmd-k': 'window:focus-pane-above'
   
   'space f': 'editor:toggle-current-row-folding'
   

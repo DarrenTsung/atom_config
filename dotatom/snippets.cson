@@ -19,6 +19,16 @@
 
 # Storm8 Snippets (php)
 '.text.html.php':
+  'protected (override)':
+    'prefix': 'po'
+    'body': 'protected '
+  'private (override)':
+    'prefix': 'pr'
+    'body': 'private'
+  'public (override)':
+    'prefix': 'pu'
+    'body': 'public '
+
   'debugLog':
     'prefix': 'log'
     'body': 'debugLog("$1", false);'
@@ -56,13 +66,13 @@
                                                     '${4:changeEventVariable5}' => \$${4:changeEventVariable5}));
       return false;
       """
-    
+
   # reminders for myself to use the snippets
   'Snippets \'log\'/\'logVar\'!':
     'prefix': 'debugLog'
     'body': 'lo'
-    
-    
+
+
 # CoffeeScript Snippets
 '.source.coffee':
   'LogVariable':
@@ -71,19 +81,21 @@
   'LogObject':
     'prefix': 'logObject'
     'body': """
-      paramStrings = []
-      for k, v of ${1:variableName}
-        paramStrings.push(k + " => " + v)
-      console.log("${1:variableName}: {\\\\n" + paramStrings.reduceRight((x, y) -> x + "\\\\n" + y) + "\\\\n}")
+      util = require 'util'
+      console.log("${1:variableName}: \\\\n" + util.inspect(${1:variableName}, {showHidden: true, depth: null}))
     """
-    
+    #   paramStrings = []
+    #   for k, v of ${1:variableName}
+    #     paramStrings.push(k + " => " + v)
+    #   console.log("${1:variableName}: {\\\\n" + paramStrings.reduceRight((x, y) -> x + "\\\\n" + y) + "\\\\n}")
+
   'Region Mark':
     'prefix': 'region'
     'body': '#region mark - $1'
   'End Region':
     'prefix': 'endregion'
     'body': '#endregion'
-    
+
   'Add Notification Success':
     'prefix': 'notifSuccess'
     'body': 'atom.notifications.addSuccess("${1:Succeeded at something!}", {dismissable: true})'
@@ -96,8 +108,8 @@
   'Add Notification Error':
     'prefix': 'notifError'
     'body': 'atom.notifications.addError("${1:Failed to do something!}", {dismissable: true})'
-  
-  
+
+
 # Unity Snippets
 '.source.cs':
   'deltaTime':
@@ -115,22 +127,21 @@
   'Debug.LogError':
     'prefix': 'logError'
     'body': 'Debug.LogError("$1");'
-    
+
   'Pragma Mark':
     'prefix': 'pragma'
     'body': '// PRAGMA MARK - $1'
-    
+
   'Notification Event':
     'prefix': 'notif'
     'body': 'public static UnityEvent ${2:PlayerChanged} = new UnityEvent();'
   'Notification Event With Arguments':
     'prefix': 'notifArgs'
     'body': 'public static UnityEvents.${1:Type} ${2:PlayerChanged} = new UnityEvents.${1:Type}();'
-    
   'Toolbox Instance':
     'prefix': 'tinstance'
     'body': 'Toolbox.GetInstance<${1:GameManager}>()'
-    
+
   'Summary':
     'prefix': 'summary'
     'body': """
@@ -143,30 +154,47 @@
     'body': """
       /// <param name="${2:paramName}">${3:paramInformation}</param>
       """
-      
+<<<<<<< HEAD
+
   'Throw Generic Exception':
     'prefix': 'gthrow'
     'body': 'throw new Exception(string.Format("${1:Some error message here}", ${2:arguments}));'
-      
+
   'Header':
     'prefix': 'header'
     'body': '[Header("$1")]'
+=======
+
+  'Interface Region':
+    'prefix': 'iregion'
+    'body': """
+      #region ${1:IQuestView} implementation
+      public void ${2:Method}();
+      #endregion
+    """
+  'Region':
+    'prefix': 'region'
+    'body': """
+      #region ${1:Region Name}
+      #endregion
+    """
+
+>>>>>>> Latest config for atom config
   'SerializeField':
     'prefix': 'serial'
     'body': '[SerializeField]'
   'SerializeFieldReadyOnly':
     'prefix': 'readonly'
     'body': '[SerializeField, ReadOnly]'
-    
+
   'PlayerNotificationWrapper':
     'prefix': 'playerNotificationWrapper'
     'body': """
     protected void ${1:HandlePrimaryDirection}Wrapper(int playerIndex, ${2:Vector2} ${3:primaryDirection}) {
       if (playerIndex == _playerIndex) this.${1:HandlePrimaryDirection}(${3:primaryDirection});
     }
-    
+
     protected virtual void ${1:HandlePrimaryDirection}(Vector2 ${3:primaryDirection}) {
       // do nothing for now
     }
     """
-  

@@ -39,8 +39,13 @@
   "homepage": "https://github.com/danielbrodin/atom-project-manager#readme",
   "_id": "project-manager@2.6.5",
   "_shasum": "43f118808d620dcc295f74944ca8e325987667a0",
+<<<<<<< HEAD
   "_resolved": "file:../d-1151012-81313-p6gveg/package.tgz",
   "_from": "../d-1151012-81313-p6gveg/package.tgz",
+=======
+  "_resolved": "file:../d-115102-40253-1nfysrt/package.tgz",
+  "_from": "../d-115102-40253-1nfysrt/package.tgz",
+>>>>>>> Latest config for atom config
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [

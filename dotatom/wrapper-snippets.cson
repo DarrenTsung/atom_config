@@ -12,16 +12,16 @@
 # Storm8 Snippets (php)
 '.text.html.php':
   'if':
-    'body': 'if (${cursor}) {\n${selection}\n}'
+    'body': 'if (${cursor}) {\n${selection, indent:1}\n}'
     
 # Unity Snippets
 '.source.cs':
   'if':
-    'body': 'if (${cursor}) {\n${selection}\n}'
+    'body': 'if (${cursor}) {\n${selection, indent:1}\n}'
   'namespace':
-    'body': 'namespace ${cursor} {\n${selection}\n}'
+    'body': 'namespace ${cursor} {\n${selection, indent:1}\n}'
 
 # CoffeeScript Snippets
 '.source.coffee':
   'if':
-    'body': 'if ${cursor}\n${selection}'
+    'body': 'if ${cursor}\n${selection, indent:1}'
