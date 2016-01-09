@@ -19,29 +19,20 @@ class Linter
 
     # Private Stuff
     @emitter = new Emitter
-<<<<<<< HEAD
-    @linters = new (require('./linter-registry'))()
-    @editors = new (require('./editor-registry'))()
-    @messages = new (require('./message-registry'))()
-=======
     @linters = new LinterRegistry
     @indieLinters = new IndieRegistry()
     @editors = new EditorRegistry
     @messages = new MessageRegistry()
->>>>>>> Latest config for atom config
     @views = new LinterViews(state.scope, @editors)
     @commands = new Commands(this)
 
     @subscriptions = new CompositeDisposable(@views, @editors, @linters, @messages, @commands, @indieLinters)
 
-<<<<<<< HEAD
-=======
     @indieLinters.observe (indieLinter) =>
       indieLinter.onDidDestroy =>
         @messages.deleteMessages(indieLinter)
     @indieLinters.onDidUpdateMessages ({linter, messages}) =>
       @messages.set({linter, messages})
->>>>>>> Latest config for atom config
     @linters.onDidUpdateMessages ({linter, messages, editor}) =>
       @messages.set({linter, messages, editorLinter: @editors.ofTextEditor(editor)})
     @messages.onDidUpdateMessages (messages) =>

@@ -19,10 +19,7 @@ export default class EditorRegistry {
     editorLinter.onDidDestroy(() =>
       this.editorLinters.delete(textEditor)
     )
-<<<<<<< HEAD
-=======
     this.subscriptions.add(editorLinter)
->>>>>>> Latest config for atom config
     return editorLinter
   }
 
@@ -57,12 +54,6 @@ export default class EditorRegistry {
 
   dispose() {
     this.subscriptions.dispose()
-<<<<<<< HEAD
-    this.editorLinters.forEach(function(editorLinter) {
-      editorLinter.dispose()
-    })
-=======
->>>>>>> Latest config for atom config
     this.editorLinters.clear()
   }
 }

@@ -28,13 +28,8 @@
   "homepage": "https://github.com/maxgraey/atom-dark-fusion-syntax",
   "_id": "atom-dark-fusion-syntax@1.1.0",
   "_shasum": "6a1b890d3660a207ee4711c87cb472fe905a08ae",
-<<<<<<< HEAD
-  "_resolved": "file:../d-1151012-81256-o5v557/package.tgz",
-  "_from": "../d-1151012-81256-o5v557/package.tgz",
-=======
   "_resolved": "file:../d-1151016-16598-suj23y/package.tgz",
   "_from": "../d-1151016-16598-suj23y/package.tgz",
->>>>>>> Latest config for atom config
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [],

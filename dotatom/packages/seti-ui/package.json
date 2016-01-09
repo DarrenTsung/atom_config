@@ -19,13 +19,8 @@
   "homepage": "https://github.com/jesseweed/seti-ui#readme",
   "_id": "seti-ui@0.8.1",
   "_shasum": "e17441fe5dd478a34060238c467623c07fd21192",
-<<<<<<< HEAD
-  "_resolved": "file:../d-1151012-81322-1s7cd5r/package.tgz",
-  "_from": "../d-1151012-81322-1s7cd5r/package.tgz",
-=======
   "_resolved": "file:../d-115102-40258-zl78my/package.tgz",
   "_from": "../d-115102-40258-zl78my/package.tgz",
->>>>>>> Latest config for atom config
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [],

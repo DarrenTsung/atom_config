@@ -23,13 +23,8 @@
   "dist": {
     "shasum": "a0af88e3c747d4d551db8963c46c11a128ecd970"
   },
-<<<<<<< HEAD
-  "_resolved": "file:../d-1151012-81264-w1vfj3/package.tgz",
-  "_from": "../d-1151012-81264-w1vfj3/package.tgz",
-=======
   "_resolved": "file:../d-115102-40207-19zwmdh/package.tgz",
   "_from": "../d-115102-40207-19zwmdh/package.tgz",
->>>>>>> Latest config for atom config
   "_shasum": "0e1b34f5d9d9eb8355401ceae71b52d4927c8095",
   "_atomModuleCache": {
     "version": 1,

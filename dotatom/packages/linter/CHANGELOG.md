@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 ## 1.11.1
 
 * Revert notification for when no providers are installed.
@@ -9,7 +7,6 @@
 * A notification is shown to user if no linter providers are installed.
 * A better self-API for PUSH style providers. Check the wiki for more information.
 
->>>>>>> Latest config for atom config
 ## 1.10.0
 
 * Fix a minor style issue in bottom tabs

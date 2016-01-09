@@ -39,13 +39,8 @@
   "homepage": "https://github.com/AtomLinter/linter-php#readme",
   "_id": "linter-php@1.1.1",
   "_shasum": "fd8284fe4d04e44ac9ccfdf30f85deb118db8262",
-<<<<<<< HEAD
-  "_resolved": "file:../d-1151012-81284-l92zj7/package.tgz",
-  "_from": "../d-1151012-81284-l92zj7/package.tgz",
-=======
   "_resolved": "file:../d-1151016-16619-tsf6ow/package.tgz",
   "_from": "../d-1151016-16619-tsf6ow/package.tgz",
->>>>>>> Latest config for atom config
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [
