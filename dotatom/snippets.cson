@@ -167,7 +167,6 @@
     'prefix': 'iregion'
     'body': """
       #region ${1:IQuestView} implementation
-      public void ${2:Method}();
       #endregion
     """
   'Region':
