@@ -4,7 +4,8 @@ os = require 'os'
 uuid = require 'node-uuid'
 helpers = require './spec-helper'
 
-Ex = require('../lib/ex').singleton()
+ExClass = require('../lib/ex')
+Ex = ExClass.singleton()
 
 describe "the commands", ->
   [editor, editorElement, vimState, exState, dir, dir2] = []
@@ -12,27 +13,37 @@ describe "the commands", ->
   beforeEach ->
     vimMode = atom.packages.loadPackage('vim-mode')
     exMode = atom.packages.loadPackage('ex-mode')
-    exMode.activate()
+    waitsForPromise ->
+      activationPromise = exMode.activate()
+      helpers.activateExMode()
+      activationPromise
+
+    runs ->
+      spyOn(exMode.mainModule.globalExState, 'setVim').andCallThrough()
 
     waitsForPromise ->
-      vimMode.activate().then ->
-        helpers.activateExMode().then ->
-          dir = path.join(os.tmpdir(), "atom-ex-mode-spec-#{uuid.v4()}")
-          dir2 = path.join(os.tmpdir(), "atom-ex-mode-spec-#{uuid.v4()}")
-          fs.makeTreeSync(dir)
-          fs.makeTreeSync(dir2)
-          atom.project.setPaths([dir, dir2])
+      vimMode.activate()
 
-          helpers.getEditorElement (element) ->
-            atom.commands.dispatch(element, 'ex-mode:open')
-            keydown('escape')
-            editorElement = element
-            editor = editorElement.getModel()
-            vimState = vimMode.mainModule.getEditorState(editor)
-            exState = exMode.mainModule.exStates.get(editor)
-            vimState.activateNormalMode()
-            vimState.resetNormalMode()
-            editor.setText("abc\ndef\nabc\ndef")
+    waitsFor ->
+      exMode.mainModule.globalExState.setVim.calls.length > 0
+
+    runs ->
+      dir = path.join(os.tmpdir(), "atom-ex-mode-spec-#{uuid.v4()}")
+      dir2 = path.join(os.tmpdir(), "atom-ex-mode-spec-#{uuid.v4()}")
+      fs.makeTreeSync(dir)
+      fs.makeTreeSync(dir2)
+      atom.project.setPaths([dir, dir2])
+
+      helpers.getEditorElement (element) ->
+        atom.commands.dispatch(element, "ex-mode:open")
+        keydown('escape')
+        editorElement = element
+        editor = editorElement.getModel()
+        vimState = vimMode.mainModule.getEditorState(editor)
+        exState = exMode.mainModule.exStates.get(editor)
+        vimState.activateNormalMode()
+        vimState.resetNormalMode()
+        editor.setText("abc\ndef\nabc\ndef")
 
   afterEach ->
     fs.removeSync(dir)
@@ -151,6 +162,115 @@ describe "the commands", ->
           expect(atom.notifications.notifications).toEqual([])
           expect(fs.readFileSync(existsPath, 'utf-8')).toEqual('abc\ndef')
 
+  describe ":wall", ->
+    it "saves all", ->
+      spyOn(atom.workspace, 'saveAll')
+      keydown(':')
+      submitNormalModeInputText('wall')
+      expect(atom.workspace.saveAll).toHaveBeenCalled()
+
+  describe ":saveas", ->
+    describe "when editing a new file", ->
+      beforeEach ->
+        editor.getBuffer().setText('abc\ndef')
+
+      it "opens the save dialog", ->
+        spyOn(atom, 'showSaveDialogSync')
+        keydown(':')
+        submitNormalModeInputText('saveas')
+        expect(atom.showSaveDialogSync).toHaveBeenCalled()
+
+      it "saves when a path is specified in the save dialog", ->
+        filePath = projectPath('saveas-from-save-dialog')
+        spyOn(atom, 'showSaveDialogSync').andReturn(filePath)
+        keydown(':')
+        submitNormalModeInputText('saveas')
+        expect(fs.existsSync(filePath)).toBe(true)
+        expect(fs.readFileSync(filePath, 'utf-8')).toEqual('abc\ndef')
+
+      it "saves when a path is specified in the save dialog", ->
+        spyOn(atom, 'showSaveDialogSync').andReturn(undefined)
+        spyOn(fs, 'writeFileSync')
+        keydown(':')
+        submitNormalModeInputText('saveas')
+        expect(fs.writeFileSync.calls.length).toBe(0)
+
+    describe "when editing an existing file", ->
+      filePath = ''
+      i = 0
+
+      beforeEach ->
+        i++
+        filePath = projectPath("saveas-#{i}")
+        editor.setText('abc\ndef')
+        editor.saveAs(filePath)
+
+      it "complains if no path given", ->
+        editor.setText('abc')
+        keydown(':')
+        submitNormalModeInputText('saveas')
+        expect(atom.notifications.notifications[0].message).toEqual(
+          'Command error: Argument required'
+        )
+
+      describe "with a specified path", ->
+        newPath = ''
+
+        beforeEach ->
+          newPath = path.relative(dir, "#{filePath}.new")
+          editor.getBuffer().setText('abc')
+          keydown(':')
+
+        afterEach ->
+          submitNormalModeInputText("saveas #{newPath}")
+          newPath = path.resolve(dir, fs.normalize(newPath))
+          expect(fs.existsSync(newPath)).toBe(true)
+          expect(fs.readFileSync(newPath, 'utf-8')).toEqual('abc')
+          expect(editor.isModified()).toBe(false)
+          fs.removeSync(newPath)
+
+        it "saves to the path", ->
+
+        it "expands .", ->
+          newPath = path.join('.', newPath)
+
+        it "expands ..", ->
+          newPath = path.join('..', newPath)
+
+        it "expands ~", ->
+          newPath = path.join('~', newPath)
+
+      it "throws an error with more than one path", ->
+        keydown(':')
+        submitNormalModeInputText('saveas path1 path2')
+        expect(atom.notifications.notifications[0].message).toEqual(
+          'Command error: Only one file name allowed'
+        )
+
+      describe "when the file already exists", ->
+        existsPath = ''
+
+        beforeEach ->
+          existsPath = projectPath('saveas-exists')
+          fs.writeFileSync(existsPath, 'abc')
+
+        afterEach ->
+          fs.removeSync(existsPath)
+
+        it "throws an error if the file already exists", ->
+          keydown(':')
+          submitNormalModeInputText("saveas #{existsPath}")
+          expect(atom.notifications.notifications[0].message).toEqual(
+            'Command error: File exists (add ! to override)'
+          )
+          expect(fs.readFileSync(existsPath, 'utf-8')).toEqual('abc')
+
+        it "writes if forced with :saveas!", ->
+          keydown(':')
+          submitNormalModeInputText("saveas! #{existsPath}")
+          expect(atom.notifications.notifications).toEqual([])
+          expect(fs.readFileSync(existsPath, 'utf-8')).toEqual('abc\ndef')
+
   describe ":quit", ->
     pane = null
     beforeEach ->
@@ -174,6 +294,13 @@ describe "the commands", ->
         keydown(':')
         submitNormalModeInputText('quit')
         expect(pane.promptToSaveItem).toHaveBeenCalled()
+
+  describe ":quitall", ->
+    it "closes Atom", ->
+      spyOn(atom, 'close')
+      keydown(':')
+      submitNormalModeInputText('quitall')
+      expect(atom.close).toHaveBeenCalled()
 
   describe ":tabclose", ->
     it "acts as an alias to :quit", ->
@@ -253,7 +380,7 @@ describe "the commands", ->
       submitNormalModeInputText('wq wq-2')
       expect(Ex.write)
         .toHaveBeenCalled()
-      expect(Ex.write.calls[0].args[1].trim()).toEqual('wq-2')
+      expect(Ex.write.calls[0].args[0].args.trim()).toEqual('wq-2')
       waitsFor((-> Ex.quit.wasCalled), "the :quit command to be called", 100)
 
   describe ":xit", ->
@@ -262,6 +389,15 @@ describe "the commands", ->
       keydown(':')
       submitNormalModeInputText('xit')
       expect(Ex.wq).toHaveBeenCalled()
+
+  describe ":wqall", ->
+    it "calls :wall, then :quitall", ->
+      spyOn(Ex, 'wall')
+      spyOn(Ex, 'quitall')
+      keydown(':')
+      submitNormalModeInputText('wqall')
+      expect(Ex.wall).toHaveBeenCalled()
+      expect(Ex.quitall).toHaveBeenCalled()
 
   describe ":edit", ->
     describe "without a file name", ->
@@ -449,12 +585,116 @@ describe "the commands", ->
       submitNormalModeInputText(':%substitute/abc/ghi/ig')
       expect(editor.getText()).toEqual('ghiaghi\ndefdDEF\nghiaghi')
 
-    it "can't be delimited by letters", ->
-      keydown(':')
-      submitNormalModeInputText(':substitute nanxngi')
-      expect(atom.notifications.notifications[0].message).toEqual(
-        "Command error: Regular expressions can't be delimited by letters")
-      expect(editor.getText()).toEqual('abcaABC\ndefdDEF\nabcaABC')
+    describe "illegal delimiters", ->
+      test = (delim) ->
+        keydown(':')
+        submitNormalModeInputText(":substitute #{delim}a#{delim}x#{delim}gi")
+        expect(atom.notifications.notifications[0].message).toEqual(
+          "Command error: Regular expressions can't be delimited by alphanumeric characters, '\\', '\"' or '|'")
+        expect(editor.getText()).toEqual('abcaABC\ndefdDEF\nabcaABC')
+
+      it "can't be delimited by letters", -> test 'n'
+      it "can't be delimited by numbers", -> test '3'
+      it "can't be delimited by '\\'",    -> test '\\'
+      it "can't be delimited by '\"'",    -> test '"'
+      it "can't be delimited by '|'",     -> test '|'
+
+    describe "empty replacement", ->
+      beforeEach ->
+        editor.setText('abcabc\nabcabc')
+
+      it "removes the pattern without modifiers", ->
+        keydown(':')
+        submitNormalModeInputText(":substitute/abc//")
+        expect(editor.getText()).toEqual('abc\nabcabc')
+
+      it "removes the pattern with modifiers", ->
+        keydown(':')
+        submitNormalModeInputText(":substitute/abc//g")
+        expect(editor.getText()).toEqual('\nabcabc')
+
+    describe "replacing with escape sequences", ->
+      beforeEach ->
+        editor.setText('abc,def,ghi')
+
+      test = (escapeChar, escaped) ->
+        keydown(':')
+        submitNormalModeInputText(":substitute/,/\\#{escapeChar}/g")
+        expect(editor.getText()).toEqual("abc#{escaped}def#{escaped}ghi")
+
+      it "replaces with a tab", -> test('t', '\t')
+      it "replaces with a linefeed", -> test('n', '\n')
+      it "replaces with a carriage return", -> test('r', '\r')
+
+    describe "case sensitivity", ->
+      describe "respects the smartcase setting", ->
+        beforeEach ->
+          editor.setText('abcaABC\ndefdDEF\nabcaABC')
+
+        it "uses case sensitive search if smartcase is off and the pattern is lowercase", ->
+          atom.config.set('vim-mode.useSmartcaseForSearch', false)
+          keydown(':')
+          submitNormalModeInputText(':substitute/abc/ghi/g')
+          expect(editor.getText()).toEqual('ghiaABC\ndefdDEF\nabcaABC')
+
+        it "uses case sensitive search if smartcase is off and the pattern is uppercase", ->
+          editor.setText('abcaABC\ndefdDEF\nabcaABC')
+          keydown(':')
+          submitNormalModeInputText(':substitute/ABC/ghi/g')
+          expect(editor.getText()).toEqual('abcaghi\ndefdDEF\nabcaABC')
+
+        it "uses case insensitive search if smartcase is on and the pattern is lowercase", ->
+          editor.setText('abcaABC\ndefdDEF\nabcaABC')
+          atom.config.set('vim-mode.useSmartcaseForSearch', true)
+          keydown(':')
+          submitNormalModeInputText(':substitute/abc/ghi/g')
+          expect(editor.getText()).toEqual('ghiaghi\ndefdDEF\nabcaABC')
+
+        it "uses case sensitive search if smartcase is on and the pattern is uppercase", ->
+          editor.setText('abcaABC\ndefdDEF\nabcaABC')
+          keydown(':')
+          submitNormalModeInputText(':substitute/ABC/ghi/g')
+          expect(editor.getText()).toEqual('abcaghi\ndefdDEF\nabcaABC')
+
+      describe "\\c and \\C in the pattern", ->
+        beforeEach ->
+          editor.setText('abcaABC\ndefdDEF\nabcaABC')
+
+        it "uses case insensitive search if smartcase is off and \c is in the pattern", ->
+          atom.config.set('vim-mode.useSmartcaseForSearch', false)
+          keydown(':')
+          submitNormalModeInputText(':substitute/abc\\c/ghi/g')
+          expect(editor.getText()).toEqual('ghiaghi\ndefdDEF\nabcaABC')
+
+        it "doesn't matter where in the pattern \\c is", ->
+          atom.config.set('vim-mode.useSmartcaseForSearch', false)
+          keydown(':')
+          submitNormalModeInputText(':substitute/a\\cbc/ghi/g')
+          expect(editor.getText()).toEqual('ghiaghi\ndefdDEF\nabcaABC')
+
+        it "uses case sensitive search if smartcase is on, \\C is in the pattern and the pattern is lowercase", ->
+          atom.config.set('vim-mode.useSmartcaseForSearch', true)
+          keydown(':')
+          submitNormalModeInputText(':substitute/a\\Cbc/ghi/g')
+          expect(editor.getText()).toEqual('ghiaABC\ndefdDEF\nabcaABC')
+
+        it "overrides \\C with \\c if \\C comes first", ->
+          atom.config.set('vim-mode.useSmartcaseForSearch', true)
+          keydown(':')
+          submitNormalModeInputText(':substitute/a\\Cb\\cc/ghi/g')
+          expect(editor.getText()).toEqual('ghiaghi\ndefdDEF\nabcaABC')
+
+        it "overrides \\C with \\c if \\c comes first", ->
+          atom.config.set('vim-mode.useSmartcaseForSearch', true)
+          keydown(':')
+          submitNormalModeInputText(':substitute/a\\cb\\Cc/ghi/g')
+          expect(editor.getText()).toEqual('ghiaghi\ndefdDEF\nabcaABC')
+
+        it "overrides an appended /i flag with \\C", ->
+          atom.config.set('vim-mode.useSmartcaseForSearch', true)
+          keydown(':')
+          submitNormalModeInputText(':substitute/ab\\Cc/ghi/gi')
+          expect(editor.getText()).toEqual('ghiaABC\ndefdDEF\nabcaABC')
 
     describe "capturing groups", ->
       beforeEach ->
@@ -516,3 +756,21 @@ describe "the commands", ->
         atom.commands.dispatch(editorElement, 'ex-mode:open')
         submitNormalModeInputText(':set nonumber')
         expect(atom.config.get('editor.showLineNumbers')).toBe(false)
+
+  describe "aliases", ->
+    it "calls the aliased function without arguments", ->
+      ExClass.registerAlias('W', 'w')
+      spyOn(Ex, 'write')
+      keydown(':')
+      submitNormalModeInputText('W')
+      expect(Ex.write).toHaveBeenCalled()
+
+    it "calls the aliased function with arguments", ->
+      ExClass.registerAlias('W', 'write')
+      spyOn(Ex, 'W').andCallThrough()
+      spyOn(Ex, 'write')
+      keydown(':')
+      submitNormalModeInputText('W')
+      WArgs = Ex.W.calls[0].args[0]
+      writeArgs = Ex.write.calls[0].args[0]
+      expect(WArgs).toBe writeArgs

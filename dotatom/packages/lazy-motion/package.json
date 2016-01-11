@@ -1,7 +1,7 @@
 {
   "name": "lazy-motion",
   "main": "./lib/main",
-  "version": "0.1.13",
+  "version": "0.1.16",
   "description": "Rapid cursor positioning with fuzzy search",
   "keywords": [],
   "repository": {
@@ -33,10 +33,10 @@
     "url": "https://github.com/t9md/atom-lazy-motion/issues"
   },
   "homepage": "https://github.com/t9md/atom-lazy-motion#readme",
-  "_id": "lazy-motion@0.1.13",
-  "_shasum": "2d18aed2bba10260da86ab45577a9e564357d708",
-  "_resolved": "file:../d-11583-94145-ljk9v7/package.tgz",
-  "_from": "../d-11583-94145-ljk9v7/package.tgz",
+  "_id": "lazy-motion@0.1.16",
+  "_shasum": "713bede427d0eec5a4bbccd5014c029845576f64",
+  "_resolved": "file:../d-11608-2010-110ge5d/package.tgz",
+  "_from": "../d-11608-2010-110ge5d/package.tgz",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [

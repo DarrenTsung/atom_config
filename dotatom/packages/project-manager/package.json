@@ -1,7 +1,7 @@
 {
   "name": "project-manager",
   "main": "./lib/project-manager",
-  "version": "2.6.5",
+  "version": "2.7.1",
   "description": "Project Manager for easy access and switching between projects in Atom.",
   "repository": {
     "type": "git",
@@ -31,16 +31,16 @@
       }
     }
   },
-  "readme": "# Project Manager\n[![Build status](https://travis-ci.org/danielbrodin/atom-project-manager.svg?branch=master)](https://travis-ci.org/danielbrodin/atom-project-manager/)\n[![apm](https://img.shields.io/apm/dm/project-manager.svg)](https://atom.io/packages/project-manager)\n[![apm](https://img.shields.io/apm/v/project-manager.svg)]()\n\n![Project Manager](https://raw.github.com/danielbrodin/atom-project-manager/master/project-manager.gif)\n\n\nGet easy access to all your projects and manage them with project specific settings and options.\n\n\n## Install\n```\n$ apm install project-manager\n```\nor open Atom and go to Preferences > Install and search for `project-manager`\n\n\n## Use\n### List Projects\n`ctrl-cmd-p` (mac) / `alt-shift-P` (win & linux) or `Project Manager: List Projects` in the Command Palette.\n\nYou can filter projects by `title`, `group` and `template`.\n`group: atom` would list all projects with the group `atom`. Default is `title`\n\n### Save Project\n`Project Manager: Save Project` in the Command Palette and write the title you want to save the project as.\n\n### Edit Projects\nAll projects are saved in a `.cson` file which you can easily reach by searching for `Project Manager: Edit Projects` in the Command Palette.\n\n## Project Settings\n\nsetting    | Type      | Description                                                                                                                                           | Default               \n-----------|-----------|-------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------\n`title`    | `string`  | Projects title. Used in the projects list                                                                                                | `''`                  \n`paths`    | `array`   | The folders that will open in the tree view. First path is the main one that counts as the project.                                                   | `[]`                  \n`settings` | `Object`  | Enables you to set project specific settings. Everything that goes in the `config.cson` file can go here. It also supports scoped settings.           | `{}`                  \n`icon`     | `string`  | Icon that shows in the projects list. It's class-based so can either be a class already provided by Atom like `icon-squirell` or a class of your own. | `'icon-chevron-right'`\n`devMode`  | `boolean` | `true` if project should open in dev mode                                                                                                             | `false`               \n`group`    | `string`  | Adds a group to the projects list that can be used to group and filter projects                                                                       | `null`                \n`template` | `string`  | If you add a project in the `projects.cson` file without `paths` it will count as a template. This way you can easily share settings between projects | `null`                \n\n\n### Example\n```\nprojectmanager:\n  title: 'Project Manager'\n  devMode: true\n  group: 'Atom'\n  template: 'coffeescript-template'\n  paths: [\n    '/path/to/project-manager'\n  ]\n  settings:\n    '*':\n      'editor.tabLength': 4\n\n'coffeescript-template':\n  icon: 'icon-coffeescript'\n  settings:\n    '.source.coffee':\n      'editor.tabLength': 2\n      'editor.preferredLineLength': 80\n```\n\n## Package Settings\nName                          | Setting                                       | Default     | Description                                                                                                                                      \n------------------------------|-----------------------------------------------|-------------|------------\nShow Path                     | `project-manager.showPath`                    | `true`      | Shows each projects paths in the projects list                                                                                                   \nEnvironment Specific Projects | `project-manager.environmentSpecificProjects` | `false`     | If you share your `.atom` folder between computers but don't use the same projects. Will create a `projects.[hostname].cson` for each environment\nSort By                       | `project-manager.sortBy`                      | `'default'` | Will sort the projects list by selected option. Default sorting is the order in which the are                                                    \n~~Close Current~~             | ~~`project-manager.closeCurrent`~~            | ~~`false`~~ | ~~Closes the current window before opening a new project.~~ **Currently disabled** because I haven't found a proper way to achieve this anymore.\n\n\n## API\nThe project manager provides a service that you can use in your own Atom packages. To use it, include `project-manager` in the `consumedServices` section of your package.json.\n\n```\n\"consumedServices\": {\n    \"project-manager\": {\n      \"versions\": {\n        \"^2.2.1\": \"consumeProjectManager\"\n      }\n    }\n  }\n```\nThen in your package's main module, call methods on the service\n```\nmodule.exports =\n  doSomethingWithTheCurrentProject: (project) ->\n\n  consumeProjectManager: (PM) ->\n    PM.projects.getCurrent (project) =>\n      if project\n        @doSomethingWithTheCurrentProject(project)\n```\n\n### Methods\n#### `{Projects}`\n- `::getAll`\n  - `{Function} callback` - Callback that receives an `Array` of `{Project}`'s\n- `::getCurrent`\n  - `{Function} callback` - Callback that receives the current `{Project}` or `false` if there is none active\n- `::onUpdate`\n  - `{Function} callback` - Will be called each time a project have been updated\n\n#### `{Project}`\n- `{props}` - Contains all properties of the project like `title`, `paths` and `settings`\n- `::open` - Will open the project\n- `::isCurrent` - Returns `true` if it's the current project\n- `::onUpdate`\n  - `{Function} callback` - Will be called when the project have been updated\n- `::set` - Will set the property on the project\n  - `{String} key`\n  - `{Mixed} value`\n- `::unset` - Will remove the property from the project\n  - `{String} key`\n\n\nPlease let me know if you make something out of it :)\n\n## Contribute\nIf you would like to contribute to the project manager, be it new features or bugs,\nplease do the following:\n\n1. Fork the repository\n2. Create a new topic branch off the master branch that describe what it does\n3. Commit and push the branch\n4. Make a pull request describing what you have done\n5. Now it will hopefully get merged :)\n\nAll PR's should:\n- Pass the [jscs](https://atom.io/packages/linter-jscs) linter\n- Pass the [jshint](https://atom.io/packages/linter-jshint) linter\n- Add a test when it makes sense, which should be most of the time\n\n--------\n\n[![Paypal Donations](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=DR4XQWAZV6M2A&lc=SE&item_name=Project%20Manager&item_number=atom%2dproject%2dmanager&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted) a :beer: if you enjoy using the [project manager](https://github.com/danielbrodin/atom-project-manager) :)",
+  "readme": "# Project Manager\n[![Build status](https://travis-ci.org/danielbrodin/atom-project-manager.svg?branch=master)](https://travis-ci.org/danielbrodin/atom-project-manager/)\n[![apm](https://img.shields.io/apm/dm/project-manager.svg)](https://atom.io/packages/project-manager)\n[![apm](https://img.shields.io/apm/v/project-manager.svg)]()\n\n![Project Manager](https://raw.github.com/danielbrodin/atom-project-manager/master/project-manager.gif)\n\n\nGet easy access to all your projects and manage them with project specific settings and options.\n\n\n## Install\n```\n$ apm install project-manager\n```\nor open Atom and go to Preferences > Install and search for `project-manager`\n\n\n## Use\n### List Projects\n`ctrl-cmd-p` (mac) / `alt-shift-P` (win & linux) or `Project Manager: List Projects` in the Command Palette.\n\nYou can filter projects by `title`, `group` and `template`.\n`group: atom` would list all projects with the group `atom`. Default is `title`\n\n### Save Project\n`Project Manager: Save Project` in the Command Palette and write the title you want to save the project as.\n\n### Edit Projects\nAll projects are saved in a `.cson` file which you can easily reach by searching for `Project Manager: Edit Projects` in the Command Palette.\n\n## Project Settings\n\nsetting    | Type      | Description                                                                                                                                           | Default               \n-----------|-----------|-------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------\n`title`    | `string`  | Projects title. Used in the projects list                                                                                                | `''`                  \n`paths`    | `array`   | The folders that will open in the tree view. First path is the main one that counts as the project.                                                   | `[]`                  \n`settings` | `Object`  | Enables you to set project specific settings. Everything that goes in the `config.cson` file can go here. It also supports scoped settings.           | `{}`                  \n`icon`     | `string`  | Icon that shows in the projects list. It's class-based so can either be a class already provided by Atom like `icon-squirell` or a class of your own. | `'icon-chevron-right'`\n`devMode`  | `boolean` | `true` if project should open in dev mode                                                                                                             | `false`               \n`group`    | `string`  | Adds a group to the projects list that can be used to group and filter projects                                                                       | `null`                \n`template` | `string`  | If you add a project in the `projects.cson` file without `paths` it will count as a template. This way you can easily share settings between projects | `null`                \n\n\n### Example\n```\nprojectmanager:\n  title: 'Project Manager'\n  devMode: true\n  group: 'Atom'\n  template: 'coffeescript-template'\n  paths: [\n    '/path/to/project-manager'\n  ]\n  settings:\n    '*':\n      'editor.tabLength': 4\n\n'coffeescript-template':\n  icon: 'icon-coffeescript'\n  settings:\n    '.source.coffee':\n      'editor.tabLength': 2\n      'editor.preferredLineLength': 80\n```\n\n## Package Settings\nName                          | Setting                                       | Default     | Description                                                                                                                                      \n------------------------------|-----------------------------------------------|-------------|------------\nShow Path                     | `project-manager.showPath`                    | `true`      | Shows each projects paths in the projects list                                                                                                   \nEnvironment Specific Projects | `project-manager.environmentSpecificProjects` | `false`     | If you share your `.atom` folder between computers but don't use the same projects. Will create a `projects.[hostname].cson` for each environment\nSort By                       | `project-manager.sortBy`                      | `'default'` | Will sort the projects list by selected option. Default sorting is the order in which the are                                                    \nClose Current                 | `project-manager.closeCurrent`                | `false`     | Closes the current window before opening a new project.\n\n\n## API\nThe project manager provides a service that you can use in your own Atom packages. To use it, include `project-manager` in the `consumedServices` section of your package.json.\n\n```\n\"consumedServices\": {\n    \"project-manager\": {\n      \"versions\": {\n        \"^2.2.1\": \"consumeProjectManager\"\n      }\n    }\n  }\n```\nThen in your package's main module, call methods on the service\n```\nmodule.exports =\n  doSomethingWithTheCurrentProject: (project) ->\n\n  consumeProjectManager: (PM) ->\n    PM.projects.getCurrent (project) =>\n      if project\n        @doSomethingWithTheCurrentProject(project)\n```\n\n### Methods\n#### `{Projects}`\n- `::getAll`\n  - `{Function} callback` - Callback that receives an `Array` of `{Project}`'s\n- `::getCurrent`\n  - `{Function} callback` - Callback that receives the current `{Project}` or `false` if there is none active\n- `::onUpdate`\n  - `{Function} callback` - Will be called each time a project have been updated\n\n#### `{Project}`\n- `{props}` - Contains all properties of the project like `title`, `paths` and `settings`\n- `::open` - Will open the project\n- `::isCurrent` - Returns `true` if it's the current project\n- `::onUpdate`\n  - `{Function} callback` - Will be called when the project have been updated\n- `::set` - Will set the property on the project\n  - `{String} key`\n  - `{Mixed} value`\n- `::unset` - Will remove the property from the project\n  - `{String} key`\n\n\nPlease let me know if you make something out of it :)\n\n## Contribute\nIf you would like to contribute to the project manager, be it new features or bugs,\nplease do the following:\n\n1. Fork the repository\n2. Create a new topic branch off the master branch that describe what it does\n3. Commit and push the branch\n4. Make a pull request describing what you have done\n5. Now it will hopefully get merged :)\n\nAll PR's should:\n- Pass the [jscs](https://atom.io/packages/linter-jscs) linter\n- Pass the [jshint](https://atom.io/packages/linter-jshint) linter\n- Add a test when it makes sense, which should be most of the time\n\n--------\n\n[![Paypal Donations](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=DR4XQWAZV6M2A&lc=SE&item_name=Project%20Manager&item_number=atom%2dproject%2dmanager&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted) a :beer: if you enjoy using the [project manager](https://github.com/danielbrodin/atom-project-manager) :)\n",
   "readmeFilename": "README.md",
   "bugs": {
     "url": "https://github.com/danielbrodin/atom-project-manager/issues"
   },
   "homepage": "https://github.com/danielbrodin/atom-project-manager#readme",
-  "_id": "project-manager@2.6.5",
-  "_shasum": "43f118808d620dcc295f74944ca8e325987667a0",
-  "_resolved": "file:../d-115102-40253-1nfysrt/package.tgz",
-  "_from": "../d-115102-40253-1nfysrt/package.tgz",
+  "_id": "project-manager@2.7.1",
+  "_shasum": "c8db36017749ae8deae7ae3dd53b05e78be1fefb",
+  "_resolved": "file:../d-11608-2048-11plptq/package.tgz",
+  "_from": "../d-11608-2048-11plptq/package.tgz",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [
@@ -81,7 +81,7 @@
       },
       {
         "name": "es5-ext",
-        "version": "0.10.8",
+        "version": "0.10.11",
         "path": "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/index.js"
       },
       {
@@ -91,7 +91,7 @@
       },
       {
         "name": "es6-symbol",
-        "version": "3.0.1",
+        "version": "3.0.2",
         "path": "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/index.js"
       },
       {
@@ -116,7 +116,7 @@
       },
       {
         "name": "jquery",
-        "version": "2.1.4",
+        "version": "2.2.0",
         "path": "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/dist/jquery.js"
       },
       {
@@ -479,6 +479,8 @@
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/copy.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/count.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/create.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/ensure-natural-number-value.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/ensure-natural-number.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/eq.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/every.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/filter.js",
@@ -494,6 +496,7 @@
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-copy-deep.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-copy.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-empty.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-number-value.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-object.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-plain-object.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is.js",
@@ -630,6 +633,7 @@
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/ajax/parseJSON.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/ajax/parseXML.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/ajax/script.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/ajax/var/location.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/ajax/var/nonce.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/ajax/var/rquery.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/ajax/xhr.js",
@@ -645,42 +649,59 @@
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/core/init.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/core/parseHTML.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/core/ready.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/core/support.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/core/var/rsingleTag.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/core.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/css/addGetHookIf.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/css/adjustCSS.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/css/curCSS.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/css/defaultDisplay.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/css/hiddenVisibleSelectors.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/css/showHide.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/css/support.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/css/swap.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/css/var/cssExpand.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/css/var/getStyles.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/css/var/isHidden.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/css/var/rmargin.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/css/var/rnumnonpx.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/css/var/swap.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/css.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/data/Data.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/data/accepts.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/data/var/data_priv.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/data/var/data_user.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/data/support.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/data/var/acceptData.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/data/var/dataPriv.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/data/var/dataUser.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/data.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/deferred.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/deprecated.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/dimensions.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/effects/Tween.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/effects/animatedSelector.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/effects/support.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/effects.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/event/ajax.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/event/alias.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/event/focusin.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/event/support.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/event/trigger.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/event.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/exports/amd.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/exports/global.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/intro.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/jquery.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/manipulation/_evalUrl.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/manipulation/buildFragment.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/manipulation/createSafeFragment.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/manipulation/getAll.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/manipulation/setGlobalEval.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/manipulation/support.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/manipulation/var/nodeNames.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/manipulation/var/rcheckableType.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/manipulation/var/rleadingWhitespace.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/manipulation/var/rscriptType.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/manipulation/var/rtagName.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/manipulation/wrapMap.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/manipulation.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/offset.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/outro.js",
@@ -690,21 +711,25 @@
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/selector-sizzle.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/selector.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/serialize.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/sizzle/dist/sizzle.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/sizzle/dist/sizzle.min.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/support.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/traversing/findFilter.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/traversing/var/dir.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/traversing/var/rneedsContext.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/traversing/var/siblings.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/traversing.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/var/arr.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/var/class2type.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/var/concat.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/var/deletedIds.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/var/document.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/var/documentElement.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/var/hasOwn.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/var/indexOf.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/var/pnum.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/var/push.js",
+        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/var/rcssNum.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/var/rnotwhite.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/var/slice.js",
-        "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/var/strundefined.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/var/support.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/var/toString.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/wrap.js",
@@ -761,7 +786,6 @@
         "node_modules/underscore-plus/node_modules/underscore/underscore.js"
       ],
       ".coffee": [
-        "lib/db.coffee",
         "lib/dialog.coffee",
         "lib/save-dialog.coffee"
       ],
@@ -1032,7 +1056,7 @@
         ],
         "dependencies": {
           "es6-iterator": "2",
-          "es6-symbol": "3"
+          "es6-symbol": "~3.0.2"
         }
       },
       {
@@ -1055,7 +1079,7 @@
         ],
         "dependencies": {
           "d": "~0.1.1",
-          "es5-ext": "~0.10.8"
+          "es5-ext": "~0.10.10"
         }
       },
       {

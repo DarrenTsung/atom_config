@@ -1,7 +1,7 @@
 {
   "name": "vim-mode",
   "main": "./lib/vim-mode",
-  "version": "0.63.0",
+  "version": "0.64.0",
   "description": "Add vim modal control",
   "license": "MIT",
   "private": true,
@@ -41,10 +41,10 @@
     "url": "https://github.com/atom/vim-mode/issues"
   },
   "homepage": "https://github.com/atom/vim-mode#readme",
-  "_id": "vim-mode@0.63.0",
-  "_shasum": "4ec31220547f0c6e4741b315273c5f09b7fff74e",
-  "_resolved": "file:../d-115103-6004-1om4ugi/package.tgz",
-  "_from": "../d-115103-6004-1om4ugi/package.tgz",
+  "_id": "vim-mode@0.64.0",
+  "_shasum": "b87e9462ccb5793db56bed6f55391cd5e8f3297d",
+  "_resolved": "file:../d-11608-2052-1ni1a9r/package.tgz",
+  "_from": "../d-11608-2052-1ni1a9r/package.tgz",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [
@@ -75,7 +75,7 @@
       },
       {
         "name": "es5-ext",
-        "version": "0.10.8",
+        "version": "0.10.11",
         "path": "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/index.js"
       },
       {
@@ -85,7 +85,7 @@
       },
       {
         "name": "es6-symbol",
-        "version": "3.0.1",
+        "version": "3.0.2",
         "path": "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/index.js"
       },
       {
@@ -130,7 +130,7 @@
       },
       {
         "name": "es5-ext",
-        "version": "0.10.8",
+        "version": "0.10.11",
         "path": "node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/index.js"
       },
       {
@@ -140,7 +140,7 @@
       },
       {
         "name": "es6-symbol",
-        "version": "3.0.1",
+        "version": "3.0.2",
         "path": "node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/index.js"
       },
       {
@@ -522,6 +522,8 @@
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/copy.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/count.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/create.js",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/ensure-natural-number-value.js",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/ensure-natural-number.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/eq.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/every.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/filter.js",
@@ -537,6 +539,7 @@
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-copy-deep.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-copy.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-empty.js",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-number-value.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-object.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-plain-object.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is.js",
@@ -951,6 +954,8 @@
         "node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/copy.js",
         "node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/count.js",
         "node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/create.js",
+        "node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/ensure-natural-number-value.js",
+        "node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/ensure-natural-number.js",
         "node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/eq.js",
         "node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/every.js",
         "node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/filter.js",
@@ -966,6 +971,7 @@
         "node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-copy-deep.js",
         "node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-copy.js",
         "node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-empty.js",
+        "node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-number-value.js",
         "node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-object.js",
         "node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-plain-object.js",
         "node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is.js",
@@ -1325,7 +1331,7 @@
         ],
         "dependencies": {
           "es6-iterator": "2",
-          "es6-symbol": "3"
+          "es6-symbol": "~3.0.2"
         }
       },
       {
@@ -1348,7 +1354,7 @@
         ],
         "dependencies": {
           "d": "~0.1.1",
-          "es5-ext": "~0.10.8"
+          "es5-ext": "~0.10.10"
         }
       },
       {
@@ -1583,7 +1589,7 @@
         ],
         "dependencies": {
           "es6-iterator": "2",
-          "es6-symbol": "3"
+          "es6-symbol": "~3.0.2"
         }
       },
       {
@@ -1606,7 +1612,7 @@
         ],
         "dependencies": {
           "d": "~0.1.1",
-          "es5-ext": "~0.10.8"
+          "es5-ext": "~0.10.10"
         }
       },
       {

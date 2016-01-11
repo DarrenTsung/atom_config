@@ -1,7 +1,7 @@
 {
   "name": "ex-mode",
   "main": "./lib/ex-mode",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Ex for Atom's vim-mode",
   "activationCommands": {
     "atom-workspace": "ex-mode:open"
@@ -39,16 +39,16 @@
   "devDependencies": {
     "node-uuid": "^1.4.2"
   },
-  "readme": "# ex-mode package\n\nex-mode for Atom's vim-mode\n\n## Use\n\nInstall both [vim-mode](https://github.com/atom/vim-mode) and ex-mode. Type `:` in command mode. Enter `w` or `write`.\n\n## Extend\n\nUse the service to register commands, from your own package, or straight from `init.coffee`:\n\n```coffee\n# in Atom's init.coffee\natom.packages.onDidActivatePackage (pack) ->\n  if pack.name == 'ex-mode'\n    Ex = pack.mainModule.provideEx()\n    Ex.registerCommand 'z', -> console.log(\"Zzzzzz...\")\n```\n\nSee `lib/ex.coffee` for some examples commands. Contributions are very welcome!\n\n## Status\n\nGroundwork is done. More ex commands are easy to add and will be coming as time permits and contributions come in.\n\n## License\n\nMIT\n",
+  "readme": "# ex-mode package\n\nex-mode for Atom's vim-mode\n\n## Use\n\nInstall both [vim-mode](https://github.com/atom/vim-mode) and ex-mode. Type `:` in command mode. Enter `w` or `write`.\n\n## Extend\n\nUse the service to register commands, from your own package, or straight from `init.coffee`:\n\n```coffee\n# in Atom's init.coffee\natom.packages.onDidActivatePackage (pack) ->\n  if pack.name == 'ex-mode'\n    Ex = pack.mainModule.provideEx()\n    Ex.registerCommand 'z', -> console.log(\"Zzzzzz...\")\n    # Register an alias - Now :W acts like :w\n    Ex.registerAlias 'W', 'w'\n```\n\nSee `lib/ex.coffee` for some examples commands. Contributions are very welcome!\n\n## Status\n\nGroundwork is done. More ex commands are easy to add and will be coming as time permits and contributions come in.\n\n## License\n\nMIT\n",
   "readmeFilename": "README.md",
   "bugs": {
     "url": "https://github.com/lloeki/ex-mode/issues"
   },
   "homepage": "https://github.com/lloeki/ex-mode#readme",
-  "_id": "ex-mode@0.7.0",
-  "_shasum": "afecba0f6a689e6d14f919493c5eb36450897552",
-  "_resolved": "file:../d-11583-91560-d2kl3p/package.tgz",
-  "_from": "../d-11583-91560-d2kl3p/package.tgz",
+  "_id": "ex-mode@0.8.0",
+  "_shasum": "bc82de3d741c715bf8958704cc5606369743134f",
+  "_resolved": "file:../d-11608-1996-6n4hi5/package.tgz",
+  "_from": "../d-11608-1996-6n4hi5/package.tgz",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [
@@ -89,8 +89,18 @@
       },
       {
         "name": "es5-ext",
-        "version": "0.10.7",
+        "version": "0.10.11",
         "path": "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/index.js"
+      },
+      {
+        "name": "es6-iterator",
+        "version": "2.0.0",
+        "path": "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/index.js"
+      },
+      {
+        "name": "es6-symbol",
+        "version": "3.0.2",
+        "path": "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/index.js"
       },
       {
         "name": "es6-iterator",
@@ -139,7 +149,7 @@
       },
       {
         "name": "grim",
-        "version": "1.4.2",
+        "version": "1.5.0",
         "path": "node_modules/space-pen/node_modules/grim/lib/grim.js"
       },
       {
@@ -159,8 +169,18 @@
       },
       {
         "name": "es5-ext",
-        "version": "0.10.7",
+        "version": "0.10.11",
         "path": "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/index.js"
+      },
+      {
+        "name": "es6-iterator",
+        "version": "2.0.0",
+        "path": "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/index.js"
+      },
+      {
+        "name": "es6-symbol",
+        "version": "3.0.2",
+        "path": "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/index.js"
       },
       {
         "name": "es6-iterator",
@@ -184,7 +204,7 @@
       },
       {
         "name": "jquery",
-        "version": "2.1.4",
+        "version": "2.2.0",
         "path": "node_modules/space-pen/node_modules/jquery/dist/jquery.js"
       },
       {
@@ -450,6 +470,21 @@
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/math/trunc/index.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/math/trunc/is-implemented.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/math/trunc/shim.js",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/#/chain.js",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/array.js",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/for-of.js",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/get.js",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/index.js",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/is-iterable.js",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/string.js",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/valid-iterable.js",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/implement.js",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/index.js",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/is-implemented.js",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/is-native-implemented.js",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/is-symbol.js",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/polyfill.js",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/validate-symbol.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/#/index.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/#/pad.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/epsilon/implement.js",
@@ -468,6 +503,7 @@
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/is-nan/index.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/is-nan/is-implemented.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/is-nan/shim.js",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/is-natural.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/is-number.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/is-safe-integer/implement.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/is-safe-integer/index.js",
@@ -494,9 +530,13 @@
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/copy.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/count.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/create.js",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/ensure-natural-number-value.js",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/ensure-natural-number.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/eq.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/every.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/filter.js",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/find-key.js",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/find.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/first-key.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/flatten.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/for-each.js",
@@ -507,6 +547,7 @@
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-copy-deep.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-copy.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-empty.js",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-number-value.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-object.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-plain-object.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is.js",
@@ -604,6 +645,7 @@
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/string/#/starts-with/index.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/string/#/starts-with/is-implemented.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/string/#/starts-with/shim.js",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/string/#/uncapitalize.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/string/format-method.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/string/from-code-point/implement.js",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/string/from-code-point/index.js",
@@ -867,6 +909,21 @@
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/math/trunc/index.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/math/trunc/is-implemented.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/math/trunc/shim.js",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/#/chain.js",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/array.js",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/for-of.js",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/get.js",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/index.js",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/is-iterable.js",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/string.js",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/valid-iterable.js",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/implement.js",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/index.js",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/is-implemented.js",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/is-native-implemented.js",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/is-symbol.js",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/polyfill.js",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/validate-symbol.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/#/index.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/#/pad.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/epsilon/implement.js",
@@ -885,6 +942,7 @@
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/is-nan/index.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/is-nan/is-implemented.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/is-nan/shim.js",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/is-natural.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/is-number.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/is-safe-integer/implement.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/number/is-safe-integer/index.js",
@@ -911,9 +969,13 @@
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/copy.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/count.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/create.js",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/ensure-natural-number-value.js",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/ensure-natural-number.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/eq.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/every.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/filter.js",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/find-key.js",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/find.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/first-key.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/flatten.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/for-each.js",
@@ -924,6 +986,7 @@
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-copy-deep.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-copy.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-empty.js",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-number-value.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-object.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-plain-object.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is.js",
@@ -1021,6 +1084,7 @@
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/string/#/starts-with/index.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/string/#/starts-with/is-implemented.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/string/#/starts-with/shim.js",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/string/#/uncapitalize.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/string/format-method.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/string/from-code-point/implement.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/string/from-code-point/index.js",
@@ -1059,6 +1123,7 @@
         "node_modules/space-pen/node_modules/jquery/src/ajax/parseJSON.js",
         "node_modules/space-pen/node_modules/jquery/src/ajax/parseXML.js",
         "node_modules/space-pen/node_modules/jquery/src/ajax/script.js",
+        "node_modules/space-pen/node_modules/jquery/src/ajax/var/location.js",
         "node_modules/space-pen/node_modules/jquery/src/ajax/var/nonce.js",
         "node_modules/space-pen/node_modules/jquery/src/ajax/var/rquery.js",
         "node_modules/space-pen/node_modules/jquery/src/ajax/xhr.js",
@@ -1074,42 +1139,59 @@
         "node_modules/space-pen/node_modules/jquery/src/core/init.js",
         "node_modules/space-pen/node_modules/jquery/src/core/parseHTML.js",
         "node_modules/space-pen/node_modules/jquery/src/core/ready.js",
+        "node_modules/space-pen/node_modules/jquery/src/core/support.js",
         "node_modules/space-pen/node_modules/jquery/src/core/var/rsingleTag.js",
         "node_modules/space-pen/node_modules/jquery/src/core.js",
         "node_modules/space-pen/node_modules/jquery/src/css/addGetHookIf.js",
+        "node_modules/space-pen/node_modules/jquery/src/css/adjustCSS.js",
         "node_modules/space-pen/node_modules/jquery/src/css/curCSS.js",
         "node_modules/space-pen/node_modules/jquery/src/css/defaultDisplay.js",
         "node_modules/space-pen/node_modules/jquery/src/css/hiddenVisibleSelectors.js",
+        "node_modules/space-pen/node_modules/jquery/src/css/showHide.js",
         "node_modules/space-pen/node_modules/jquery/src/css/support.js",
-        "node_modules/space-pen/node_modules/jquery/src/css/swap.js",
         "node_modules/space-pen/node_modules/jquery/src/css/var/cssExpand.js",
         "node_modules/space-pen/node_modules/jquery/src/css/var/getStyles.js",
         "node_modules/space-pen/node_modules/jquery/src/css/var/isHidden.js",
         "node_modules/space-pen/node_modules/jquery/src/css/var/rmargin.js",
         "node_modules/space-pen/node_modules/jquery/src/css/var/rnumnonpx.js",
+        "node_modules/space-pen/node_modules/jquery/src/css/var/swap.js",
         "node_modules/space-pen/node_modules/jquery/src/css.js",
         "node_modules/space-pen/node_modules/jquery/src/data/Data.js",
         "node_modules/space-pen/node_modules/jquery/src/data/accepts.js",
-        "node_modules/space-pen/node_modules/jquery/src/data/var/data_priv.js",
-        "node_modules/space-pen/node_modules/jquery/src/data/var/data_user.js",
+        "node_modules/space-pen/node_modules/jquery/src/data/support.js",
+        "node_modules/space-pen/node_modules/jquery/src/data/var/acceptData.js",
+        "node_modules/space-pen/node_modules/jquery/src/data/var/dataPriv.js",
+        "node_modules/space-pen/node_modules/jquery/src/data/var/dataUser.js",
         "node_modules/space-pen/node_modules/jquery/src/data.js",
         "node_modules/space-pen/node_modules/jquery/src/deferred.js",
         "node_modules/space-pen/node_modules/jquery/src/deprecated.js",
         "node_modules/space-pen/node_modules/jquery/src/dimensions.js",
         "node_modules/space-pen/node_modules/jquery/src/effects/Tween.js",
         "node_modules/space-pen/node_modules/jquery/src/effects/animatedSelector.js",
+        "node_modules/space-pen/node_modules/jquery/src/effects/support.js",
         "node_modules/space-pen/node_modules/jquery/src/effects.js",
         "node_modules/space-pen/node_modules/jquery/src/event/ajax.js",
         "node_modules/space-pen/node_modules/jquery/src/event/alias.js",
+        "node_modules/space-pen/node_modules/jquery/src/event/focusin.js",
         "node_modules/space-pen/node_modules/jquery/src/event/support.js",
+        "node_modules/space-pen/node_modules/jquery/src/event/trigger.js",
         "node_modules/space-pen/node_modules/jquery/src/event.js",
         "node_modules/space-pen/node_modules/jquery/src/exports/amd.js",
         "node_modules/space-pen/node_modules/jquery/src/exports/global.js",
         "node_modules/space-pen/node_modules/jquery/src/intro.js",
         "node_modules/space-pen/node_modules/jquery/src/jquery.js",
         "node_modules/space-pen/node_modules/jquery/src/manipulation/_evalUrl.js",
+        "node_modules/space-pen/node_modules/jquery/src/manipulation/buildFragment.js",
+        "node_modules/space-pen/node_modules/jquery/src/manipulation/createSafeFragment.js",
+        "node_modules/space-pen/node_modules/jquery/src/manipulation/getAll.js",
+        "node_modules/space-pen/node_modules/jquery/src/manipulation/setGlobalEval.js",
         "node_modules/space-pen/node_modules/jquery/src/manipulation/support.js",
+        "node_modules/space-pen/node_modules/jquery/src/manipulation/var/nodeNames.js",
         "node_modules/space-pen/node_modules/jquery/src/manipulation/var/rcheckableType.js",
+        "node_modules/space-pen/node_modules/jquery/src/manipulation/var/rleadingWhitespace.js",
+        "node_modules/space-pen/node_modules/jquery/src/manipulation/var/rscriptType.js",
+        "node_modules/space-pen/node_modules/jquery/src/manipulation/var/rtagName.js",
+        "node_modules/space-pen/node_modules/jquery/src/manipulation/wrapMap.js",
         "node_modules/space-pen/node_modules/jquery/src/manipulation.js",
         "node_modules/space-pen/node_modules/jquery/src/offset.js",
         "node_modules/space-pen/node_modules/jquery/src/outro.js",
@@ -1119,21 +1201,25 @@
         "node_modules/space-pen/node_modules/jquery/src/selector-sizzle.js",
         "node_modules/space-pen/node_modules/jquery/src/selector.js",
         "node_modules/space-pen/node_modules/jquery/src/serialize.js",
-        "node_modules/space-pen/node_modules/jquery/src/sizzle/dist/sizzle.js",
-        "node_modules/space-pen/node_modules/jquery/src/sizzle/dist/sizzle.min.js",
+        "node_modules/space-pen/node_modules/jquery/src/support.js",
         "node_modules/space-pen/node_modules/jquery/src/traversing/findFilter.js",
+        "node_modules/space-pen/node_modules/jquery/src/traversing/var/dir.js",
         "node_modules/space-pen/node_modules/jquery/src/traversing/var/rneedsContext.js",
+        "node_modules/space-pen/node_modules/jquery/src/traversing/var/siblings.js",
         "node_modules/space-pen/node_modules/jquery/src/traversing.js",
         "node_modules/space-pen/node_modules/jquery/src/var/arr.js",
         "node_modules/space-pen/node_modules/jquery/src/var/class2type.js",
         "node_modules/space-pen/node_modules/jquery/src/var/concat.js",
+        "node_modules/space-pen/node_modules/jquery/src/var/deletedIds.js",
+        "node_modules/space-pen/node_modules/jquery/src/var/document.js",
+        "node_modules/space-pen/node_modules/jquery/src/var/documentElement.js",
         "node_modules/space-pen/node_modules/jquery/src/var/hasOwn.js",
         "node_modules/space-pen/node_modules/jquery/src/var/indexOf.js",
         "node_modules/space-pen/node_modules/jquery/src/var/pnum.js",
         "node_modules/space-pen/node_modules/jquery/src/var/push.js",
+        "node_modules/space-pen/node_modules/jquery/src/var/rcssNum.js",
         "node_modules/space-pen/node_modules/jquery/src/var/rnotwhite.js",
         "node_modules/space-pen/node_modules/jquery/src/var/slice.js",
-        "node_modules/space-pen/node_modules/jquery/src/var/strundefined.js",
         "node_modules/space-pen/node_modules/jquery/src/var/support.js",
         "node_modules/space-pen/node_modules/jquery/src/var/toString.js",
         "node_modules/space-pen/node_modules/jquery/src/wrap.js",
@@ -1146,6 +1232,8 @@
         "node_modules/atom-space-pen-views/package.json",
         "node_modules/event-kit/api.json",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/d/package.json",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/package.json",
+        "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/package.json",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/package.json",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es6-iterator/package.json",
         "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es6-symbol/package.json",
@@ -1162,6 +1250,8 @@
         "node_modules/fs-plus/package.json",
         "node_modules/space-pen/api.json",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/d/package.json",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/package.json",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/package.json",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/package.json",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es6-iterator/package.json",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es6-symbol/package.json",
@@ -1411,8 +1501,31 @@
           "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/test/string/raw"
         ],
         "dependencies": {
-          "es6-iterator": "~0.1.3",
-          "es6-symbol": "~2.0.1"
+          "es6-iterator": "2",
+          "es6-symbol": "~3.0.2"
+        }
+      },
+      {
+        "paths": [
+          "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/#",
+          "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator",
+          "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/test/#",
+          "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/test"
+        ],
+        "dependencies": {
+          "d": "^0.1.1",
+          "es5-ext": "^0.10.7",
+          "es6-symbol": "3"
+        }
+      },
+      {
+        "paths": [
+          "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol",
+          "node_modules/event-kit/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/test"
+        ],
+        "dependencies": {
+          "d": "~0.1.1",
+          "es5-ext": "~0.10.10"
         }
       },
       {
@@ -1669,8 +1782,31 @@
           "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/test/string/raw"
         ],
         "dependencies": {
-          "es6-iterator": "~0.1.3",
-          "es6-symbol": "~2.0.1"
+          "es6-iterator": "2",
+          "es6-symbol": "~3.0.2"
+        }
+      },
+      {
+        "paths": [
+          "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/#",
+          "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator",
+          "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/test/#",
+          "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/test"
+        ],
+        "dependencies": {
+          "d": "^0.1.1",
+          "es5-ext": "^0.10.7",
+          "es6-symbol": "3"
+        }
+      },
+      {
+        "paths": [
+          "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol",
+          "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/test"
+        ],
+        "dependencies": {
+          "d": "~0.1.1",
+          "es5-ext": "~0.10.10"
         }
       },
       {

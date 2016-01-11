@@ -1,3 +1,103 @@
+<a name="v4.19.0"></a>
+# v4.19.0 (2015-12-24)
+
+## :sparkles: Features
+
+- Add a smoothScrolling setting to enable/disable canvas offset ([18f57c80](https://github.com/atom-minimap/minimap/commit/18f57c80fd248e4e888e87da692bb71bb8109689))
+
+<a name="v4.18.4"></a>
+# v4.18.4 (2015-12-21)
+
+## :bug: Bug Fixes
+
+- Fix error raised when editor is destroyed during animation ([cb215b68](https://github.com/atom-minimap/minimap/commit/cb215b68427264586fd8b56874e7d8e8a71853ae), [#438](https://github.com/atom-minimap/minimap/issues/438))
+
+<a name="v4.18.3"></a>
+# v4.18.3 (2015-12-21)
+
+## :bug: Bug Fixes
+
+- Fixes [#383](https://github.com/atom-minimap/minimap/issues/383) Fix touch scroll support ([cfb509eb](https://github.com/atom-minimap/minimap/commit/cfb509ebe1b861be4ee0c0d85227ba00144234bf), thanks to @TimoSta)
+
+<a name="v4.18.2"></a>
+# v4.18.2 (2015-12-17)
+
+## :racehorse: Performances
+
+- Lazy load model and views ([e0b11276](https://github.com/atom-minimap/minimap/commit/e0b11276ebd2d28581f85114e40d8d59590b84ca), [#430](https://github.com/atom-minimap/minimap/issues/430))
+
+<a name="v4.18.1"></a>
+# v4.18.1 (2015-12-16)
+
+## :bug: Bug Fixes
+
+- Clear require cache on main module loading ([1b698abf](https://github.com/atom-minimap/minimap/commit/1b698abf8da2e07408e67be8a27c53c96dbf4188))
+- Fix folding/unfolding rows giving invalid redraw range ([8d0f061c](https://github.com/atom-minimap/minimap/commit/8d0f061c8ef3e7780d714a86a7451b4cdd7cdee6), [#429](https://github.com/atom-minimap/minimap/issues/429))
+
+## :racehorse: Performances
+
+- Use dedicated pending changes array for back and front decorations ([aef0c49a](https://github.com/atom-minimap/minimap/commit/aef0c49a1544023e189fee17b5d45c02fbc189eb))
+
+<a name="v4.18.0"></a>
+# v4.18.0 (2015-12-11)
+
+## :racehorse: Performances
+
+- Add a CanvasLayer class to handle onscreen/offscreen canvases ([b339e73e](https://github.com/atom-minimap/minimap/commit/b339e73ebbae0a93279bd002d046b069578cf282))<br/>
+  Render is now separate into three layers to reduce accesses to line tokens.
+
+## :bug: Bug Fixes
+
+- Fix over-blurring of the Minimap for device with a float for pixel raio ([77f3b38f9](https://github.com/atom-minimap/minimap/commit/77f3b38f99f3a3998ea3ef6d3a72d38e2186caf5))
+
+
+## :arrow_up: Dependencies Update
+
+- Bump atom-utils version ([d42fe50d](https://github.com/atom-minimap/minimap/commit/d42fe50d083ba4212f2f5295f01b34a910de1560))
+
+<a name="v4.17.0"></a>
+# v4.17.0 (2015-12-08)
+
+:sparkles: **Starting with this version, the Minimap is now totally written in ES6 with Babel** :sparkles:
+
+We're also using the decorator feature from ES7 for mixin inclusion and custom elements registration.
+
+## :sparkles: Features
+
+- Add a element decorator to handle creating custom elements ([f1823116](https://github.com/atom-minimap/minimap/commit/f18231168b8b63298390d1e4000577e329aa18b4))
+- Add a helper function to generate decorators for mixin inclusion ([d2ed7591](https://github.com/atom-minimap/minimap/commit/d2ed759189fa43ece70cc96f6f2d1bde8fe6a8d8))
+- Add new dependency to support ES7 features linter and docs ([dc758103](https://github.com/atom-minimap/minimap/commit/dc75810314e153f992b7fd1a38863bde7ee67893))
+- Add esdoc to generate documentation for es6 version ([68142570](https://github.com/atom-minimap/minimap/commit/681425707d7398f979ba988f605a1030ed6a04dd))
+- Add standard linter for es6 conversion ([f0bb6561](https://github.com/atom-minimap/minimap/commit/f0bb6561cdafa2f4447a558b673787bf0c91f552))
+- Use new Babel-friendly space-pen DSL ([e4be4483](https://github.com/atom-minimap/minimap/commit/e4be4483b2d7b9d0ef99d955052c357f4efaec69))
+
+## :racehorse: Performances
+
+- Avoid reading directly from the line's token property ([e8235235](https://github.com/atom-minimap/minimap/commit/e823523526a3502dc8e781bf67a8bebd1a51f1d1))
+
+## :arrow_up: Dependencies Update
+
+- Bump atom-utils version ([b15fce7a](https://github.com/atom-minimap/minimap/commit/b15fce7a7f106d70c316721e06f21bb5eb56fe9b))
+
+<a name="v4.16.2"></a>
+# v4.16.2 (2015-11-24)
+
+## :bug: Bug Fixes
+
+- Prevent stand alone minimap to have width, height and flex properties ([fd7a9dd0](https://github.com/atom-minimap/minimap/commit/fd7a9dd003aa0c113ee0bc84165da49449c0dcb1))
+- Prevent generation of a returned array in drawLineDecorations method ([04fdd35c](https://github.com/atom-minimap/minimap/commit/04fdd35c01752ac0b1a13b280f2880ed72f8c14f))
+
+<a name="v4.16.1"></a>
+# v4.16.1 (2015-11-18)
+
+## :bug: Bug Fixes
+
+- Store minimap locally in update to prevent racing conditions ([8a7179f3](https://github.com/atom-minimap/minimap/commit/8a7179f3949c3eb57dc38f4978eb3a1557813121))
+
+## :racehorse: Performances
+
+- Implement a basic cache of editor dimension during update ([5aeb5ce3](https://github.com/atom-minimap/minimap/commit/5aeb5ce3905d51fa70862720ec0acd191d06f719))
+
 <a name="v4.16.0"></a>
 # v4.16.0 (2015-11-01)
 

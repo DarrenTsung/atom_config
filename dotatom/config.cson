@@ -98,14 +98,12 @@
       '''
   whitespace:
     removeTrailingWhitespace: false
-".coffee.source":
-  "wrapper-snippets":
-    if:
-      name: "if"
-      body: '''
-        if ${cursor}
-        ${selection, indent:1}
-      '''
+".cake.source":
+  editor:
+    tabLength: 4
+".nant-build.source":
+  editor:
+    tabLength: 4
 ".cs.source":
   "wrapper-snippets":
     if:
@@ -124,9 +122,11 @@
       '''
   editor:
     tabLength: 4
-".nant-build.source":
-  editor:
-    tabLength: 4
-".cake.source":
-  editor:
-    tabLength: 4
+".coffee.source":
+  "wrapper-snippets":
+    if:
+      name: "if"
+      body: '''
+        if ${cursor}
+        ${selection, indent:1}
+      '''
