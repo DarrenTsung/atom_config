@@ -1,8 +1,9 @@
 "*":
-  "exception-reporting":
-    userId: "44048cfb-4890-b4a9-ea94-754b28c3f60f"
-  welcome:
-    showOnStartup: false
+  "autocomplete-plus": {}
+  "bracket-matcher":
+    autocompleteBrackets: false
+    autocompleteSmartQuotes: false
+    wrapSelectionsInBrackets: false
   core:
     disabledPackages: [
       "background-tips"
@@ -15,32 +16,30 @@
       "link"
       "minimap"
     ]
+    followSymlinks: false
     ignoredNames: [
       ".git"
       "*.meta"
       ".svn"
       ".DS_STORE"
     ]
+    packagesWithKeymapsDisabled: [
+      "highlight-selected"
+    ]
     themes: [
       "nucleus-dark-ui"
       "one-dark-syntax"
     ]
-    packagesWithKeymapsDisabled: [
-      "highlight-selected"
-    ]
-    followSymlinks: false
   editor:
-    invisibles: {}
     fontFamily: "Monaco"
-    tabType: "soft"
     fontSize: 13
+    invisibles: {}
     scrollPastEnd: true
-  whitespace:
-    ensureSingleTrailingNewline: false
-    ignoreWhitespaceOnCurrentLine: false
-  "vim-mode": {}
-  "linter-php": {}
-  linter: {}
+    tabType: "soft"
+  "exception-reporting":
+    userId: "44048cfb-4890-b4a9-ea94-754b28c3f60f"
+  "find-and-replace":
+    openProjectFindResultsInRightPane: true
   "fuzzy-finder":
     ignoredNames: [
       "*.html"
@@ -69,64 +68,65 @@
       "*.cginc"
     ]
     useAlternateScoring: true
-  tabs: {}
-  "one-dark-ui": {}
-  minimap: {}
+  "git-plus": {}
+  "highlight-selected": {}
   "lazy-motion": {}
-  "find-and-replace":
-    openProjectFindResultsInRightPane: true
+  linter: {}
+  "linter-php": {}
+  minimap: {}
+  "one-dark-ui": {}
+  "project-manager":
+    environmentSpecificProjects: true
+  tabs: {}
   "tree-view":
     hideIgnoredNames: true
     hideVcsIgnoredFiles: true
-  "autocomplete-plus": {}
-  "git-plus": {}
-  "bracket-matcher":
-    autocompleteBrackets: false
-    autocompleteSmartQuotes: false
-    wrapSelectionsInBrackets: false
-  "project-manager":
-    environmentSpecificProjects: true
-  "highlight-selected": {}
-".html.php.text":
-  "wrapper-snippets":
-    if:
-      name: "if"
-      body: '''
-        if (${cursor}) {
-        ${selection, indent:1}
-        }
-      '''
+  "vim-mode": {}
+  welcome:
+    showOnStartup: false
   whitespace:
-    removeTrailingWhitespace: false
+    ensureSingleTrailingNewline: false
+    ignoreWhitespaceOnCurrentLine: false
 ".cake.source":
-  editor:
-    tabLength: 4
-".nant-build.source":
-  editor:
-    tabLength: 4
-".cs.source":
-  "wrapper-snippets":
-    if:
-      name: "if"
-      body: '''
-        if (${cursor}) {
-        ${selection, indent:1}
-        }
-      '''
-    namespace:
-      name: "namespace"
-      body: '''
-        namespace ${cursor} {
-        ${selection, indent:1}
-        }
-      '''
   editor:
     tabLength: 4
 ".coffee.source":
   "wrapper-snippets":
     if:
-      name: "if"
       body: '''
         if ${cursor}
         ${selection, indent:1}
       '''
+      name: "if"
+".cs.source":
+  editor:
+    tabLength: 4
+  "wrapper-snippets":
+    if:
+      body: '''
+        if (${cursor}) {
+        ${selection, indent:1}
+        }
+      '''
+      name: "if"
+    namespace:
+      body: '''
+        namespace ${cursor} {
+        ${selection, indent:1}
+        }
+      '''
+      name: "namespace"
+".html.php.text":
+  whitespace:
+    removeTrailingWhitespace: false
+  "wrapper-snippets":
+    if:
+      body: '''
+        if (${cursor}) {
+        ${selection, indent:1}
+        }
+      '''
+      name: "if"
+".nant-build.source":
+  editor:
+    tabLength: 4
