@@ -5,6 +5,7 @@
     autocompleteSmartQuotes: false
     wrapSelectionsInBrackets: false
   core:
+    closeEmptyWindows: false
     disabledPackages: [
       "background-tips"
       "go-to-line"
@@ -14,7 +15,6 @@
       "language-toml"
       "language-yaml"
       "link"
-      "minimap"
     ]
     followSymlinks: false
     ignoredNames: [
@@ -80,7 +80,6 @@
   tabs: {}
   "tree-view":
     hideIgnoredNames: true
-    hideVcsIgnoredFiles: true
   "vim-mode": {}
   welcome:
     showOnStartup: false

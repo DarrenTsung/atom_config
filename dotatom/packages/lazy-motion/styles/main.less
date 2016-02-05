@@ -13,15 +13,17 @@ atom-text-editor::shadow {
   .lazy-motion-match .region {
     .lazy-motion.round-box;
     background-color: transparent;
-    border: 2px solid @syntax-result-marker-color;
+    border: 1px solid @syntax-result-marker-color;
   }
-  .lazy-motion-match.top .region {
-    border: 2px solid @syntax-color-renamed;
+  .lazy-motion-match.first .region {
+    border-color: @syntax-color-renamed;
   }
-  .lazy-motion-match.bottom .region {
-    border: 2px solid @syntax-color-removed;
+  .lazy-motion-match.last .region {
+    border-color: @syntax-color-removed;
   }
   .lazy-motion-match.current .region {
+    border-width: 2px;
+    border-style: solid;
     background-color: @syntax-selection-color;
   }
   .lazy-motion-flash .region {
@@ -31,21 +33,26 @@ atom-text-editor::shadow {
   .lazy-motion-cursor .region {
     background-color: @syntax-cursor-color;
   }
-  .lazy-motion-hover {
-    z-index: 2147483647;
-    position: absolute;
-    color: @text-color-highlight;
-    background-color: @base-background-color;
-    border-radius: @component-border-radius;
-    box-shadow: 0 0 10px @syntax-text-color;
-    &.top {
-      background-color: @background-color-info;
-    }
-    &.bottom {
-      background-color: @background-color-error;
-    }
+}
+
+.lazy-motion-hover {
+  color: @text-color-highlight;
+  background-color: @base-background-color;
+  border-radius: @component-border-radius;
+  box-shadow: 0 0 10px @syntax-text-color;
+  margin-top: -2.5em;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+  margin-left: -0.1em;
+  text-align: center;
+  &.first {
+    background-color: @background-color-info;
+  }
+  &.last {
+    background-color: @background-color-error;
   }
 }
+
 .lazy-motion-ui {
   .editor-container {
     padding: @component-padding/4 @component-padding;
@@ -55,4 +62,5 @@ atom-text-editor::shadow {
     font-size: 1.3em;
     color: @text-color;
   }
+  // .atom-text-editor.lazy-motion':
 }

@@ -1,4 +1,19 @@
-## 0.1.15 - FIX
+## 0.3.0
+- New: New config param `clearSearchTextOnEverySearch` to clear search text on every search. #7.
+
+## 0.2.0
+- Now use atom's overlay decoration instead of direct pixel calculation.
+- Refactoring: Rewritten 30% of whole code.
+- New: #4 Support space separated multi search keyword. right keyword is searched from line where left keyword was found.
+- New: Use fuzzaldrin-plus but not much difference for behavior.
+- Breaking: Remove `autoLand`, `minimumInputLength` configuration parameter.
+- Remove dependency of atom-config-plus module.
+
+## 0.1.17
+- Fix #10 Setting view cannot accessible from Atom v1.4.0.
+- Fix #11 Throw error when search single occurrence with autoLand is enabled.
+
+## 0.1.16 - FIX
 - Just for releasing v0.1.14. fix minor mistake for releasing version.
 
 ## 0.1.14 - FIX

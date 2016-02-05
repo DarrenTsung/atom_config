@@ -49,7 +49,13 @@ export default class DB {
         }
 
         for (let i in result.paths) {
-          result.paths[i] = result.paths[i].replace('~', os.homedir());
+          if (typeof result.paths[i] !== 'string') {
+            continue;
+          }
+
+          if (result.paths[i].charAt(0) === '~') {
+            result.paths[i] = result.paths[i].replace('~', os.homedir());
+          }
         }
 
         projects.push(result);

@@ -1,113 +1,101 @@
-{CompositeDisposable} = require 'atom'
+{Emitter, CompositeDisposable} = require 'atom'
 settings = require './settings'
-{HoverContainer}  = require './hover-indicator'
 
 class UI extends HTMLElement
   createdCallback: ->
+    @emitter = new Emitter
     @classList.add 'lazy-motion-ui'
-
-    @editorContainer = document.createElement 'div'
-    @editorContainer.className = 'editor-container'
-    @counterContainer = document.createElement 'div'
-    @counterContainer.className = 'counter'
-
+    @counterContainer = @createElement('div', classList: ['counter'])
+    @editorContainer = @createElement('div', classList: ['editor-container'])
     @appendChild @counterContainer
     @appendChild @editorContainer
 
-    @editorElement = document.createElement 'atom-text-editor'
-    @editorElement.classList.add 'editor', 'lazy-motion'
-    @editorElement.getModel().setMini true
-    @editorElement.setAttribute 'mini', ''
+    @editorElement = @createElement 'atom-text-editor',
+      classList: ['editor', 'lazy-motion']
+      attribute: {mini: ''}
+
     @editorContainer.appendChild @editorElement
     @editor = @editorElement.getModel()
-    @panel = atom.workspace.addBottomPanel item: this, visible: false
+    @editor.setMini true
+    @panel = atom.workspace.addBottomPanel {item: this, visible: false}
+
+  createElement: (element, {classList, attribute}) ->
+    element = document.createElement element
+    element.classList.add classList...
+    for name, value of attribute ? {}
+      element.setAttribute(name, value)
+    element
+
+  onDidChange: (fn) -> @emitter.on 'did-change', fn
+  onDidConfirm: (fn) -> @emitter.on 'did-confirm', fn
+  onDidCancel: (fn) -> @emitter.on 'did-cancel', fn
+  onDidUnfocus: (fn) -> @emitter.on 'did-unfocus', fn
+  onCommand: (fn) -> @emitter.on 'command', fn
 
   initialize: (@main) ->
+    emitCommand = (command) =>
+      @emitter.emit('command', command)
+
     @subscriptions = new CompositeDisposable
     @subscriptions.add atom.commands.add 'atom-text-editor.lazy-motion',
       'core:confirm': => @confirm()
       'core:cancel':  => @cancel()
-      'click':        => @cancel()
-      'blur':         => @cancel()
+      'click': => @cancel()
+      'blur': => @cancel()
 
-      'lazy-motion:set-history-next': => @setHistory('next')
-      'lazy-motion:set-history-prev': => @setHistory('prev')
-      'lazy-motion:set-cursor-word':  => @setCursorWord()
+      'core:move-down': -> emitCommand('set-history-next')
+      'core:move-up': -> emitCommand('set-history-prev')
+      'lazy-motion:set-history-next': -> emitCommand('set-history-next')
+      'lazy-motion:set-history-prev': -> emitCommand('set-history-prev')
+      'lazy-motion:set-cursor-word': -> emitCommand('set-cursor-word')
 
-    @handleInput()
+    @editor.onDidChange =>
+      return if @finishing
+      @emitter.emit 'did-change', {text: @getText()}
     this
 
-  handleInput: ->
-    @subscriptions = subs = new CompositeDisposable
+  updateCounter: (text) ->
+    @counterContainer.textContent = "Lazy Motion: #{text}"
 
-    subs.add @editor.onDidChange =>
-      return if @finishing
-      text = @editor.getText()
-      if text.length >= settings.get('minimumInputLength')
-        @main.search text
-      @showCounter()
+  setText: (text) ->
+    @editor.setText(text)
 
-    subs.add @editor.onDidDestroy =>
-      subs.dispose()
-
-  showCounter: ->
-    count = @main.getCount()
-    {total, current} = count
-    content = if total isnt 0 then "#{current} / #{total}" else "0"
-    @counterContainer.textContent = "Lazy Motion: #{content}"
-
-    if settings.get('showHoverIndicator')
-      @hoverContainer ?= new HoverContainer().initialize(@main.editor)
-      @hoverContainer.hide()
-      if total isnt 0
-        @hoverContainer.show @main.matches.getCurrent(), count
-
-  setHistory: (direction) ->
-    if entry = @main.historyManager.get(direction)
-      @editor.setText entry
-
-  setCursorWord: ->
-    wordRegex = @main.getWordPattern()
-    # [NOTE] We shouldn't simply use cursor::wordRegExp().
-    # Instead use lazy-motion.wordRegExp setting.
-    @editor.setText @main.editor.getWordUnderCursor({wordRegex})
+  getText: ->
+    @editor.getText()
 
   focus: ->
     @panel.show()
     @editorElement.focus()
-    @showCounter()
+    @updateCounter('0')
 
   unFocus: ->
-    @editor.setText ''
-    @hoverContainer?.destroy()
-    @hoverContainer = null
+    @setText '' if settings.get('clearSearchTextOnEverySearch')
     @panel.hide()
     atom.workspace.getActivePane().activate()
     @finishing = false
 
   confirm: ->
-    return if @main.matches.isEmpty()
+    return if @main.matchList.isEmpty()
     @finishing = true
-    @main.historyManager.save @editor.getText()
-    @main.land()
+    @emitter.emit 'did-confirm', {text: @getText()}
     @unFocus()
 
   cancel: ->
     # [NOTE] blur event happen on confirmed() in this case we shouldn't cancel
     return if @finishing
     @finishing = true
-    if settings.get('saveHistoryOnCancel')
-      @main.historyManager.save @editor.getText()
-    @main.cancel()
+    @emitter.emit 'did-cancel', {text: @getText()}
     @unFocus()
 
   isVisible: ->
     @panel.isVisible()
 
   destroy: ->
+    @emitter.dispose()
     @panel.destroy()
     @editor.destroy()
     @subscriptions.dispose()
+    {@emitter, @panel, @editor, @subscriptions} = {}
     @remove()
 
 module.exports =

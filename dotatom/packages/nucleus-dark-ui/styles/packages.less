@@ -111,9 +111,9 @@ linter-panel:empty {
   border: 0 !important;
   background: transparent;
 
-  &:hover {
-    color: @text-color-highlight;
-    background: transparent;
+  &:hover, &:focus, :active {
+    color: @text-color-highlight !important;
+    background: transparent !important;
   }
 }
 
