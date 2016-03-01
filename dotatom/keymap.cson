@@ -7,14 +7,14 @@
 ### MAPPINGS ###
 'body':
   'ctrl-[': 'core:cancel'
-  
+
 'atom-workspace':
   'ctrl-cmd-h': 'history-tracker:go-backwards-in-history'
   'ctrl-cmd-l': 'history-tracker:go-forward-in-history'
 
 'atom-text-editor.vim-mode:not(.insert-mode)':
-  'ctrl-i': 'vim-mode:auto-indent'  
-  
+  'ctrl-i': 'vim-mode:auto-indent'
+
   # I use cmd-(1-9) to switch between commonly used applications so remap folding to space N
   'space 0': 'editor:unfold-all'
   'space 1': 'editor:fold-at-indent-level-1'
@@ -22,31 +22,57 @@
   'space 3': 'editor:fold-at-indent-level-3'
   'space 4': 'editor:fold-at-indent-level-4'
   'space 5': 'editor:fold-at-indent-level-5'
-  
+
   'space ctrl-h': 'pane:split-left'
   'space ctrl-l': 'pane:split-right'
   'space ctrl-j': 'pane:split-down'
   'space ctrl-k': 'pane:split-up'
-  
+
   'shift-ctrl-cmd-h': 'window:focus-pane-on-left'
   'shift-ctrl-cmd-l': 'window:focus-pane-on-right'
   'shift-ctrl-cmd-j': 'window:focus-pane-below'
   'shift-ctrl-cmd-k': 'window:focus-pane-above'
-  
+
   'space f': 'editor:toggle-current-row-folding'
-  
+
   # Bookmarks
   'space m': 'bookmarks:view-all'
   'm': 'bookmarks:toggle-bookmark'
   'shift-cmd-m': 'bookmarks:clear-bookmarks'
-  
+
   # Lazy-motion
   's': 'lazy-motion:forward'
-  
+
   'shift-tab': 'snippets:next-tab-stop'
- 
+
 '.platform-darwin atom-text-editor.lazy-motion[mini]':
   ']':      'lazy-motion:forward'
   '[':      'lazy-motion:backward'
   ';':      'core:confirm'
   'ctrl-g': 'core:cancel'
+
+
+# Vim Mode Plus :O
+'atom-text-editor.vim-mode-plus.normal-mode':
+  'g l':    'vim-mode-plus:select-latest-change'
+
+  # Surround family
+  's': 'vim-mode-plus:surround'
+  's w': 'vim-mode-plus:surround-word'
+  'y m s':  'vim-mode-plus:map-surround'
+  'd s': 'vim-mode-plus:delete-surround-any-pair'
+  'c s': 'vim-mode-plus:change-surround-any-pair'
+
+'atom-text-editor.vim-mode-plus:not(.insert-mode)':
+  'g _': 'vim-mode-plus:snake-case'
+  '_': 'vim-mode-plus:replace-with-register'
+
+  'ctrl-cmd-k': 'vim-mode-plus:move-up-to-edge'
+  'ctrl-cmd-j': 'vim-mode-plus:move-down-to-edge'
+
+  'ctrl-e': 'vim-mode-plus-user:move-to-end-of-subword'
+  'Q':      'vim-mode-plus-user:move-to-beginning-of-subword'
+  'q':      'vim-mode-plus-user:move-to-next-subword'
+
+'atom-text-editor.vim-mode-plus.operator-pending-mode, atom-text-editor.vim-mode-plus.visual-mode':
+  'i q': 'vim-mode-plus-user:inner-subword'

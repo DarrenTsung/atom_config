@@ -10,22 +10,6 @@
 #   editor.onDidSave ->
 #     console.log "Saved! #{editor.getPath()}"
 
-
-
-# With the new updated version of the atom editor, this no longer needs to exist.
-# Godspeed.
-#
-# atom.commands.add 'atom-text-editor', 'exit-insert-mode-if-preceded-by-j': (e) ->
-#   editor = @getModel()
-#   pos = editor.getCursorBufferPosition()
-#   range = [pos.traverse([0,-1]), pos]
-#   lastChar = editor.getTextInBufferRange(range)
-#   if lastChar != "j"
-#     e.abortKeyBinding()
-#   else
-#     editor.backspace()
-#     atom.commands.dispatch(e.currentTarget, 'vim-mode:activate-command-mode')
-    
 atom.commands.add 'atom-text-editor',
   'editor:toggle-current-row-folding': (event) ->
     editor = @getModel()
@@ -36,65 +20,61 @@ atom.commands.add 'atom-text-editor',
       editor.foldBufferRow(bufferRow)
 
 #pragma mark - Storm8
-atom.commands.add 'atom-text-editor', 'replace-app-constant-to-api': (e) ->
-  editor = @getModel()
-  selectedText = editor.getSelectedText()
-  selectedBufferRange = editor.getSelectedBufferRange()
-  
-  convertToVariableName = ((appConstantName) -> 
-    # lowercase the first word
-    variableName = appConstantName.replace(/[^\_]*/, (text) ->
-      text.toLowerCase()
-    )
-    # camelcase the rest of the words
-    variableName = variableName.replace(/\_\w[^\_]*/g, (text) ->
-      variable = text[1].toUpperCase()
-      if (text.length > 2)
-        variable += text[2..text.length - 1].toLowerCase()
-      variable
-    )
-    variableName
-  )
-  
-  # replace all
-  # const APP_CONSTANT_NAME = ....;
-  # with
-  # $data['appConstantName'] = AppConstant::APP_CONSTANT_NAME
-  regex = /[^;]*?(\s*)const\b (\w*)\b .*?;/gm
-  editor.scanInBufferRange(regex, selectedBufferRange, ({match, replace}) ->
-    appConstantName = match[2]
-    variableName = convertToVariableName(appConstantName)
-    replace(match[1] + "$data['" + variableName + "'] = AppConstant::" + appConstantName + ";")
-  )
-    
-  # replace all
-  # public static $APP_CONSTANT_NAME = ....;
-  # with
-  # $data['appConstantName'] = AppConstant::$APP_CONSTANT_NAME
-  regex = /[^;]*?^(\s*)public static \$(\w*) =[\s\S]*?;/gm
-  editor.scanInBufferRange(regex, selectedBufferRange, ({match, replace}) ->
-    appConstantName = match[2]
-    variableName = convertToVariableName(appConstantName)
-    replace(match[1] + "$data['" + variableName + "'] = AppConstant::$" + appConstantName + ";")
-  )
-
-atom.commands.add 'atom-text-editor', 'replace-api-to-client-app-constant': (e) ->
-  editor = @getModel()
-  selectedText = editor.getSelectedText()
-  selectedBufferRange = editor.getSelectedBufferRange()
-  
-  regex = /.*'(.*)'.*/gm
-  editor.scanInBufferRange(regex, selectedBufferRange, ({match, replace}) ->
-    replace("@property (nonatomic) float " + match[1] + ";");
-  )
-
 atom.commands.add 'atom-text-editor', 'replace-selected-double-quotes-with-single-quotes': (e) ->
   editor = @getModel()
   selectedText = editor.getSelectedText()
   selectedBufferRange = editor.getSelectedBufferRange()
-  
+
   regex = /"/gm
   editor.scanInBufferRange(regex, selectedBufferRange, ({match, replace}) ->
     replace("'");
   )
-  
+
+
+# VIM MODE PLUS EXTENSIONS
+# General service consumer factory
+getConsumer = (packageName, provider) ->
+  (fn) ->
+    atom.packages.onDidActivatePackage (pack) ->
+      return unless pack.name is packageName
+      service = pack.mainModule[provider]()
+      fn(service)
+
+# get vim-mode-plus service API provider
+consumeVimModePlus = getConsumer 'vim-mode-plus', 'provideVimModePlus'
+requireVimModePlus = (path) ->
+  packPath = atom.packages.resolvePackagePath('vim-mode-plus')
+  require "#{packPath}/lib/#{path}"
+
+consumeVimModePlus ({Base}) ->
+  # SUBWORD TEXT OBJECTS
+  # Motion = Base.getClass('Motion')
+  # class MoveSubword extends Motion
+  #   @commandPrefix: 'vim-mode-plus-user'
+  #   moveCursor: (cursor) ->
+  #     cursor.moveToNextSubwordBoundary()
+  #
+  # MoveSubword.registerCommand() # `vim-mode-plus-user:move-subword`
+  #
+  # swrap = requireVimModePlus './selection-wrapper'
+  #
+  # class Subword extends Base.getClass('Word')
+  #   @commandPrefix: 'vim-mode-plus-user'
+  #   @extend(false)
+  #   selectInner: (selection, wordRegex) ->
+  #     wordRegex = selection.cursor.subwordRegExp()
+  #     range = selection.cursor.getCurrentWordBufferRange({wordRegex})
+  #     swrap(selection).setBufferRangeSafely range
+  #
+  # class ASubword extends Subword
+  #   @commandPrefix: 'vim-mode-plus-user'
+  #   @extend()
+  #
+  # class InnerSubword extends Subword
+  #   @commandPrefix: 'vim-mode-plus-user'
+  #   @extend()
+  #
+  # Subword.registerCommand()
+  # ASubword.registerCommand()
+  # InnerSubword.registerCommand()
+

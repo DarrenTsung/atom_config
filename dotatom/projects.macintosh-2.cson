@@ -68,3 +68,16 @@ bakery2:
     "/Users/darren/Projects/storm8/g2_dev/bakery2"
     "/Users/darren/Projects/storm8/g2_dev/restaurant2"
   ]
+"bingounity-server":
+  title: "bingounity - server"
+  paths: [
+    "/Users/darren/Projects/storm8/casualdev/bingounity"
+    "/Users/darren/Projects/storm8/casualdev/base"
+    "/Users/darren/Projects/storm8/phpdev"
+  ]
+bingo_unity:
+  title: "bingo_unity"
+  paths: [
+    "/Users/darren/Projects/storm8/s8unity_shared"
+    "/Users/darren/Projects/storm8/bingo"
+  ]

@@ -15,6 +15,7 @@
       "language-toml"
       "language-yaml"
       "link"
+      "vim-mode"
     ]
     followSymlinks: false
     ignoredNames: [
@@ -81,6 +82,12 @@
   "tree-view":
     hideIgnoredNames: true
   "vim-mode": {}
+  "vim-mode-plus":
+    flashOnUndoRedo: true
+    highlightSearch: true
+    incrementalSearch: true
+    showHoverOnOperate: true
+  "vim-surround": {}
   welcome:
     showOnStartup: false
   whitespace:
