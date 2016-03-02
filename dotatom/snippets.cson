@@ -131,6 +131,9 @@
   'Pragma Mark':
     'prefix': 'pragma'
     'body': '// PRAGMA MARK - $1'
+  'Interface Pragma Mark':
+    'prefix': 'ipragma'
+    'body': '// PRAGMA MARK - $1 Implementation'
 
   'Notification Event':
     'prefix': 'notif'
@@ -176,6 +179,9 @@
       #endregion
     """
 
+  'HideInInspector':
+    'prefix': 'hide'
+    'body': '[HideInInspector]'
   'SerializeField':
     'prefix': 'serial'
     'body': '[SerializeField]'

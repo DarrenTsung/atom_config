@@ -23,6 +23,7 @@
       "*.meta"
       ".svn"
       ".DS_STORE"
+      "Build"
     ]
     packagesWithKeymapsDisabled: [
       "highlight-selected"
@@ -106,7 +107,7 @@
       name: "if"
 ".cs.source":
   editor:
-    tabLength: 4
+    tabLength: 2
   "wrapper-snippets":
     for:
       body: '''
