@@ -1,6 +1,6 @@
 ### UN-MAPPINGS ###
 'atom-workspace atom-text-editor:not([mini])':
-  'cmd-j': 'lazy-unity-helper:jump-to-definition'
+  'cmd-o': 'lazy-unity-helper:jump-to-definition'
   'shift-cmd-h': 'pane:show-previous-item'
   'shift-cmd-l': 'pane:show-next-item'
 
@@ -13,7 +13,7 @@
   'ctrl-cmd-l': 'history-tracker:go-forward-in-history'
 
 'atom-text-editor.vim-mode-plus:not(.insert-mode)':
-  'ctrl-i': 'vim-mode:auto-indent'
+  'ctrl-i': 'vim-mode-plus:auto-indent'
 
   # I use cmd-(1-9) to switch between commonly used applications so remap folding to space N
   'space 0': 'editor:unfold-all'
@@ -41,9 +41,19 @@
   'shift-cmd-m': 'bookmarks:clear-bookmarks'
 
   # Lazy-motion
-  's': 'lazy-motion:forward'
+  # 's': 'lazy-motion:forward'
 
   'shift-tab': 'snippets:next-tab-stop'
+
+  'g _': 'vim-mode-plus:snake-case'
+  '_': 'vim-mode-plus:replace-with-register'
+
+  'ctrl-cmd-k': 'vim-mode-plus:move-up-to-edge'
+  'ctrl-cmd-j': 'vim-mode-plus:move-down-to-edge'
+
+  # 'q e': 'vim-mode-plus-user:move-to-end-of-subword'
+  'Q':      'vim-mode-plus-user:move-to-beginning-of-subword'
+  'q':      'vim-mode-plus-user:move-to-next-subword'
 
 '.platform-darwin atom-text-editor.lazy-motion[mini]':
   ']':      'lazy-motion:forward'
@@ -65,17 +75,6 @@
   'y m s':  'vim-mode-plus:map-surround'
   'd s': 'vim-mode-plus:delete-surround-any-pair'
   'c s': 'vim-mode-plus:change-surround-any-pair'
-
-'atom-text-editor.vim-mode-plus:not(.insert-mode)':
-  'g _': 'vim-mode-plus:snake-case'
-  '_': 'vim-mode-plus:replace-with-register'
-
-  'ctrl-cmd-k': 'vim-mode-plus:move-up-to-edge'
-  'ctrl-cmd-j': 'vim-mode-plus:move-down-to-edge'
-
-  # 'q e': 'vim-mode-plus-user:move-to-end-of-subword'
-  'Q':      'vim-mode-plus-user:move-to-beginning-of-subword'
-  'q':      'vim-mode-plus-user:move-to-next-subword'
 
 'atom-text-editor.vim-mode-plus.operator-pending-mode, atom-text-editor.vim-mode-plus.visual-mode':
   'i q': 'vim-mode-plus-user:inner-subword'

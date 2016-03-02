@@ -16,6 +16,7 @@
       "language-yaml"
       "link"
       "vim-mode"
+      "autocomplete-paths"
     ]
     followSymlinks: false
     ignoredNames: [
@@ -37,6 +38,7 @@
     fontSize: 13
     invisibles: {}
     scrollPastEnd: true
+    tabLength: 4
     tabType: "soft"
   "exception-reporting":
     userId: "44048cfb-4890-b4a9-ea94-754b28c3f60f"
@@ -107,7 +109,7 @@
       name: "if"
 ".cs.source":
   editor:
-    tabLength: 2
+    tabLength: 4
   "wrapper-snippets":
     for:
       body: '''
