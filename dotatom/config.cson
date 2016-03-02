@@ -108,6 +108,13 @@
   editor:
     tabLength: 4
   "wrapper-snippets":
+    for:
+      body: '''
+        for (${cursor}) {
+        ${selection, indent:1}
+        }
+      '''
+      name: "for"
     if:
       body: '''
         if (${cursor}) {

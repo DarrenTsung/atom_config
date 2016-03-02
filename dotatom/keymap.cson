@@ -12,7 +12,7 @@
   'ctrl-cmd-h': 'history-tracker:go-backwards-in-history'
   'ctrl-cmd-l': 'history-tracker:go-forward-in-history'
 
-'atom-text-editor.vim-mode:not(.insert-mode)':
+'atom-text-editor.vim-mode-plus:not(.insert-mode)':
   'ctrl-i': 'vim-mode:auto-indent'
 
   # I use cmd-(1-9) to switch between commonly used applications so remap folding to space N
@@ -51,6 +51,9 @@
   ';':      'core:confirm'
   'ctrl-g': 'core:cancel'
 
+'atom-text-editor.vim-mode-plus.visual-mode':
+  'cmd-r': 'selection-wrapper:display-wrapper-snippets-for-selection'
+
 
 # Vim Mode Plus :O
 'atom-text-editor.vim-mode-plus.normal-mode':
@@ -70,7 +73,7 @@
   'ctrl-cmd-k': 'vim-mode-plus:move-up-to-edge'
   'ctrl-cmd-j': 'vim-mode-plus:move-down-to-edge'
 
-  'ctrl-e': 'vim-mode-plus-user:move-to-end-of-subword'
+  # 'q e': 'vim-mode-plus-user:move-to-end-of-subword'
   'Q':      'vim-mode-plus-user:move-to-beginning-of-subword'
   'q':      'vim-mode-plus-user:move-to-next-subword'
 

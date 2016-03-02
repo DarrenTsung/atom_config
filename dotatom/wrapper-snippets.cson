@@ -1,9 +1,8 @@
 # Wrapper Snippets
 #
 # '.source.coffee':
-#   'Console log':
-#     'prefix': 'log'
-#     'body': 'console.log $1'
+#   'if':
+#     'body': 'if ${cursor}\n${selection, indent:1}'
 #
 # This file uses CoffeeScript Object Notation (CSON).
 # If you are unfamiliar with CSON, you can read more about it here:
@@ -13,11 +12,13 @@
 '.text.html.php':
   'if':
     'body': 'if (${cursor}) {\n${selection, indent:1}\n}'
-    
+
 # Unity Snippets
 '.source.cs':
   'if':
     'body': 'if (${cursor}) {\n${selection, indent:1}\n}'
+  'for':
+    'body': 'for (${cursor}) {\n${selection, indent:1}\n}'
   'namespace':
     'body': 'namespace ${cursor} {\n${selection, indent:1}\n}'
 
