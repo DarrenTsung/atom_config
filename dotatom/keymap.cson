@@ -1,6 +1,6 @@
 ### UN-MAPPINGS ###
 'atom-workspace atom-text-editor:not([mini])':
-  'cmd-o': 'lazy-unity-helper:jump-to-definition'
+  'ctrl-o': 'lazy-unity-helper:jump-to-definition'
   'shift-cmd-h': 'pane:show-previous-item'
   'shift-cmd-l': 'pane:show-next-item'
 

@@ -133,6 +133,8 @@
       '''
       name: "namespace"
 ".html.php.text":
+  editor:
+    tabLength: 2
   whitespace:
     removeTrailingWhitespace: false
   "wrapper-snippets":
