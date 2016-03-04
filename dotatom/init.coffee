@@ -30,6 +30,16 @@ atom.commands.add 'atom-text-editor', 'replace-selected-double-quotes-with-singl
     replace("'");
   )
 
+atom.commands.add 'atom-text-editor', 'replace-php-array-indexer-with-idx': (e) ->
+  editor = @getModel()
+  selectedText = editor.getSelectedText()
+  selectedBufferRange = editor.getSelectedBufferRange()
+
+  regex = /(\$[^\$]+)\[([^\]]+)\]/g
+  editor.scanInBufferRange(regex, selectedBufferRange, ({match, replace}) ->
+    replace('idx(' + match[1] + ', ' + match[2] + ')');
+  )
+
 
 # VIM MODE PLUS EXTENSIONS
 # General service consumer factory

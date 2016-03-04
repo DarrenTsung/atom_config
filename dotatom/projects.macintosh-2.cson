@@ -44,10 +44,10 @@ historytracker:
   paths: [
     "/Users/darren/Documents/Coding/AtomPackages/selection-wrapper"
   ]
-storm8bot:
-  title: "storm8bot"
+beaky:
+  title: "beaky"
   paths: [
-    "/Users/darren/Documents/Coding/storm8bot"
+    "/Users/darren/Projects/storm8/beaky"
   ]
 jsonanimationparser:
   title: "JSONAnimationParser"
