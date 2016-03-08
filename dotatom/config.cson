@@ -29,10 +29,6 @@
     packagesWithKeymapsDisabled: [
       "highlight-selected"
     ]
-    themes: [
-      "nucleus-dark-ui"
-      "one-dark-syntax"
-    ]
   editor:
     fontFamily: "Monaco"
     fontSize: 13
