@@ -1,7 +1,7 @@
 {
   "name": "vim-mode-plus",
   "main": "./lib/main",
-  "version": "0.22.1",
+  "version": "0.23.0",
   "description": "vim-mode improved",
   "license": "MIT",
   "private": true,
@@ -44,10 +44,10 @@
     "url": "https://github.com/t9md/atom-vim-mode-plus/issues"
   },
   "homepage": "https://github.com/t9md/atom-vim-mode-plus#readme",
-  "_id": "vim-mode-plus@0.22.1",
-  "_shasum": "4e3eed9f703f384d67dcdb79a9bc0aea8e543ca9",
-  "_resolved": "file:../d-11621-5760-kjmqho/package.tgz",
-  "_from": "../d-11621-5760-kjmqho/package.tgz",
+  "_id": "vim-mode-plus@0.23.0",
+  "_shasum": "f88cbc28c035d38c5a28b0e21137358435d50da0",
+  "_resolved": "file:../d-116210-64259-159se3s/package.tgz",
+  "_from": "../d-116210-64259-159se3s/package.tgz",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [

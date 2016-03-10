@@ -119,6 +119,16 @@ Toggles the display of a side line showing which part of the buffer is currently
 
 When plugins are installed, a setting is created for each to enable/disable them directly from the Minimap settings view.
 
+#### Plugins * Decorations Z-Index
+
+When several plugins create decorations for the same layer, the general rule is to render the decorations as follows:
+
+- On the background layer, the `line` decorations are rendered before the `highlight-under` decorations.
+- On the foreground layer, the `highlight-over` decorations are rendered before the `highlight-outine` decorations.
+- When two plugins adds the same type of decorations at the same place, the decorations are rendered in the order they have been created.
+
+But fortunately, it's possible to reorder decorations on their specific layer using these settings. These settings works as a `z-index` in CSS, the higher the value, the higher the decorations will be in the render stack, for instance, a plugin's decorations with an order value of `1` will appear above decorations from a plugin with an order value of `0`.
+
 #### Smooth Scrolling
 
 Whether to offset the minimap canvas when scrolling to keep the scroll smooth. When `true` the minimap canvas will be offseted, resulting in a smoother scroll, but with the side-effect of a blurry minimap when the canvas is placed between pixels. When `false` the canvas will always stay at the same position, and will never look blurry, but the scroll will appear more jagged. `(default=true)`
@@ -135,6 +145,15 @@ Enable animations when scrolling the editor by clicking on the Minimap. `(defaul
 
 Duration of the scroll animation when clicking on the Minimap. `(default=300)`
 
+#### Independent Minimap Scroll On Mouse Wheel Events
+
+When enabled, using the mouse wheel over the Minimap will make it scroll independently of the text editor. The Minimap will still sync with the editor whenever the editor is scrolled, but it will no longer relay the mouse wheel events to the editor. `(default=false)`
+
+![](https://github.com/atom-minimap/minimap/blob/master/resources/independent-scroll.gif?raw=true)
+
+#### Scroll Sensitivity
+
+The scrolling speed when the `Independent Minimap Scroll On Mouse Wheel Events` setting is enabled. `(default=0.5)`
 
 #### Use Hardware Acceleration
 
@@ -227,6 +246,28 @@ atom-text-editor::shadow atom-text-editor-minimap::shadow .minimap-visible-area 
 ```
 
 The visible area will still allow interaction but the Minimap track won't.
+
+#### Making Minimap visible only in the focused pane
+
+You can put the following code in your user stylesheet to achieve this effect:
+
+```css
+atom-text-editor {
+  &, &::shadow {
+    atom-text-editor-minimap {
+      display: none;
+    }
+  }
+
+  &.is-focused {
+    &, &::shadow {
+      atom-text-editor-minimap {
+        display: block;
+      }
+    }
+  }
+}
+```
 
 ### ASCII Art Comments
 
@@ -345,6 +386,14 @@ minimapView.decorateMarker(marker, {type: 'line', color: '#ff0000'})
 ```
 
 In that case neither the scope nor the class will be used.
+
+#### Decorations Origin
+
+A plugin can and should set the plugin origin on the decorations it creates so that the Minimap can easily know which order to apply on the decorations. When not provided, the plugin origin will be inferred from the path of the function invoking the `decorateMarker` method. If the origin can't be inferred the order value will always be `0` for this decoration.
+
+```js
+minimapView.decorateMarker(marker, {type: 'line', color: '#ff0000', plugin: 'my-plugin-name'})
+```
 
 #### Decorations Types
 

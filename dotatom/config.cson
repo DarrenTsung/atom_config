@@ -15,8 +15,9 @@
       "language-toml"
       "language-yaml"
       "link"
-      "vim-mode"
       "autocomplete-paths"
+      "vim-mode-plus-subword-movement"
+      "vim-mode-plus"
     ]
     followSymlinks: false
     ignoredNames: [

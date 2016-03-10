@@ -1,4 +1,3 @@
-# Refactoring status: 100%
 class Settings
   constructor: (@scope, @config) ->
 
@@ -44,96 +43,112 @@ module.exports = new Settings 'vim-mode-plus',
     type: 'array'
     items: type: 'string'
     default: []
-    description: 'comma separated list of character, which add additional space inside when surround.'
+    description: 'Comma separated list of character, which add additional space inside when surround.'
   showCursorInVisualMode:
     order: 7
     type: 'boolean'
     default: true
-  useSmartcaseForSearch:
-    order: 8
-    type: 'boolean'
-    default: false
-  highlightSearch:
-    order: 9
-    type: 'boolean'
-    default: false
-  incrementalSearch:
+  ignoreCaseForSearch:
     order: 10
     type: 'boolean'
     default: false
-  stayOnTransformString:
+    description: 'For `/` and `?`'
+  useSmartcaseForSearch:
     order: 11
+    type: 'boolean'
+    default: false
+    description: 'For `/` and `?`. Override `ignoreCaseForSearch`'
+  ignoreCaseForSearchCurrentWord:
+    order: 12
+    type: 'boolean'
+    default: false
+    description: 'For `*` and `#`.'
+  useSmartcaseForSearchCurrentWord:
+    order: 13
+    type: 'boolean'
+    default: false
+    description: 'For `*` and `#`. Override `ignoreCaseForSearchCurrentWord`'
+  highlightSearch:
+    order: 14
+    type: 'boolean'
+    default: false
+  incrementalSearch:
+    order: 15
+    type: 'boolean'
+    default: false
+  stayOnTransformString:
+    order: 16
     type: 'boolean'
     default: false
     description: "Don't move cursor after TransformString e.g Toggle, Surround"
   stayOnYank:
-    order: 12
+    order: 17
     type: 'boolean'
     default: false
     description: "Don't move cursor after Yank"
   flashOnUndoRedo:
-    order: 15
+    order: 18
     type: 'boolean'
     default: false
   flashOnUndoRedoDuration:
-    order: 16
+    order: 19
     type: 'integer'
     default: 100
     description: "Duration(msec) for flash"
   flashOnOperate:
-    order: 17
+    order: 20
     type: 'boolean'
     default: true
   flashOnOperateDuration:
-    order: 18
+    order: 21
     type: 'integer'
     default: 100
     description: "Duration(msec) for flash"
   flashOnOperateBlacklist:
-    order: 19
+    order: 22
     type: 'array'
     items: type: 'string'
     default: []
     description: 'comma separated list of operator class name to disable flash e.g. "Yank, AutoIndent"'
   flashOnSearch:
-    order: 20
+    order: 23
     type: 'boolean'
     default: true
   flashOnSearchDuration:
-    order: 21
+    order: 24
     type: 'integer'
     default: 300
     description: "Duration(msec) for search flash"
   flashScreenOnSearchHasNoMatch:
-    order: 21
+    order: 25
     type: 'boolean'
     default: true
   showHoverOnOperate:
-    order: 22
+    order: 26
     type: 'boolean'
     default: false
     description: "Show count, register and optional icon on hover overlay"
   showHoverOnOperateIcon:
-    order: 23
+    order: 27
     type: 'string'
     default: 'icon'
     enum: ['none', 'icon', 'emoji']
   showHoverSearchCounter:
-    order: 24
+    order: 28
     type: 'boolean'
     default: false
   showHoverSearchCounterDuration:
-    order: 25
+    order: 29
     type: 'integer'
     default: 700
     description: "Duration(msec) for hover search counter"
   disableInputMethodExceptInsertMode:
-    order: 26
+    order: 30
     type: 'boolean'
     default: false
     description: 'Automatically disable IME except insert-mode'
   throwErrorOnNonEmptySelectionInNormalMode:
-    order: 101
+    order: 100
     type: 'boolean'
     default: false
     description: "[Dev use] Throw error when non-empty selection was remained in normal-mode at the timing of operation finished"

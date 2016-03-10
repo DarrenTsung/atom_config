@@ -66,12 +66,12 @@
   '+':     'vim-mode-plus:move-to-first-character-of-line-down'
   'enter': 'vim-mode-plus:move-to-first-character-of-line-down'
 
-  'ctrl-u':  'vim-mode-plus:scroll-half-screen-up'
-  'ctrl-b':  'vim-mode-plus:scroll-full-screen-up'
-  'ctrl-d':  'vim-mode-plus:scroll-half-screen-down'
-  'ctrl-f':  'vim-mode-plus:scroll-full-screen-down'
-  'ctrl-e':  'vim-mode-plus:scroll-down'
-  'ctrl-y':  'vim-mode-plus:scroll-up'
+  'ctrl-u': 'vim-mode-plus:scroll-half-screen-up'
+  'ctrl-b': 'vim-mode-plus:scroll-full-screen-up'
+  'ctrl-d': 'vim-mode-plus:scroll-half-screen-down'
+  'ctrl-f': 'vim-mode-plus:scroll-full-screen-down'
+  'ctrl-e': 'vim-mode-plus:scroll-down'
+  'ctrl-y': 'vim-mode-plus:scroll-up'
 
   'z enter': 'vim-mode-plus:scroll-cursor-to-top'
   'z t':     'vim-mode-plus:scroll-cursor-to-top-leave'
@@ -332,15 +332,15 @@
   'i f':  'vim-mode-plus:inner-function'
   'a f':  'vim-mode-plus:a-function'
 
-  'i l':  'vim-mode-plus:inner-current-line'
-  'a l':  'vim-mode-plus:a-current-line'
+  'i l': 'vim-mode-plus:inner-current-line'
+  'a l': 'vim-mode-plus:a-current-line'
 
-  'i e':  'vim-mode-plus:inner-entire'
-  'a e':  'vim-mode-plus:a-entire'
+  'i e': 'vim-mode-plus:inner-entire'
+  'a e': 'vim-mode-plus:a-entire'
 
   # [NOTE] subject to change in futur
-  'i c':  'vim-mode-plus:inner-latest-change'
-  'a c':  'vim-mode-plus:a-latest-change'
+  'i c': 'vim-mode-plus:inner-latest-change'
+  'a c': 'vim-mode-plus:a-latest-change'
 
 # visual
 # -------------------------
@@ -350,11 +350,12 @@
   'o': 'vim-mode-plus:reverse-selections'
   '"': 'vim-mode-plus:set-register-name'
 
-  'v':      'vim-mode-plus:activate-characterwise-visual-mode'
-  'V':      'vim-mode-plus:activate-linewise-visual-mode'
+  'v': 'vim-mode-plus:activate-characterwise-visual-mode'
+  'V': 'vim-mode-plus:activate-linewise-visual-mode'
   'ctrl-v': 'vim-mode-plus:activate-blockwise-visual-mode'
-  # 'ctrl-k': 'vim-mode-plus:move-line-up'
-  # 'ctrl-j': 'vim-mode-plus:move-line-down'
+
+  # 'p': 'vim-mode-plus:swap-with-register'
+  # 'P': 'vim-mode-plus:swap-with-register'
 
 # visual-blockwise
 # -------------------------

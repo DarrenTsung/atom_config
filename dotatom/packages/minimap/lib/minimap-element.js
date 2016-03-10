@@ -2,6 +2,7 @@
 
 import {CompositeDisposable, Disposable} from 'atom'
 import {EventsDelegation, AncestorsMethods} from 'atom-utils'
+import Main from './main'
 import include from './decorators/include'
 import element from './decorators/element'
 import DOMStylesReader from './mixins/dom-styles-reader'
@@ -307,10 +308,12 @@ export default class MinimapElement {
       Why? Currently, The style element will be removed first, and then re-added
       and the `change` event has not be triggered in the process.
     */
-    return this.subscriptions.add(atom.styles.onDidAddStyleElement(() => {
+    this.subscriptions.add(atom.styles.onDidAddStyleElement(() => {
       this.invalidateDOMStylesCache()
       this.requestForcedUpdate()
     }))
+
+    this.subscriptions.add(this.subscribeToMediaQuery())
   }
 
   /**
@@ -406,7 +409,9 @@ export default class MinimapElement {
 
     this.subscriptions.add(this.subscribeTo(this, {
       'mousewheel': (e) => {
-        if (!this.standAlone) { this.relayMousewheelEvent(e) }
+        if (!this.standAlone) {
+          this.relayMousewheelEvent(e)
+        }
       }
     }))
 
@@ -666,6 +671,10 @@ export default class MinimapElement {
       this.requestUpdate()
     }))
 
+    this.subscriptions.add(Main.onDidChangePluginOrder(() => {
+      this.requestForcedUpdate()
+    }))
+
     this.setStandAlone(this.minimap.isStandAlone())
 
     if (this.width != null && this.height != null) {
@@ -775,7 +784,7 @@ export default class MinimapElement {
       canvasTransform += ' ' + this.makeScale(1 / devicePixelRatio)
     }
 
-    if(this.smoothScrolling) {
+    if (this.smoothScrolling) {
       if (SPEC_MODE) {
         this.applyStyles(this.backLayer.canvas, {top: canvasTop + 'px'})
         this.applyStyles(this.tokensLayer.canvas, {top: canvasTop + 'px'})
@@ -794,7 +803,7 @@ export default class MinimapElement {
     if (this.scrollIndicator != null) {
       let minimapScreenHeight = minimap.getScreenHeight()
       let indicatorHeight = minimapScreenHeight * (minimapScreenHeight / minimap.getHeight())
-      let indicatorScroll = (minimapScreenHeight - indicatorHeight) * minimap.getCapedTextEditorScrollRatio()
+      let indicatorScroll = (minimapScreenHeight - indicatorHeight) * minimap.getScrollRatio()
 
       if (SPEC_MODE) {
         this.applyStyles(this.scrollIndicator, {
@@ -1014,7 +1023,11 @@ export default class MinimapElement {
    * @access private
    */
   relayMousewheelEvent (e) {
-    this.getTextEditorElement().component.onMouseWheel(e)
+    if (this.minimap.scrollIndependentlyOnMouseWheel()) {
+      this.minimap.onMouseWheel(e)
+    } else {
+      this.getTextEditorElement().component.onMouseWheel(e)
+    }
   }
 
   /**
@@ -1057,6 +1070,24 @@ export default class MinimapElement {
       isLeftMouse: true, // Touch is treated like a left mouse button click
       isMiddleMouse: false
     }
+  }
+
+  /**
+   * Subscribes to a media query for device pixel ratio changes and forces
+   * a repaint when it occurs.
+   *
+   * @return {Disposable} a disposable to remove the media query listener
+   * @access private
+   */
+  subscribeToMediaQuery () {
+    const query = 'screen and (-webkit-min-device-pixel-ratio: 1.5)'
+    const mediaQuery = window.matchMedia(query)
+    const mediaListener = (e) => { this.requestForcedUpdate() }
+    mediaQuery.addListener(mediaListener)
+
+    return new Disposable(() => {
+      mediaQuery.removeListener(mediaListener)
+    })
   }
 
   //    ########    ####    ########

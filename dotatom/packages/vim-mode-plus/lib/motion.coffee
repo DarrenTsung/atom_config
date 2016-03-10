@@ -41,6 +41,8 @@ swrap = require './selection-wrapper'
 settings = require './settings'
 Base = require './base'
 
+IsKeywordDefault = "[@a-zA-Z0-9_\-]+"
+
 class Motion extends Base
   @extend(false)
   inclusive: false
@@ -94,9 +96,21 @@ class Motion extends Base
     {cursor} = selection
     selection.modifySelection =>
       tailRange = swrap(selection).getTailBufferRange()
+      if @isMode('visual', 'blockwise')
+        originalPoint = cursor.getBufferPosition()
+
       @moveCursor(cursor)
+
+      if @isMode('visual', 'blockwise')
+        currentPoint = cursor.getBufferPosition()
+        if originalPoint.row isnt currentPoint.row
+          column = if currentPoint.isGreaterThan(originalPoint)
+            Infinity
+          else
+            0
+          cursor.setBufferPosition([originalPoint.row, column])
       if @isMode('visual') and cursor.isAtEndOfLine()
-        moveCursorLeft(cursor)
+        moveCursorLeft(cursor, {preserveGoalColumn: true})
 
       # When mode isnt 'visual' selection.isEmpty() at this point means no movement happened.
       if selection.isEmpty() and (not @isMode('visual'))
@@ -714,13 +728,18 @@ class MoveToMarkLine extends MoveToMark
 # -------------------------
 class SearchBase extends Motion
   @extend(false)
-  saveCurrentSearch: true
   backwards: false
   escapeRegExp: false
 
   initialize: ->
-    if @saveCurrentSearch
-      globalState.currentSearch.backwards = @backwards
+    unless @instanceof('RepeatSearch')
+      globalState.currentSearch = this
+
+  isCaseSensitive: (term) ->
+    switch @getCaseSensitivity()
+      when 'smartcase' then term.search('[A-Z]') isnt -1
+      when 'insensitive' then false
+      when 'sensitive' then true
 
   isBackwards: ->
     @backwards
@@ -785,7 +804,7 @@ class SearchBase extends Motion
 
     # FIXME: ORDER MATTER
     # In SearchCurrentWord, @getInput move cursor, which is necessary movement.
-    # So we need to call @getInput() BEFORE settin fromPoint
+    # So we need to call @getInput() BEFORE setting fromPoint
     input = @getInput()
     return ranges if input is ''
 
@@ -806,24 +825,21 @@ class SearchBase extends Motion
     post.concat(pre)
 
   getPattern: (term) ->
-    modifiers = {'g': true}
+    modifiers = if @isCaseSensitive(term) then 'g' else 'gi'
 
-    if not term.match('[A-Z]') and settings.get('useSmartcaseForSearch')
-      modifiers['i'] = true
-
+    # FIXME this prevent search \\c itself.
+    # DONT thinklessly mimic pure Vim. Instead, provide ignorecase button and shortcut.
     if term.indexOf('\\c') >= 0
       term = term.replace('\\c', '')
-      modifiers['i'] = true
-
-    modFlags = Object.keys(modifiers).join('')
+      modifiers += 'i' unless 'i' in modifiers
 
     if @escapeRegExp
-      new RegExp(_.escapeRegExp(term), modFlags)
+      new RegExp(_.escapeRegExp(term), modifiers)
     else
       try
-        new RegExp(term, modFlags)
+        new RegExp(term, modifiers)
       catch
-        new RegExp(_.escapeRegExp(term), modFlags)
+        new RegExp(_.escapeRegExp(term), modifiers)
 
   # NOTE: trim first space if it is.
   # experimental if search word start with ' ' we switch escape mode.
@@ -856,6 +872,14 @@ class Search extends SearchBase
   isComplete: ->
     return false unless @confirmed
     super
+
+  getCaseSensitivity: ->
+    if settings.get('useSmartcaseForSearch')
+      'smartcase'
+    else if settings.get('ignoreCaseForSearch')
+      'insensitive'
+    else
+      'sensitive'
 
   subscribeScrollChange: ->
     @subscribe @editorElement.onDidChangeScrollTop =>
@@ -914,33 +938,37 @@ class SearchBackwards extends Search
 
 class SearchCurrentWord extends SearchBase
   @extend()
-  wordRegex: null
 
   getInput: ->
-    return @input if @input?
+    @input ?= (
+      # [FIXME] @getCurrentWord() have side effect(moving cursor), so don't call twice.
+      @getCurrentWord(new RegExp(settings.get('iskeyword') ? IsKeywordDefault))
+    )
 
-    # FIXME: This must depend on the current language
-    defaultIsKeyword = "[@a-zA-Z0-9_\-]+"
-    userIsKeyword = settings.get('iskeyword')
-    @wordRegex = new RegExp(userIsKeyword or defaultIsKeyword)
-    # @getCurrentWord() have side effect(moving cursor), so don't call twice.
-    @input = @getCurrentWord()
+  getCaseSensitivity: ->
+    if settings.get('useSmartcaseForSearchCurrentWord')
+      'smartcase'
+    else if settings.get('ignoreCaseForSearchCurrentWord')
+      'insensitive'
+    else
+      'sensitive'
 
-  getPattern: (text) ->
-    pattern = _.escapeRegExp(text)
-    pattern = if /\W/.test(text) then "#{pattern}\\b" else "\\b#{pattern}\\b"
-    new RegExp(pattern, 'gi') # always case insensitive.
+  getPattern: (term) ->
+    modifiers = if @isCaseSensitive(term) then 'g' else 'gi'
+    pattern = _.escapeRegExp(term)
+    pattern = if /\W/.test(term) then "#{pattern}\\b" else "\\b#{pattern}\\b"
+    new RegExp(pattern, modifiers)
 
   # FIXME: Should not move cursor.
-  getCurrentWord: ->
+  getCurrentWord: (wordRegex) ->
     cursor = @editor.getLastCursor()
     rowStart = cursor.getBufferRow()
-    range = cursor.getCurrentWordBufferRange({@wordRegex})
+    range = cursor.getCurrentWordBufferRange({wordRegex})
     if range.end.isEqual(cursor.getBufferPosition())
-      point = cursor.getBeginningOfNextWordBufferPosition({@wordRegex})
+      point = cursor.getBeginningOfNextWordBufferPosition({wordRegex})
       if point.row is rowStart
         cursor.setBufferPosition(point)
-        range = cursor.getCurrentWordBufferRange({@wordRegex})
+        range = cursor.getCurrentWordBufferRange({wordRegex})
 
     if range.isEmpty()
       ''
@@ -954,12 +982,11 @@ class SearchCurrentWordBackwards extends SearchCurrentWord
 
 class RepeatSearch extends SearchBase
   @extend()
-  saveCurrentSearch: false
 
   initialize: ->
-    super
-    @input = @vimState.searchHistory.get('prev')
-    @backwards = globalState.currentSearch.backwards
+    unless search = globalState.currentSearch
+      @abort()
+    {@input, @backwards, @getPattern, @getCaseSensitivity} = search
 
 class RepeatSearchReverse extends RepeatSearch
   @extend()

@@ -31,7 +31,7 @@ describe "Motion Search", ->
 
       # clear search history
       vimState.searchHistory.clear()
-      globalState.currentSearch = {}
+      globalState.currentSearch = null
 
     describe "as a motion", ->
       it "moves the cursor to the specified search pattern", ->
@@ -110,15 +110,35 @@ describe "Motion Search", ->
           ensure ['/', search: 'AbC\\c'], cursor: [1, 0]
           ensure 'n', cursor: [2, 0]
 
-        it "uses case insensitive search if useSmartcaseForSearch is true and searching lowercase", ->
-          settings.set 'useSmartcaseForSearch', true
-          ensure ['/', search: 'abc'], cursor: [1, 0]
-          ensure 'n', cursor: [2, 0]
+        describe "when ignoreCaseForSearch is enabled", ->
+          beforeEach ->
+            settings.set 'ignoreCaseForSearch', true
 
-        it "uses case sensitive search if useSmartcaseForSearch is true and searching uppercase", ->
-          settings.set 'useSmartcaseForSearch', true
-          ensure ['/', search: 'ABC'], cursor: [2, 0]
-          ensure 'n', cursor: [2, 0]
+          it "ignore case when search [case-1]", ->
+            ensure ['/', search: 'abc'], cursor: [1, 0]
+            ensure 'n', cursor: [2, 0]
+
+          it "ignore case when search [case-2]", ->
+            ensure ['/', search: 'ABC'], cursor: [1, 0]
+            ensure 'n', cursor: [2, 0]
+
+        describe "when useSmartcaseForSearch is enabled", ->
+          beforeEach ->
+            settings.set 'useSmartcaseForSearch', true
+
+          it "ignore case when searh term includes A-Z", ->
+            ensure ['/', search: 'ABC'], cursor: [2, 0]
+            ensure 'n', cursor: [2, 0]
+
+          it "ignore case when searh term NOT includes A-Z regardress of `ignoreCaseForSearch`", ->
+            settings.set 'ignoreCaseForSearch', false # default
+            ensure ['/', search: 'abc'], cursor: [1, 0]
+            ensure 'n', cursor: [2, 0]
+
+          it "ignore case when searh term NOT includes A-Z regardress of `ignoreCaseForSearch`", ->
+            settings.set 'ignoreCaseForSearch', true # default
+            ensure ['/', search: 'abc'], cursor: [1, 0]
+            ensure 'n', cursor: [2, 0]
 
       describe "repeating", ->
         it "does nothing with no search history", ->
@@ -278,6 +298,46 @@ describe "Motion Search", ->
             cursorBuffer: [3, 0]
           ensure '*', cursorBuffer: [3, 0]
 
+    describe "caseSensitivity setting", ->
+      beforeEach ->
+        set
+          text: """
+          abc
+          ABC
+          abC
+          abc
+          ABC
+          """
+          cursor: [0, 0]
+
+      it "search case sensitively when `ignoreCaseForSearchCurrentWord` is false(=default)", ->
+        expect(settings.get('ignoreCaseForSearchCurrentWord')).toBe(false)
+        ensure '*', cursorBuffer: [3, 0]
+        ensure 'n', cursorBuffer: [0, 0]
+
+      it "search case insensitively when `ignoreCaseForSearchCurrentWord` true", ->
+        settings.set 'ignoreCaseForSearchCurrentWord', true
+        ensure '*', cursorBuffer: [1, 0]
+        ensure 'n', cursorBuffer: [2, 0]
+        ensure 'n', cursorBuffer: [3, 0]
+        ensure 'n', cursorBuffer: [4, 0]
+
+      describe "useSmartcaseForSearchCurrentWord is enabled", ->
+        beforeEach ->
+          settings.set 'useSmartcaseForSearchCurrentWord', true
+
+        it "search case sensitively when enable and search term includes uppercase", ->
+          set cursor: [1, 0]
+          ensure '*', cursorBuffer: [4, 0]
+          ensure 'n', cursorBuffer: [1, 0]
+
+        it "search case insensitively when enable and search term NOT includes uppercase", ->
+          set cursor: [0, 0]
+          ensure '*', cursorBuffer: [1, 0]
+          ensure 'n', cursorBuffer: [2, 0]
+          ensure 'n', cursorBuffer: [3, 0]
+          ensure 'n', cursorBuffer: [4, 0]
+
   describe "the hash keybinding", ->
     describe "as a motion", ->
       it "moves cursor to previous occurence of word under cursor", ->
@@ -319,6 +379,47 @@ describe "Motion Search", ->
             text: "abc\n@def\nabc\n@def\n"
             cursorBuffer: [1, 0]
           ensure '*', cursorBuffer: [3, 0]
+
+    describe "caseSensitivity setting", ->
+      beforeEach ->
+        set
+          text: """
+          abc
+          ABC
+          abC
+          abc
+          ABC
+          """
+          cursor: [4, 0]
+
+      it "search case sensitively when `ignoreCaseForSearchCurrentWord` is false(=default)", ->
+        expect(settings.get('ignoreCaseForSearchCurrentWord')).toBe(false)
+        ensure '#', cursorBuffer: [1, 0]
+        ensure 'n', cursorBuffer: [4, 0]
+
+      it "search case insensitively when `ignoreCaseForSearchCurrentWord` true", ->
+        settings.set 'ignoreCaseForSearchCurrentWord', true
+        ensure '#', cursorBuffer: [3, 0]
+        ensure 'n', cursorBuffer: [2, 0]
+        ensure 'n', cursorBuffer: [1, 0]
+        ensure 'n', cursorBuffer: [0, 0]
+
+      describe "useSmartcaseForSearchCurrentWord is enabled", ->
+        beforeEach ->
+          settings.set 'useSmartcaseForSearchCurrentWord', true
+
+        it "search case sensitively when enable and search term includes uppercase", ->
+          set cursor: [4, 0]
+          ensure '#', cursorBuffer: [1, 0]
+          ensure 'n', cursorBuffer: [4, 0]
+
+        it "search case insensitively when enable and search term NOT includes uppercase", ->
+          set cursor: [0, 0]
+          ensure '#', cursorBuffer: [4, 0]
+          ensure 'n', cursorBuffer: [3, 0]
+          ensure 'n', cursorBuffer: [2, 0]
+          ensure 'n', cursorBuffer: [1, 0]
+          ensure 'n', cursorBuffer: [0, 0]
 
   # FIXME: No longer child of search so move to motion-general-spec.coffe?
   describe 'the % motion', ->

@@ -1,5 +1,7 @@
 'use babel'
 
+import _ from 'underscore-plus'
+import path from 'path'
 import Mixin from 'mixto'
 import {Emitter} from 'atom'
 import Decoration from '../decoration'
@@ -291,9 +293,17 @@ export default class DecorationManagement extends Mixin {
    *                                        decoration background. Note that if
    *                                        the `scope` property is set, the
    *                                        `class` won't be used.
-   * @param  {string} [decorationParams.color] the CSS color to use to render the
-   *                                        decoration. When set, neither
-   *                                        `scope` nor `class` are used.
+   * @param  {string} [decorationParams.color] the CSS color to use to render
+   *                                           the decoration. When set, neither
+   *                                           `scope` nor `class` are used.
+   * @param  {string} [decorationParams.plugin] the name of the plugin that
+   *                                            created this decoration. It'll
+   *                                            be used to order the decorations
+   *                                            on the same layer and that are
+   *                                            overlapping. If the parameter is
+   *                                            omitted the Minimap will attempt
+   *                                            to infer the plugin origin from
+   *                                            the path of the caller function.
    * @return {Decoration} the created decoration
    * @emits  {did-add-decoration} when the decoration is created successfully
    * @emits  {did-change} when the decoration is created successfully
@@ -307,7 +317,11 @@ export default class DecorationManagement extends Mixin {
       decorationParams.type = 'highlight-over'
     }
 
-    const {type} = decorationParams
+    const {type, plugin} = decorationParams
+
+    if (plugin == null) {
+      decorationParams.plugin = this.getOriginatorPackageName()
+    }
 
     if (decorationParams.scope == null && decorationParams['class'] != null) {
       let cls = decorationParams['class'].split(' ').join('.')
@@ -393,6 +407,16 @@ export default class DecorationManagement extends Mixin {
     })
 
     return decoration
+  }
+
+  getOriginatorPackageName () {
+    const line = new Error().stack.split('\n')[3]
+    const filePath = line.split('(')[1].replace(')', '')
+    const re = new RegExp(
+      atom.packages.getPackageDirPaths().join('|') + _.escapeRegExp(path.sep)
+    )
+    const plugin = filePath.replace(re, '').split(path.sep)[0].replace(/minimap-|-minimap/, '')
+    return plugin.indexOf(path.sep) < 0 ? plugin : undefined
   }
 
   /**
