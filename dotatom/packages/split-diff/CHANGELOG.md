@@ -1,3 +1,9 @@
+## ?.?.? - ???
+* Added Left/Right Editor Color settings
+* Fixed a bug where char diff would be at the wrong position
+* Updated application and context menus to be smarter
+* Fixed bug #19 - thanks lwblackledge!
+
 ## 0.6.0 - 2016-02-26
 * Fixed keybindings not binding
 * Added highlight colors to gutter line numbers

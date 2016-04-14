@@ -1,7 +1,7 @@
 {
   "name": "seti-syntax",
   "theme": "syntax",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Seti Syntax - A subtle dark colored theme for Atom.",
   "repository": {
     "type": "git",
@@ -17,10 +17,10 @@
     "url": "https://github.com/jesseweed/seti-syntax/issues"
   },
   "homepage": "https://github.com/jesseweed/seti-syntax#readme",
-  "_id": "seti-syntax@0.4.1",
-  "_shasum": "dbc16407970ace74bdab8c5773ed245128ccf1ba",
-  "_resolved": "file:../d-115103-5997-vb4891/package.tgz",
-  "_from": "../d-115103-5997-vb4891/package.tgz",
+  "_id": "seti-syntax@0.4.2",
+  "_shasum": "0447e1ca67b76120555dff28f90be99662c9150a",
+  "_resolved": "file:../d-116314-87202-mqqo4o/package.tgz",
+  "_from": "../d-116314-87202-mqqo4o/package.tgz",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [],

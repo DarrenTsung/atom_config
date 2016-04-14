@@ -3,13 +3,11 @@
 import _ from 'underscore-plus';
 
 export default class Settings {
-
   update(settings={}) {
     this.load(settings);
   }
 
   load(settings={}) {
-
     if ('global' in settings) {
       settings['*'] = settings.global;
       delete settings.global;
@@ -43,11 +41,6 @@ export default class Settings {
 
     for (setting in flatSettings) {
       value = flatSettings[setting];
-      if (_.isArray(value)) {
-        valueOptions = scope ? {scope: scope} : {};
-        currentValue = atom.config.get(setting, valueOptions);
-        value = _.union(currentValue, value);
-      }
 
       atom.config.set(setting, value, options);
     }

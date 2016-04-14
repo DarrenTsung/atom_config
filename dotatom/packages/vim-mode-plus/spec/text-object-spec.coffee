@@ -1,5 +1,5 @@
 # Refactoring status: 80%
-{getVimState, dispatch} = require './spec-helper'
+{getVimState, dispatch, TextData} = require './spec-helper'
 
 describe "TextObject", ->
   [set, ensure, keystroke, editor, editorElement, vimState] = []
@@ -142,7 +142,6 @@ describe "TextObject", ->
         .... `abc` ....
         .... {abc} ....
         .... <abc> ....
-        .... >abc< ....
         .... [abc] ....
         .... (abc) ....
         """
@@ -165,7 +164,6 @@ describe "TextObject", ->
             .... `abc` ....
             .... {abc} ....
             .... <abc> ....
-            .... >abc< ....
             .... [abc] ....
             .... (abc) ....
             """
@@ -176,7 +174,6 @@ describe "TextObject", ->
             .... `` ....
             .... {} ....
             .... <> ....
-            .... >< ....
             .... [] ....
             .... () ....
             """
@@ -196,13 +193,11 @@ describe "TextObject", ->
             .... `abc` ....
             .... {abc} ....
             .... <abc> ....
-            .... >abc< ....
             .... [abc] ....
             .... (abc) ....
             """
         ensure 'j.j.j.j.j.j.j.',
           text: """
-            ....  ....
             ....  ....
             ....  ....
             ....  ....
@@ -321,6 +316,38 @@ describe "TextObject", ->
         set
           text: "' something in here and in 'here' ' and over here"
           cursor: [0, 9]
+
+      describe "don't treat literal backslash(double backslash) as escape char", ->
+        beforeEach ->
+          set
+            text: "'some-key-here\\\\': 'here-is-the-val'"
+        it "case-1", ->
+          set cursor: [0, 2]
+          ensure "di'",
+            text: "'': 'here-is-the-val'"
+            cursor: [0, 1]
+
+        it "case-2", ->
+          set cursor: [0, 19]
+          ensure "di'",
+            text: "'some-key-here\\\\': ''"
+            cursor: [0, 20]
+
+      describe "treat backslash(single backslash) as escape char", ->
+        beforeEach ->
+          set
+            text: "'some-key-here\\'': 'here-is-the-val'"
+
+        it "case-1", ->
+          set cursor: [0, 2]
+          ensure "di'",
+            text: "'': 'here-is-the-val'"
+            cursor: [0, 1]
+        it "case-2", ->
+          set cursor: [0, 17]
+          ensure "di'",
+            text: "'some-key-here\\'': ''"
+            cursor: [0, 20]
 
       it "applies operators inside the current string in operator-pending mode", ->
         ensure "di'",
@@ -496,7 +523,6 @@ describe "TextObject", ->
         it "case-2 normal", -> check close, 'd', text: textFinal, cursor: [0, 1]
         it "case-3 visual", -> check open, 'v', {selectedText}
         it "case-4 visual", -> check close, 'v', {selectedText}
-
   describe "AngleBracket", ->
     describe "inner-angle-bracket", ->
       beforeEach ->
@@ -559,39 +585,284 @@ describe "TextObject", ->
         it "case-3 visual", -> check open, 'v', {selectedText}
         it "case-4 visual", -> check close, 'v', {selectedText}
 
-  describe "Tag", ->
-    describe "inner-tag", ->
+  describe "AllowForwarding family", ->
+    beforeEach ->
+      atom.keymaps.add "text",
+        'atom-text-editor.vim-mode-plus.operator-pending-mode, atom-text-editor.vim-mode-plus.visual-mode':
+          'i }':  'vim-mode-plus:inner-curly-bracket-allow-forwarding'
+          'i >':  'vim-mode-plus:inner-angle-bracket-allow-forwarding'
+          'i ]':  'vim-mode-plus:inner-square-bracket-allow-forwarding'
+          'i )':  'vim-mode-plus:inner-parenthesis-allow-forwarding'
+
+          'a }':  'vim-mode-plus:a-curly-bracket-allow-forwarding'
+          'a >':  'vim-mode-plus:a-angle-bracket-allow-forwarding'
+          'a ]':  'vim-mode-plus:a-square-bracket-allow-forwarding'
+          'a )':  'vim-mode-plus:a-parenthesis-allow-forwarding'
+
+      set
+        text: """
+        __{000}__
+        __<111>__
+        __[222]__
+        __(333)__
+        """
+    describe "inner", ->
+      it "select forwarding range", ->
+        set cursor: [0, 0]; ensure ['escape', 'vi}'], selectedText: "000"
+        set cursor: [1, 0]; ensure ['escape', 'vi>'], selectedText: "111"
+        set cursor: [2, 0]; ensure ['escape', 'vi]'], selectedText: "222"
+        set cursor: [3, 0]; ensure ['escape', 'vi)'], selectedText: "333"
+    describe "a", ->
+      it "select forwarding range", ->
+        set cursor: [0, 0]; ensure ['escape', 'va}'], selectedText: "{000}"
+        set cursor: [1, 0]; ensure ['escape', 'va>'], selectedText: "<111>"
+        set cursor: [2, 0]; ensure ['escape', 'va]'], selectedText: "[222]"
+        set cursor: [3, 0]; ensure ['escape', 'va)'], selectedText: "(333)"
+    describe "multi line text", ->
+      [textOneInner, textOneA] = []
       beforeEach ->
         set
-          text: "<something>here</something><again>"
-          cursor: [0, 5]
+          text: """
+          000
+          000{11
+          111{22}
+          111
+          111}
+          """
+        textOneInner = """
+          11
+          111{22}
+          111
+          111
+          """
+        textOneA = """
+          {11
+          111{22}
+          111
+          111}
+          """
+      describe "forwarding inner", ->
+        it "select forwarding range", ->
+          set cursor: [1, 0]; ensure "vi}", selectedText: textOneInner
+        it "select forwarding range", ->
+          set cursor: [2, 0]; ensure "vi}", selectedText: "22"
+        it "[case-1] no forwarding open pair, fail to find", ->
+          set cursor: [0, 0]; ensure "vi}", selectedText: '0', cursor: [0, 1]
+        it "[case-2] no forwarding open pair, select enclosed", ->
+          set cursor: [1, 4]; ensure "vi}", selectedText: textOneInner
+        it "[case-3] no forwarding open pair, select enclosed", ->
+          set cursor: [3, 0]; ensure "vi}", selectedText: textOneInner
+        it "[case-3] no forwarding open pair, select enclosed", ->
+          set cursor: [4, 0]; ensure "vi}", selectedText: textOneInner
+      describe "forwarding a", ->
+        it "select forwarding range", ->
+          set cursor: [1, 0]; ensure "va}", selectedText: textOneA
+        it "select forwarding range", ->
+          set cursor: [2, 0]; ensure "va}", selectedText: "{22}"
+        it "[case-1] no forwarding open pair, fail to find", ->
+          set cursor: [0, 0]; ensure "va}", selectedText: '0', cursor: [0, 1]
+        it "[case-2] no forwarding open pair, select enclosed", ->
+          set cursor: [1, 4]; ensure "va}", selectedText: textOneA
+        it "[case-3] no forwarding open pair, select enclosed", ->
+          set cursor: [3, 0]; ensure "va}", selectedText: textOneA
+        it "[case-3] no forwarding open pair, select enclosed", ->
+          set cursor: [4, 0]; ensure "va}", selectedText: textOneA
 
-      # [FIXME] original official vim-mode support this, but its also affect other
-      # TextObject like i( I don't like original behavior.
-      # So I disabled, but for HTML tags, there is some space to improve.
-      xit "applies only if in the value of a tag", ->
-        ensure 'dit',
-          text: "<something></something><again>"
-          cursor: [0, 11]
+  describe "AnyPairAllowForwarding", ->
+    beforeEach ->
+      atom.keymaps.add "text",
+        'atom-text-editor.vim-mode-plus.operator-pending-mode, atom-text-editor.vim-mode-plus.visual-mode':
+          ";": 'vim-mode-plus:inner-any-pair-allow-forwarding'
+          ":": 'vim-mode-plus:a-any-pair-allow-forwarding'
 
-      it "applies operators inside the current word in operator-pending mode", ->
-        set cursor: [0, 13]
-        ensure 'dit',
-          text: "<something></something><again>"
-          cursor: [0, 11]
-      describe "cursor is on the pair char", ->
+      set text: """
+        00
+        00[11
+        11"222"11{333}11(
+        444()444
+        )
+        111]00{555}
+        """
+    describe "inner", ->
+      it "select forwarding range within enclosed range(if exists)", ->
+        set cursor: [2, 0]
+        keystroke 'v'
+        ensure ';', selectedText: "222"
+        ensure ';', selectedText: "333"
+        ensure ';', selectedText: "444()444\n"
+        ensure ';', selectedText: "", selectedBufferRange: [[3, 4], [3, 4]]
+    describe "a", ->
+      it "select forwarding range within enclosed range(if exists)", ->
+        set cursor: [2, 0]
+        keystroke 'v'
+        ensure ':', selectedText: '"222"'
+        ensure ':', selectedText: "{333}"
+        ensure ':', selectedText: "(\n444()444\n)"
+        ensure ':', selectedText: """
+        [11
+        11"222"11{333}11(
+        444()444
+        )
+        111]
+        """
+
+  describe "Tag", ->
+    [ensureSelectedText] = []
+    ensureSelectedText = (start, keystroke, selectedText) ->
+      set cursor: start
+      ensure keystroke, {selectedText}
+
+    describe "inner-tag", ->
+      describe "pricisely select inner", ->
         check = getCheckFunctionFor('it')
-        text = '->+<-'
-        textFinal = '-><-'
-        selectedText = '+'
-        open = [0, 1]
-        close = [0, 3]
+        text = "<abc>  <title>TITLE</title> </abc>"
+        deletedText = "<abc>  <title></title> </abc>"
+        selectedText = "TITLE"
+        innerABC = "  <title>TITLE</title> "
         beforeEach ->
           set {text}
-        it "case-1 normal", -> check open, 'd', text: textFinal, cursor: [0, 2]
-        it "case-2 normal", -> check close, 'd', text: textFinal, cursor: [0, 2]
-        it "case-3 visual", -> check open, 'v', {selectedText}
-        it "case-4 visual", -> check close, 'v', {selectedText}
+        # Select
+        it "[1] forwarding", -> check [0, 5], 'v', {selectedText}
+        it "[2] openTag leftmost", -> check [0, 7], 'v', {selectedText}
+        it "[3] openTag rightmost", -> check [0, 13], 'v', {selectedText}
+        it "[4] Inner text", -> check [0, 16], 'v', {selectedText}
+        it "[5] closeTag leftmost", -> check [0, 19], 'v', {selectedText}
+        it "[6] closeTag rightmost", -> check [0, 26], 'v', {selectedText}
+        it "[7] right of closeTag", -> check [0, 27], 'v', {selectedText: innerABC}
+
+        # Delete
+        it "[8] forwarding", -> check [0, 5], 'd', {text: deletedText}
+        it "[9] openTag leftmost", -> check [0, 7], 'd', {text: deletedText}
+        it "[10] openTag rightmost", -> check [0, 13], 'd', {text: deletedText}
+        it "[11] Inner text", -> check [0, 16], 'd', {text: deletedText}
+        it "[12] closeTag leftmost", -> check [0, 19], 'd', {text: deletedText}
+        it "[13] closeTag rightmost", -> check [0, 26], 'd', {text: deletedText}
+        it "[14] right of closeTag", -> check [0, 27], 'd', {text: "<abc></abc>"}
+
+      describe "expansion and deletion", ->
+        beforeEach ->
+          htmlLikeText = """
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+          __<meta charset="UTF-8" />
+          __<title>Document</title>
+          </head>
+          <body>
+          __<div>
+          ____<div>
+          ______<div>
+          ________<p><a>
+          ______</div>
+          ____</div>
+          __</div>
+          </body>
+          </html>\n
+          """
+          set text: htmlLikeText
+        it "can expand selection when repeated", ->
+          set cursor: [9, 0]
+          ensure 'vit', selectedText: """
+            \n________<p><a>
+            ______
+            """
+          ensure 'it', selectedText: """
+            \n______<div>
+            ________<p><a>
+            ______</div>
+            ____
+            """
+          ensure 'it', selectedText: """
+            \n____<div>
+            ______<div>
+            ________<p><a>
+            ______</div>
+            ____</div>
+            __
+            """
+          ensure 'it', selectedText: """
+            \n__<div>
+            ____<div>
+            ______<div>
+            ________<p><a>
+            ______</div>
+            ____</div>
+            __</div>\n
+            """
+          ensure 'it', selectedText: """
+            \n<head>
+            __<meta charset="UTF-8" />
+            __<title>Document</title>
+            </head>
+            <body>
+            __<div>
+            ____<div>
+            ______<div>
+            ________<p><a>
+            ______</div>
+            ____</div>
+            __</div>
+            </body>\n
+            """
+        it 'delete inner-tag and repatable', ->
+          set cursor: [9, 0]
+          ensure "dit", text: """
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+            __<meta charset="UTF-8" />
+            __<title>Document</title>
+            </head>
+            <body>
+            __<div>
+            ____<div>
+            ______<div></div>
+            ____</div>
+            __</div>
+            </body>
+            </html>\n
+            """
+          ensure "3.", text: """
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+            __<meta charset="UTF-8" />
+            __<title>Document</title>
+            </head>
+            <body></body>
+            </html>\n
+            """
+          ensure ".", text: """
+            <!DOCTYPE html>
+            <html lang="en"></html>\n
+            """
+
+    describe "a-tag", ->
+      describe "pricisely select a", ->
+        check = getCheckFunctionFor('at')
+        text = "<abc>  <title>TITLE</title> </abc>"
+        deletedText = "<abc>   </abc>"
+        selectedText = "<title>TITLE</title>"
+        aABC = "<abc>  <title>TITLE</title> </abc>"
+        beforeEach ->
+          set {text}
+        # Select
+        it "[1] forwarding", -> check [0, 5], 'v', {selectedText}
+        it "[2] openTag leftmost", -> check [0, 7], 'v', {selectedText}
+        it "[3] openTag rightmost", -> check [0, 13], 'v', {selectedText}
+        it "[4] Inner text", -> check [0, 16], 'v', {selectedText}
+        it "[5] closeTag leftmost", -> check [0, 19], 'v', {selectedText}
+        it "[6] closeTag rightmost", -> check [0, 26], 'v', {selectedText}
+        it "[7] right of closeTag", -> check [0, 27], 'v', {selectedText: aABC}
+
+        # Delete
+        it "[8] forwarding", -> check [0, 5], 'd', {text: deletedText}
+        it "[9] openTag leftmost", -> check [0, 7], 'd', {text: deletedText}
+        it "[10] openTag rightmost", -> check [0, 13], 'd', {text: deletedText}
+        it "[11] Inner text", -> check [0, 16], 'd', {text: deletedText}
+        it "[12] closeTag leftmost", -> check [0, 19], 'd', {text: deletedText}
+        it "[13] closeTag rightmost", -> check [0, 26], 'd', {text: deletedText}
+        it "[14] right of closeTag", -> check [0, 27], 'd', {text: ""}
 
   describe "SquareBracket", ->
     describe "inner-square-bracket", ->
@@ -680,8 +951,12 @@ describe "TextObject", ->
         ensure 'vi(', selectedText: 'editor.getScrollTop()'
 
       it "skip escaped pair case-1", ->
-        set text: 'expect(editor.g\\(etScrollTp())', cursor: [0, 7]
+        set text: 'expect(editor.g\\(etScrollTp())', cursor: [0, 20]
         ensure 'vi(', selectedText: 'editor.g\\(etScrollTp()'
+
+      it "dont skip literal backslash", ->
+        set text: 'expect(editor.g\\\\(etScrollTp())', cursor: [0, 20]
+        ensure 'vi(', selectedText: 'etScrollTp()'
 
       it "skip escaped pair case-2", ->
         set text: 'expect(editor.getSc\\)rollTp())', cursor: [0, 7]

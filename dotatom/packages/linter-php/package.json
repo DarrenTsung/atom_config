@@ -89,8 +89,8 @@
   "homepage": "https://github.com/AtomLinter/linter-php#readme",
   "_id": "linter-php@1.2.0",
   "_shasum": "79d653ed6f2d9095c06df437b416e9b96df7f51c",
-  "_resolved": "file:../d-116210-64224-ew4zcg/package.tgz",
-  "_from": "../d-116210-64224-ew4zcg/package.tgz",
+  "_resolved": "file:../d-116314-87162-19t6hy5/package.tgz",
+  "_from": "../d-116314-87162-19t6hy5/package.tgz",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [

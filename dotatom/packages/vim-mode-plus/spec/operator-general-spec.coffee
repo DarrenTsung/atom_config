@@ -609,15 +609,15 @@ describe "Operator general", ->
     describe "with a selection", ->
       beforeEach ->
         set
-          text: '012'
+          text: '012\n'
           cursor: [0, 1]
       describe "with characterwise selection", ->
         it "replaces selection with charwise content", ->
           set register: '"': text: "345"
-          ensure 'vp', text: "03452", cursor: [0, 3]
+          ensure 'vp', text: "03452\n", cursor: [0, 3]
         it "replaces selection with linewise content", ->
           set register: '"': text: "345\n"
-          ensure 'vp', text: "0\n345\n2", cursor: [1, 0]
+          ensure 'vp', text: "0\n345\n2\n", cursor: [1, 0]
 
       describe "with linewise selection", ->
         it "replaces selection with charwise content", ->
@@ -638,6 +638,53 @@ describe "Operator general", ->
 
       it "inserts the contents of the default register above", ->
         ensure text: "345012\n", cursor: [0, 2]
+
+  describe "PutAfterAndSelect and PutBeforeAndSelect", ->
+    beforeEach ->
+      atom.keymaps.add "text",
+        'atom-text-editor.vim-mode-plus:not(.insert-mode)':
+          'g p': 'vim-mode-plus:put-after-and-select'
+          'g P': 'vim-mode-plus:put-before-and-select'
+      set
+        text: """
+          111
+          222
+          333
+
+          """
+        cursor: [1, 0]
+    describe "in visual-mode", ->
+      describe "linewise register", ->
+        beforeEach ->
+          set register: '"': text: "AAA\n"
+        it "paste and select: [selection:linewise]", ->
+          ensure 'Vgp', text: "111\nAAA\n333\n", selectedText: "AAA\n", mode: ['visual', 'linewise']
+        it "paste and select: [selection:charwise, register:linewise]", ->
+          ensure 'vgP', text: "111\n\nAAA\n22\n333\n", selectedText: "AAA\n", mode: ['visual', 'linewise']
+
+      describe "characterwise register", ->
+        beforeEach ->
+          set register: '"': text: "AAA"
+        it "paste and select: [selection:linewise, register:charwise]", ->
+          ensure 'Vgp', text: "111\nAAA\n333\n", selectedText: "AAA\n", mode: ['visual', 'linewise']
+        it "paste and select: [selection:charwise, register:charwise]", ->
+          ensure 'vgP', text: "111\nAAA22\n333\n", selectedText: "AAA", mode: ['visual', 'characterwise']
+
+    describe "in normal", ->
+      describe "linewise register", ->
+        beforeEach ->
+          set register: '"': text: "AAA\n"
+        it "putAfter and select", ->
+          ensure 'gp', text: "111\n222\nAAA\n333\n", selectedText: "AAA\n", mode: ['visual', 'linewise']
+        it "putBefore and select", ->
+          ensure 'gP', text: "111\nAAA\n222\n333\n", selectedText: "AAA\n", mode: ['visual', 'linewise']
+      describe "characterwise register", ->
+        beforeEach ->
+          set register: '"': text: "AAA"
+        it "putAfter and select", ->
+          ensure 'gp', text: "111\n2AAA22\n333\n", selectedText: "AAA", mode: ['visual', 'characterwise']
+        it "putAfter and select", ->
+          ensure 'gP', text: "111\nAAA222\n333\n", selectedText: "AAA", mode: ['visual', 'characterwise']
 
   describe "the J keybinding", ->
     beforeEach ->

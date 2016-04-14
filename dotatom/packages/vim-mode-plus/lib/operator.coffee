@@ -10,6 +10,7 @@ _ = require 'underscore-plus'
   moveCursorLeft, moveCursorRight
   highlightRanges, getNewTextRangeFromCheckpoint
   preserveSelectionStartPoints
+  isEndsWithNewLineForBufferRow
 } = require './utils'
 swrap = require './selection-wrapper'
 settings = require './settings'
@@ -134,10 +135,14 @@ class Select extends Operator
   execute: ->
     @selectTarget()
     return if @isMode('operator-pending') or @isMode('visual', 'blockwise')
-    if @target.isAllowSubmodeChange?()
+    unless @isMode('visual')
       submode = swrap.detectVisualModeSubmode(@editor)
-      if submode? and not @isMode('visual', submode)
-        @activateMode('visual', submode)
+      @activateMode('visual', submode)
+    else
+      if @target.isAllowSubmodeChange?()
+        submode = swrap.detectVisualModeSubmode(@editor)
+        if submode? and not @isMode('visual', submode)
+          @activateMode('visual', submode)
 
 class SelectLatestChange extends Select
   @extend()
@@ -457,7 +462,7 @@ class Surround extends TransformString
   charsMax: 1
   hover: icon: ':surround:', emoji: ':two_women_holding_hands:'
   requireInput: true
-  autoIndent: true
+  autoIndent: false
 
   initialize: ->
     return unless @requireInput
@@ -480,11 +485,15 @@ class Surround extends TransformString
   surround: (text, pair) ->
     [open, close] = pair
     if LineEndingRegExp.test(text)
+      @autoIndent = true # [FIXME]
       open += "\n"
       close += "\n"
 
-    # if @input in settings.get('charactersToAddSpaceOnSurround')
-    if @input in settings.get('charactersToAddSpaceOnSurround')
+    SpaceSurroundedRegExp = /^\s([\s|\S]+)\s$/
+    isSurroundedBySpace = (text) ->
+      SpaceSurroundedRegExp.test(text)
+
+    if @input in settings.get('charactersToAddSpaceOnSurround') and not isSurroundedBySpace(text)
       open + ' ' + text + ' ' + close
     else
       open + text + close
@@ -520,18 +529,28 @@ class DeleteSurround extends Surround
     # FIXME: dont manage allowNextLine independently. Each Pair text-object can handle by themselvs.
     target = @new 'Pair',
       pair: @getPair(@input)
-      inclusive: true
+      inner: false
       allowNextLine: @input in @pairChars
     @setTarget(target)
     @processOperation()
 
   getNewText: (text) ->
-    text[1...-1].trim()
+    isSingleLine = (text) ->
+      text.split(/\n|\r\n/).length is 1
+    text = text[1...-1]
+    if isSingleLine(text)
+      text.trim()
+    else
+      text
 
 class DeleteSurroundAnyPair extends DeleteSurround
   @extend()
   requireInput: false
   target: 'AAnyPair'
+
+class DeleteSurroundAnyPairAllowForwarding extends DeleteSurroundAnyPair
+  @extend()
+  target: 'AAnyPairAllowForwarding'
 
 class ChangeSurround extends DeleteSurround
   @extend()
@@ -544,7 +563,8 @@ class ChangeSurround extends DeleteSurround
     super(from)
 
   getNewText: (text) ->
-    @surround super(text), @getPair(@char)
+    [open, close] = @getPair(@char)
+    open + text[1...-1] + close
 
 class ChangeSurroundAnyPair extends ChangeSurround
   @extend()
@@ -566,6 +586,10 @@ class ChangeSurroundAnyPair extends ChangeSurround
     @restore(selection) for selection in @editor.getSelections()
     @input = @char
     @processOperation()
+
+class ChangeSurroundAnyPairAllowForwarding extends ChangeSurroundAnyPair
+  @extend()
+  target: "AAnyPairAllowForwarding"
 
 # -------------------------
 class Yank extends Operator
@@ -794,31 +818,59 @@ class PutBefore extends Operator
         {text, type} = @vimState.register.get(null, selection)
         break unless text
         text = _.multiplyString(text, @getCount())
-        isLinewise = type is 'linewise' or @isMode('visual', 'linewise')
-
-        if isLinewise
-          newRange = @pasteLinewise(selection, text)
-          cursor.setBufferPosition(newRange.start)
-          cursor.moveToFirstCharacterOfLine()
-        else
-          newRange = @pasteCharacterwise(selection, text)
-          cursor.setBufferPosition(newRange.end.translate([0, -1]))
+        newRange = @paste selection, text,
+          linewise: (type is 'linewise') or @isMode('visual', 'linewise')
+          select: @selectPastedText
         @setMarkForChange(newRange)
         @flash newRange
-    @activateMode('normal')
+
+    if @selectPastedText# and haveSomeSelection(@editor)
+      submode = swrap.detectVisualModeSubmode(@editor)
+      unless @isMode('visual', submode)
+        @activateMode('visual', submode)
+    else
+      @activateMode('normal')
+
+  paste: (selection, text, {linewise, select}) ->
+    {cursor} = selection
+    select ?= false
+    linewise ?= false
+    if linewise
+      newRange = @pasteLinewise(selection, text)
+      adjustCursor = (range) ->
+        cursor.setBufferPosition(range.start)
+        cursor.moveToFirstCharacterOfLine()
+    else
+      newRange = @pasteCharacterwise(selection, text)
+      adjustCursor = (range) ->
+        cursor.setBufferPosition(range.end.translate([0, -1]))
+
+    if select
+      selection.setBufferRange(newRange)
+    else
+      adjustCursor(newRange)
+    newRange
 
   # Return newRange
   pasteLinewise: (selection, text) ->
     {cursor} = selection
+    text += "\n" unless text.endsWith("\n")
     if selection.isEmpty()
-      text = text.replace(LineEndingRegExp, '')
-      if @location is 'before'
-        @insertTextAbove(selection, text)
-      else
-        @insertTextBelow(selection, text)
+      row = cursor.getBufferRow()
+      switch @location
+        when 'before'
+          range = [[row, 0], [row, 0]]
+        when 'after'
+          unless isEndsWithNewLineForBufferRow(@editor, row)
+            text = text.replace(LineEndingRegExp, '')
+          cursor.moveToEndOfLine()
+          {end} = selection.insertText("\n")
+          range = @editor.bufferRangeForBufferRow(end.row, {includeNewline: true})
+      @editor.setTextInBufferRange(range, text)
     else
       if @isMode('visual', 'linewise')
-        text += "\n" unless text.endsWith("\n")
+        unless selection.getBufferRange().end.column is 0
+          text = text.replace(LineEndingRegExp, '')
       else
         selection.insertText("\n")
       selection.insertText(text)
@@ -828,20 +880,17 @@ class PutBefore extends Operator
       selection.cursor.moveRight()
     selection.insertText(text)
 
-  insertTextAbove: (selection, text) ->
-    selection.cursor.moveToBeginningOfLine()
-    selection.insertText("\n")
-    selection.cursor.moveUp()
-    selection.insertText(text)
-
-  insertTextBelow: (selection, text) ->
-    selection.cursor.moveToEndOfLine()
-    selection.insertText("\n")
-    selection.insertText(text)
-
 class PutAfter extends PutBefore
   @extend()
   location: 'after'
+
+class PutBeforeAndSelect extends PutBefore
+  @extend()
+  selectPastedText: true
+
+class PutAfterAndSelect extends PutAfter
+  @extend()
+  selectPastedText: true
 
 # Replace
 # -------------------------
@@ -1034,10 +1083,7 @@ class Change extends ActivateInsertMode
   supportInsertionCount: false
 
   execute: ->
-    unless @selectTarget()
-      @activateMode('normal')
-      return
-
+    @selectTarget()
     text = ''
     if @target.instanceof('TextObject') or @target.instanceof('Motion')
       text = "\n" if (swrap.detectVisualModeSubmode(@editor) is 'linewise')

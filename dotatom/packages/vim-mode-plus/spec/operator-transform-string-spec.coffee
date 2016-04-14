@@ -369,7 +369,7 @@ describe "Operator TransformString", ->
       it "delete surrounded chars expanded to multi-line", ->
         set cursor: [3, 1]
         ensure ['ds', char: '('],
-          text: "apple\npairs: [brackets]\npairs: [brackets]\nmulti\n  line"
+          text: "apple\npairs: [brackets]\npairs: [brackets]\n multi\n  line "
       it "delete surrounded chars and trim padding spaces", ->
         set
           text: """
@@ -379,6 +379,22 @@ describe "Operator TransformString", ->
           cursor: [0, 0]
         ensure ['ds', char: '('], text: "apple\n{  orange   }\n"
         ensure ['jds', char: '{'], text: "apple\norange\n"
+      it "delete surrounded for multi-line but dont affect code layout", ->
+        set
+          cursor: [0, 34]
+          text: """
+            highlightRanges @editor, range, {
+              timeout: timeout
+              hello: world
+            }
+            """
+        ensure ['ds', char: '{'],
+          text: [
+              "highlightRanges @editor, range, "
+              "  timeout: timeout"
+              "  hello: world"
+              ""
+            ].join("\n")
 
     describe 'change srurround', ->
       beforeEach ->
@@ -425,6 +441,23 @@ describe "Operator TransformString", ->
             !orange!
             """
 
+      it "change surrounded for multi-line but dont affect code layout", ->
+        set
+          cursor: [0, 34]
+          text: """
+            highlightRanges @editor, range, {
+              timeout: timeout
+              hello: world
+            }
+            """
+        ensure ['cs', char: '{('],
+          text: """
+            highlightRanges @editor, range, (
+              timeout: timeout
+              hello: world
+            )
+            """
+
     describe 'surround-word', ->
       beforeEach ->
         atom.keymaps.add "surround-test",
@@ -444,7 +477,7 @@ describe "Operator TransformString", ->
         ensure 'j.',
           text: "{apple}\n{pairs}: [brackets]\npairs: [brackets]\n( multi\n  line )"
 
-    describe 'delete surround-any-pair', ->
+    describe 'delete-surround-any-pair', ->
       beforeEach ->
         set
           text: """
@@ -478,9 +511,35 @@ describe "Operator TransformString", ->
       it "delete surrounded chars expanded to multi-line", ->
         set cursor: [3, 1]
         ensure 'ds',
-          text: 'apple\n(pairs: [brackets])\n{pairs "s" [brackets]}\nmulti\n  line'
+          text: 'apple\n(pairs: [brackets])\n{pairs "s" [brackets]}\n multi\n  line '
 
-    describe 'change surround-any-pair', ->
+    describe 'delete-surround-any-pair-allow-forwarding', ->
+      beforeEach ->
+        settings.set('stayOnTransformString', true)
+        atom.keymaps.add "test",
+          'atom-text-editor.vim-mode-plus:not(.insert-mode)':
+            'd s': 'vim-mode-plus:delete-surround-any-pair-allow-forwarding'
+      it "[1] single line", ->
+        set
+          cursor: [0, 0]
+          text: """
+          ___(inner)
+          ___(inner)
+          """
+        ensure 'ds',
+          text: """
+          ___inner
+          ___(inner)
+          """
+          cursor: [0, 0]
+        ensure 'j.',
+          text: """
+          ___inner
+          ___inner
+          """
+          cursor: [1, 0]
+
+    describe 'change-surround-any-pair', ->
       beforeEach ->
         set
           text: """
@@ -496,12 +555,35 @@ describe "Operator TransformString", ->
             'c s': 'vim-mode-plus:change-surround-any-pair'
 
       it "change any surrounded pair found and repeatable", ->
+        ensure ['cs', char: '<'], text: "<apple>\n(grape)\n<lemmon>\n{orange}"
+        ensure 'j.', text: "<apple>\n<grape>\n<lemmon>\n{orange}"
+        ensure 'jj.', text: "<apple>\n<grape>\n<lemmon>\n<orange>"
+
+    describe 'change-surround-any-pair-allow-forwarding', ->
+      beforeEach ->
+        settings.set('stayOnTransformString', true)
+        atom.keymaps.add "test",
+          'atom-text-editor.vim-mode-plus:not(.insert-mode)':
+            'c s': 'vim-mode-plus:change-surround-any-pair-allow-forwarding'
+      it "[1] single line", ->
+        set
+          cursor: [0, 0]
+          text: """
+          ___(inner)
+          ___(inner)
+          """
         ensure ['cs', char: '<'],
-          text: "<apple>\n(grape)\n<lemmon>\n{orange}"
+          text: """
+          ___<inner>
+          ___(inner)
+          """
+          cursor: [0, 0]
         ensure 'j.',
-          text: "<apple>\n<grape>\n<lemmon>\n{orange}"
-        ensure 'jj.',
-          text: "<apple>\n<grape>\n<lemmon>\n<orange>"
+          text: """
+          ___<inner>
+          ___<inner>
+          """
+          cursor: [1, 0]
 
   describe 'ReplaceWithRegister', ->
     originalText = null

@@ -45,7 +45,7 @@ module.exports = SplitDiff =
     panes = atom.workspace.getPanes()
     for p in panes
       activeItem = p.getActiveItem()
-      if atom.workspace.isTextEditor(activeItem)
+      if activeItem instanceof TextEditor
         if editor1 == null
           editor1 = activeItem
         else if editor2 == null
@@ -97,14 +97,46 @@ module.exports = SplitDiff =
     @editorSubscriptions.add editors.editor2.onDidDestroy =>
       @disable(true)
 
+    # update diff on any settings change
     @editorSubscriptions.add atom.config.onDidChange 'split-diff.ignoreWhitespace', ({newValue, oldValue}) =>
+      @updateDiff(editors)
+    @editorSubscriptions.add atom.config.onDidChange 'split-diff.diffLineChars', ({newValue, oldValue}) =>
+      @updateDiff(editors)
+    @editorSubscriptions.add atom.config.onDidChange 'split-diff.leftEditorColor', ({newValue, oldValue}) =>
+      @updateDiff(editors)
+    @editorSubscriptions.add atom.config.onDidChange 'split-diff.rightEditorColor', ({newValue, oldValue}) =>
       @updateDiff(editors)
 
     @updateDiff(editors)
 
+    # add application menu items
+    @editorSubscriptions.add atom.menu.add [
+      {
+        'label': 'Packages'
+        'submenu': [
+          'label': 'Split Diff'
+          'submenu': [
+            { 'label': 'Ignore Whitespace', 'command': 'split-diff:ignore-whitespace' }
+            { 'label': 'Move to Next Diff', 'command': 'split-diff:next-diff' }
+            { 'label': 'Move to Previous Diff', 'command': 'split-diff:prev-diff' }
+          ]
+        ]
+      }
+    ]
+    @editorSubscriptions.add atom.contextMenu.add {
+      'atom-text-editor': [{
+        'label': 'Split Diff',
+        'submenu': [
+          { 'label': 'Ignore Whitespace', 'command': 'split-diff:ignore-whitespace' }
+          { 'label': 'Move to Next Diff', 'command': 'split-diff:next-diff' }
+          { 'label': 'Move to Previous Diff', 'command': 'split-diff:prev-diff' }
+        ]
+      }]
+    }
+
     detailMsg = 'Ignore Whitespace: ' + @isWhitespaceIgnored
     detailMsg += '\nDiff Line Characters: ' + @isCharDiffEnabled
-    atom.notifications.addInfo('Split Diff Enabled', {detail: detailMsg})
+    atom.notifications.addInfo('Split Diff Enabled', {detail: detailMsg, dismissable: false})
 
   # called by both diffPanes and the editor subscription to update the diff
   # creates the scroll sync
@@ -144,7 +176,7 @@ module.exports = SplitDiff =
       @editorSubscriptions = null
 
     if displayMsg
-      atom.notifications.addInfo('Split Diff Disabled')
+      atom.notifications.addInfo('Split Diff Disabled', {dismissable: false})
 
   # called by "Move to next diff" command
   nextDiff: ->
@@ -209,8 +241,16 @@ module.exports = SplitDiff =
     @diffViewEditor1.setLineOffsets(computedDiff.oldLineOffsets)
     @diffViewEditor2.setLineOffsets(computedDiff.newLineOffsets)
 
-    @diffViewEditor1.setLineHighlights(undefined, computedDiff.removedLines)
-    @diffViewEditor2.setLineHighlights(computedDiff.addedLines, undefined)
+    leftColor = @getConfig('leftEditorColor')
+    rightColor = @getConfig('rightEditorColor')
+    if leftColor == 'green'
+      @diffViewEditor1.setLineHighlights(computedDiff.removedLines, 'added')
+    else
+      @diffViewEditor1.setLineHighlights(computedDiff.removedLines, 'removed')
+    if rightColor == 'green'
+      @diffViewEditor2.setLineHighlights(computedDiff.addedLines, 'added')
+    else
+      @diffViewEditor2.setLineHighlights(computedDiff.addedLines, 'removed')
 
   evaluateDiffOrder: (chunks) ->
     oldLineNumber = 0
@@ -276,21 +316,30 @@ module.exports = SplitDiff =
           lineRange = c.oldLineEnd - c.oldLineStart
         for i in [0 ... lineRange] by 1
           charDiff = SplitDiffCompute.computeCharDiff(@diffViewEditor1.getLineText(c.oldLineStart + i), @diffViewEditor2.getLineText(c.newLineStart + i))
+          leftColor = @getConfig('leftEditorColor')
+          rightColor = @getConfig('rightEditorColor')
           @diffViewEditor1.setCharHighlights(c.oldLineStart + i, charDiff, undefined)
           @diffViewEditor2.setCharHighlights(c.newLineStart + i, undefined, charDiff)
+          if leftColor == 'green'
+            @diffViewEditor1.setCharHighlights(c.oldLineStart + i, charDiff.removedChars, 'added')
+          else
+            @diffViewEditor1.setCharHighlights(c.oldLineStart + i, charDiff.removedChars, 'removed')
+          if rightColor == 'green'
+            @diffViewEditor2.setCharHighlights(c.newLineStart + i, charDiff.addedChars, 'added')
+          else
+            @diffViewEditor2.setCharHighlights(c.newLineStart + i, charDiff.addedChars, 'removed')
 
   # called by "toggle ignore whitespace" command
   # toggles ignoring whitespace and refreshes the diff
   toggleIgnoreWhitespace: ->
     @setConfig('ignoreWhitespace', !@isWhitespaceIgnored)
     @isWhiteSpaceIgnored = @getConfig('ignoreWhitespace')
-    @diffPanes()
 
   # called by "toggle" command
   # toggles split diff
   toggle: ->
     if @isEnabled
-      @disable()
+      @disable(true)
     else
       @diffPanes()
 

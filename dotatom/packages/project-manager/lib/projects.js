@@ -1,14 +1,17 @@
 'use babel';
 
 import {Emitter} from 'atom';
-import DB from './db';
 import Project from './project';
+import db from './db';
 
-export default class Projects {
+class Projects {
   constructor() {
     this.emitter = new Emitter();
-    this.db = new DB();
-    this.db.onUpdate(() => this.emitter.emit('projects-updated'));
+    this.projects = [];
+
+    db.addUpdater('iwantitall', {}, (project) => {
+      this.addProject(project);
+    });
   }
 
   onUpdate(callback) {
@@ -16,20 +19,12 @@ export default class Projects {
   }
 
   getAll(callback) {
-    this.db.find(projectSettings => {
-      let projects = [];
-      let setting;
-      let project;
-      let key;
-      for (key in projectSettings) {
-        setting = projectSettings[key];
-        if (setting.paths) {
-          project = new Project(setting);
-          projects.push(project);
-        }
+    db.find(projectSettings => {
+      for (const setting of projectSettings) {
+        this.addProject(setting);
       }
 
-      callback(projects);
+      callback(this.projects);
     });
   }
 
@@ -42,4 +37,33 @@ export default class Projects {
       });
     });
   }
+
+  addProject(settings) {
+    let found = null;
+
+    for (const project of this.projects) {
+      if (project.props._id === settings._id) {
+        found = project;
+      } else if (project.rootPath === settings.paths[0]) {
+        found = project;
+      }
+    }
+
+    if (found === null) {
+      const newProject = new Project(settings);
+      this.projects.push(newProject);
+
+      if (!newProject.props._id) {
+        newProject.save();
+      }
+
+      this.emitter.emit('projects-updated');
+      found = newProject;
+
+    }
+
+    return found;
+  }
 }
+
+export default new Projects();

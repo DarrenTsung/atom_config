@@ -63,17 +63,18 @@ getCharacterForEvent = (event) ->
 isLinewiseRange = (range) ->
   (not range.isEmpty()) and (range.start.column is 0) and (range.end.column is 0)
 
-rangeToBeginningOfFileFromPoint = (point) ->
-  new Range(Point.ZERO, point)
-
-rangeToEndOfFileFromPoint = (point) ->
-  new Range(point, Point.INFINITY)
+isEndsWithNewLineForBufferRow = (editor, row) ->
+  {start, end} = editor.bufferRangeForBufferRow(row, {includeNewline: true})
+  end.isGreaterThan(start) and end.column is 0
 
 haveSomeSelection = (editor) ->
   editor.getSelections().some((selection) -> not selection.isEmpty())
 
 sortRanges = (ranges) ->
   ranges.sort((a, b) -> a.compare(b))
+
+sortRangesByEnd = (ranges, fn) ->
+  ranges.sort((a, b) -> a.end.compare(b.end))
 
 # return adjusted index fit whitin length
 # return -1 if list is empty.
@@ -509,6 +510,18 @@ isFunctionScope = (editor, scope) ->
 sortComparable = (collection) ->
   collection.sort (a, b) -> a.compare(b)
 
+# Scroll to bufferPosition with minimum amount to keep original visible area.
+# If target position won't fit within onePageUp or onePageDown, it center target point.
+smartScrollToBufferPosition = (editor, point) ->
+  editorElement = getView(editor)
+  editorAreaHeight = editor.getLineHeightInPixels() * (editor.getRowsPerPage() - 1)
+  onePageUp = editorElement.getScrollTop() - editorAreaHeight # No need to limit to min=0
+  onePageDown = editorElement.getScrollBottom() + editorAreaHeight
+  target = editorElement.pixelPositionForBufferPosition(point).top
+  
+  center = (onePageDown < target) or (target < onePageUp)
+  editor.scrollToBufferPosition(point, {center})
+
 # Debugging purpose
 # -------------------------
 reportSelection = (subject, selection) ->
@@ -578,10 +591,10 @@ module.exports = {
   getKeystrokeForEvent
   getCharacterForEvent
   isLinewiseRange
-  rangeToBeginningOfFileFromPoint
-  rangeToEndOfFileFromPoint
+  isEndsWithNewLineForBufferRow
   haveSomeSelection
   sortRanges
+  sortRangesByEnd
   getIndex
   getVisibleBufferRange
   withVisibleBufferRange
@@ -641,6 +654,7 @@ module.exports = {
   ElementBuilder
   registerElement
   sortComparable
+  smartScrollToBufferPosition
   moveCursorDownBuffer
   moveCursorUpBuffer
 

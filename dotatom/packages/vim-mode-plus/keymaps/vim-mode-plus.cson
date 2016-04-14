@@ -111,6 +111,8 @@
   'Y': 'vim-mode-plus:yank-line'
   'P': 'vim-mode-plus:put-before'
   'p': 'vim-mode-plus:put-after'
+  # 'g P': 'vim-mode-plus:put-before-and-select'
+  # 'g p': 'vim-mode-plus:put-after-and-select'
 
   # String transformation
   '~':     'vim-mode-plus:toggle-case-and-move-right'
@@ -250,10 +252,15 @@
 
   # 'y s': 'vim-mode-plus:surround'
   # 'y s w': 'vim-mode-plus:surround-word'
+
   # 'd s': 'vim-mode-plus:delete-surround'
-  # 'c s': 'vim-mode-plus:change-surround'
   # 'd s': 'vim-mode-plus:delete-surround-any-pair'
+  # 'd s': 'vim-mode-plus:delete-surround-any-pair-allow-forwarding'
+
+  # 'c s': 'vim-mode-plus:change-surround'
   # 'c s': 'vim-mode-plus:change-surround-any-pair'
+  # 'c s': 'vim-mode-plus:change-surround-any-pair-allow-forwarding'
+
   # 'y m s':  'vim-mode-plus:map-surround'
 
 # operator-pending, visual
@@ -303,7 +310,18 @@
   'a <':  'vim-mode-plus:a-angle-bracket'
   'a >':  'vim-mode-plus:a-angle-bracket'
 
+  # allow-forwarding family
+  # 'i }':  'vim-mode-plus:inner-curly-bracket-allow-forwarding'
+  # 'a }':  'vim-mode-plus:a-curly-bracket-allow-forwarding'
+  # 'i >':  'vim-mode-plus:inner-angle-bracket-allow-forwarding'
+  # 'a >':  'vim-mode-plus:a-angle-bracket-allow-forwarding'
+  # 'i ]':  'vim-mode-plus:inner-square-bracket-allow-forwarding'
+  # 'a ]':  'vim-mode-plus:a-square-bracket-allow-forwarding'
+  # 'i )':  'vim-mode-plus:inner-parenthesis-allow-forwarding'
+  # 'a )':  'vim-mode-plus:a-parenthesis-allow-forwarding'
+
   'i t':  'vim-mode-plus:inner-tag'
+  'a t':  'vim-mode-plus:a-tag'
 
   'i [':  'vim-mode-plus:inner-square-bracket'
   'i ]':  'vim-mode-plus:inner-square-bracket'

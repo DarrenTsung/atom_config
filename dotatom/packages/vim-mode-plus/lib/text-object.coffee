@@ -1,12 +1,11 @@
 # Refactoring status: 95%
-{Range} = require 'atom'
+{Range, Point} = require 'atom'
 _ = require 'underscore-plus'
 
 Base = require './base'
 swrap = require './selection-wrapper'
 {
-  rangeToBeginningOfFileFromPoint, rangeToEndOfFileFromPoint
-  sortRanges, countChar, pointIsAtEndOfLine, getEolBufferPositionForRow
+  sortRanges, sortRangesByEnd, countChar, pointIsAtEndOfLine, getEolBufferPositionForRow
   getTextToPoint
   getIndentLevelForBufferRow
   getCodeFoldRowRangesContainesForRow
@@ -43,10 +42,6 @@ class TextObject extends Base
   select: ->
     for selection in @editor.getSelections()
       @selectTextObject(selection)
-      {start, end} = selection.getBufferRange()
-      if (end.column is 0) and swrap(selection).detectVisualModeSubmode() is 'characterwise'
-        end = getEolBufferPositionForRow(@editor, end.row - 1)
-        swrap(selection).setBufferRangeSafely([start, end])
 
 # -------------------------
 # [FIXME] make it expandable
@@ -112,117 +107,168 @@ class Pair extends TextObject
   @extend(false)
   allowNextLine: false
   allowSubmodeChange: false
-  enclosed: true
+  adjustInnerRange: true
   pair: null
+  getPattern: ->
+    [open, close] = @pair
+    if open is close
+      new RegExp("(#{_.escapeRegExp(open)})", 'g')
+    else
+      new RegExp("(#{_.escapeRegExp(open)})|(#{_.escapeRegExp(close)})", 'g')
 
   # Return 'open' or 'close'
-  getPairState: (pair, matchText, range) ->
-    [openChar, closeChar] = pair
-    if openChar is closeChar
-      @pairStateInBufferRange(range, openChar)
-    else
-      ['open', 'close'][pair.indexOf(matchText)]
+  getPairState: ({matchText, range, match}) ->
+    switch match.length
+      when 2
+        @pairStateInBufferRange(range, matchText)
+      when 3
+        switch
+          when match[1] then 'open'
+          when match[2] then 'close'
 
+  backSlashPattern = _.escapeRegExp('\\')
   pairStateInBufferRange: (range, char) ->
     text = getTextToPoint(@editor, range.end)
-    pattern = ///[^\\]?#{_.escapeRegExp(char)}///
+    escapedChar = _.escapeRegExp(char)
+    bs = backSlashPattern
+    patterns = [
+      "#{bs}#{bs}#{escapedChar}"
+      "[^#{bs}]?#{escapedChar}"
+    ]
+    pattern = new RegExp(patterns.join('|'))
     ['close', 'open'][(countChar(text, pattern) % 2)]
 
   # Take start point of matched range.
-  escapeChar = '\\'
   isEscapedCharAtPoint: (point) ->
-    range = Range.fromPointWithDelta(point, 0, -1)
-    @editor.getTextInBufferRange(range) is escapeChar
+    found = false
 
-  # options.enclosed is only used when which is 'close'
-  findPair: (pair, options) ->
-    {from, which, allowNextLine, enclosed} = options
-    switch which
-      when 'open'
-        scanFunc = 'backwardsScanInBufferRange'
-        scanRange = rangeToBeginningOfFileFromPoint(from)
-      when 'close'
-        scanFunc = 'scanInBufferRange'
-        scanRange = rangeToEndOfFileFromPoint(from)
-    pairRegexp = pair.map(_.escapeRegExp).join('|')
-    pattern = ///#{pairRegexp}///g
-
-    found = null # We will search to fill this var.
-    state = {open: [], close: []}
-
-    @editor[scanFunc] pattern, scanRange, ({matchText, range, stop}) =>
-      {start, end} = range
-      return stop() if (not allowNextLine) and (from.row isnt start.row)
-      return if @isEscapedCharAtPoint(start)
-
-      pairState = @getPairState(pair, matchText, range)
-      oppositeState = if pairState is 'open' then 'close' else 'open'
-      if pairState is which
-        openRange = state[oppositeState].pop()
-      else
-        state[pairState].push(range)
-
-      if (pairState is which) and (state.open.length is 0) and (state.close.length is 0)
-        if enclosed and openRange? and (which is 'close')
-          return unless new Range(openRange.start, range.end).containsPoint(from)
-        found = range
-        return stop()
+    bs = backSlashPattern
+    pattern = new RegExp("[^#{bs}]#{bs}")
+    scanRange = [[point.row, 0], point]
+    @editor.backwardsScanInBufferRange pattern, scanRange, ({matchText, range, stop}) ->
+      if range.end.isEqual(point)
+        stop()
+        found = true
     found
 
-  findOpen: (pair, options) ->
-    options.which = 'open'
-    options.allowNextLine ?= @allowNextLine
-    @findPair(pair, options)
+  findPair: (which, options, fn) ->
+    {from, pattern, scanFunc, scanRange} = options
+    @editor[scanFunc] pattern, scanRange, (event) =>
+      {matchText, range, stop} = event
+      unless @allowNextLine or (from.row is range.start.row)
+        return stop()
+      return if @isEscapedCharAtPoint(range.start)
+      fn(event)
 
-  findClose: (pair, options) ->
-    options.which = 'close'
-    options.allowNextLine ?= @allowNextLine
-    @findPair(pair, options)
+  findOpen: (from,  pattern) ->
+    scanFunc = 'backwardsScanInBufferRange'
+    scanRange = new Range([0, 0], from)
+    stack = []
+    found = null
+    @findPair 'open', {from, pattern, scanFunc, scanRange}, (event) =>
+      {matchText, range, stop} = event
+      pairState = @getPairState(event)
+      if pairState is 'close'
+        stack.push({pairState, matchText, range})
+      else
+        stack.pop()
+        if stack.length is 0
+          found = range
+      stop() if found?
+    found
 
-  getPairInfo: (from, pair, enclosed) ->
+  findClose: (from,  pattern) ->
+    scanFunc = 'scanInBufferRange'
+    scanRange = new Range(from, @editor.buffer.getEndPosition())
+    stack = []
+    found = null
+    @findPair 'close', {from, pattern, scanFunc, scanRange}, (event) =>
+      {range, stop} = event
+      pairState = @getPairState(event)
+      if pairState is 'open'
+        stack.push({pairState, range})
+      else
+        entry = stack.pop()
+        if stack.length is 0
+          if (openStart = entry?.range.start)
+            if @allowForwarding
+              return if openStart.row > from.row
+            else
+              return if openStart.isGreaterThan(from)
+          found = range
+      stop() if found?
+    found
+
+  getPairInfo: (from) ->
     pairInfo = null
+    pattern = @getPattern()
+    closeRange = @findClose from, pattern
+    openRange = @findOpen closeRange.end, pattern if closeRange?
 
-    closeRange = @findClose pair, {from: from, enclosed}
-    openRange = @findOpen pair, {from: closeRange.end} if closeRange?
+    unless (openRange? and closeRange?)
+      return null
 
-    if openRange? and closeRange?
-      aRange = new Range(openRange.start, closeRange.end)
-      [innerStart, innerEnd] = [openRange.end, closeRange.start]
-      innerStart = [innerStart.row + 1, 0] if pointIsAtEndOfLine(@editor, innerStart)
-      innerEnd = [innerEnd.row, 0] if getTextToPoint(@editor, innerEnd).match(/^\s*$/)
-      innerRange = new Range(innerStart, innerEnd)
-      targetRange = if @isInner() then innerRange else aRange
-      pairInfo = {openRange, closeRange, aRange, innerRange, targetRange}
-    pairInfo
+    aRange = new Range(openRange.start, closeRange.end)
+    [innerStart, innerEnd] = [openRange.end, closeRange.start]
+    if @adjustInnerRange
+      # Dirty work to feel natural for human, to behave compatible with pure Vim.
+      # Where this adjustment appear is in following situation.
+      # op-1: `ci{` replace only 2nd line
+      # op-2: `di{` delete only 2nd line.
+      # text:
+      #  {
+      #    aaa
+      #  }
+      innerStart = new Point(innerStart.row + 1, 0) if pointIsAtEndOfLine(@editor, innerStart)
+      innerEnd = new Point(innerEnd.row, 0) if getTextToPoint(@editor, innerEnd).match(/^\s*$/)
+      if (innerEnd.column is 0) and (innerStart.column isnt 0)
+        innerEnd = new Point(innerEnd.row - 1, Infinity)
 
-  getRange: (selection, {enclosed}={}) ->
+    innerRange = new Range(innerStart, innerEnd)
+    targetRange = if @isInner() then innerRange else aRange
+    if @skipEmptyPair and innerRange.isEmpty()
+      @getPairInfo(aRange.end)
+    else
+      {openRange, closeRange, aRange, innerRange, targetRange}
+
+  getPointToSearchFrom: (selection, searchFrom) ->
+    switch searchFrom
+      when 'head'
+        point = selection.getHeadBufferPosition()
+        # When selection is not empty, we have to start to search one column left
+        if (not selection.isEmpty()) and (not selection.isReversed()) and (point.column > 0)
+          point = @editor.clipScreenPosition(point.translate([0, -1]), {clip: 'backward'})
+        point
+      when 'start'
+        selection.getBufferRange().start
+
+  # Allow override @allowForwarding by 2nd argument.
+  getRange: (selection, options={}) ->
+    {allowForwarding, searchFrom} = options
+    searchFrom ?= 'head'
+    @allowForwarding = allowForwarding if allowForwarding?
     originalRange = selection.getBufferRange()
-    from = selection.getHeadBufferPosition()
-
-    # When selection is not empty, we have to start to search one column left
-    if (not selection.isEmpty() and not selection.isReversed())
-      from = from.translate([0, -1])
-
-    pairInfo = @getPairInfo(from, @pair, enclosed)
+    pairInfo = @getPairInfo(@getPointToSearchFrom(selection, searchFrom))
     # When range was same, try to expand range
     if pairInfo?.targetRange.isEqual(originalRange)
-      from = pairInfo.aRange.end.translate([0, +1])
-      pairInfo = @getPairInfo(from, @pair, enclosed)
+      pairInfo = @getPairInfo(pairInfo.aRange.end)
     pairInfo?.targetRange
 
   selectTextObject: (selection) ->
-    swrap(selection).setBufferRangeSafely @getRange(selection, {@enclosed})
+    swrap(selection).setBufferRangeSafely @getRange(selection)
 
 # -------------------------
 class AnyPair extends Pair
   @extend(false)
+  allowForwarding: false
+  skipEmptyPair: false
   member: [
     'DoubleQuote', 'SingleQuote', 'BackTick',
     'CurlyBracket', 'AngleBracket', 'Tag', 'SquareBracket', 'Parenthesis'
   ]
 
   getRangeBy: (klass, selection) ->
-    @new(klass, {@inner}).getRange(selection, {@enclosed})
+    @new(klass, {@inner, @skipEmptyPair}).getRange(selection, {@allowForwarding, @searchFrom})
 
   getRanges: (selection) ->
     (range for klass in @member when (range = @getRangeBy(klass, selection)))
@@ -241,9 +287,39 @@ class InnerAnyPair extends AnyPair
   @extend()
 
 # -------------------------
+class AnyPairAllowForwarding extends AnyPair
+  @extend(false)
+  allowForwarding: true
+  allowNextLine: false
+  skipEmptyPair: false
+  searchFrom: 'start'
+  getNearestRange: (selection) ->
+    ranges = @getRanges(selection)
+    from = selection.cursor.getBufferPosition()
+    [forwardingRanges, enclosingRanges] = _.partition ranges, (range) ->
+      range.start.isGreaterThanOrEqual(from)
+    enclosingRange = _.last(sortRanges(enclosingRanges))
+    forwardingRanges = sortRanges(forwardingRanges)
+
+    # When enclosingRange is exists,
+    # We don't go across enclosingRange.end.
+    # So choose from ranges contained in enclosingRange.
+    if enclosingRange
+      forwardingRanges = forwardingRanges.filter (range) ->
+        enclosingRange.containsRange(range)
+
+    forwardingRanges[0] or enclosingRange
+
+class AAnyPairAllowForwarding extends AnyPairAllowForwarding
+  @extend()
+
+class InnerAnyPairAllowForwarding extends AnyPairAllowForwarding
+  @extend()
+
+# -------------------------
 class AnyQuote extends AnyPair
   @extend(false)
-  enclosed: false
+  allowForwarding: true
   member: ['DoubleQuote', 'SingleQuote', 'BackTick']
   getNearestRange: (selection) ->
     ranges = @getRanges(selection)
@@ -257,10 +333,14 @@ class InnerAnyQuote extends AnyQuote
   @extend()
 
 # -------------------------
-class DoubleQuote extends Pair
+class Quote extends Pair
+  @extend(false)
+  allowForwarding: true
+  allowNextLine: false
+
+class DoubleQuote extends Quote
   @extend(false)
   pair: ['"', '"']
-  enclosed: false
 
 class ADoubleQuote extends DoubleQuote
   @extend()
@@ -269,10 +349,9 @@ class InnerDoubleQuote extends DoubleQuote
   @extend()
 
 # -------------------------
-class SingleQuote extends Pair
+class SingleQuote extends Quote
   @extend(false)
   pair: ["'", "'"]
-  enclosed: false
 
 class ASingleQuote extends SingleQuote
   @extend()
@@ -281,10 +360,9 @@ class InnerSingleQuote extends SingleQuote
   @extend()
 
 # -------------------------
-class BackTick extends Pair
+class BackTick extends Quote
   @extend(false)
   pair: ['`', '`']
-  enclosed: false
 
 class ABackTick extends BackTick
   @extend()
@@ -292,6 +370,7 @@ class ABackTick extends BackTick
 class InnerBackTick extends BackTick
   @extend()
 
+# Pair expands multi-lines
 # -------------------------
 class CurlyBracket extends Pair
   @extend(false)
@@ -303,6 +382,14 @@ class ACurlyBracket extends CurlyBracket
 
 class InnerCurlyBracket extends CurlyBracket
   @extend()
+
+class ACurlyBracketAllowForwarding extends CurlyBracket
+  @extend()
+  allowForwarding: true
+
+class InnerCurlyBracketAllowForwarding extends CurlyBracket
+  @extend()
+  allowForwarding: true
 
 # -------------------------
 class SquareBracket extends Pair
@@ -316,6 +403,14 @@ class ASquareBracket extends SquareBracket
 class InnerSquareBracket extends SquareBracket
   @extend()
 
+class ASquareBracketAllowForwarding extends SquareBracket
+  @extend()
+  allowForwarding: true
+
+class InnerSquareBracketAllowForwarding extends SquareBracket
+  @extend()
+  allowForwarding: true
+
 # -------------------------
 class Parenthesis extends Pair
   @extend(false)
@@ -328,6 +423,14 @@ class AParenthesis extends Parenthesis
 class InnerParenthesis extends Parenthesis
   @extend()
 
+class AParenthesisAllowForwarding extends Parenthesis
+  @extend()
+  allowForwarding: true
+
+class InnerParenthesisAllowForwarding extends Parenthesis
+  @extend()
+  allowForwarding: true
+
 # -------------------------
 class AngleBracket extends Pair
   @extend(false)
@@ -339,14 +442,97 @@ class AAngleBracket extends AngleBracket
 class InnerAngleBracket extends AngleBracket
   @extend()
 
+class AAngleBracketAllowForwarding extends AngleBracket
+  @extend()
+  allowForwarding: true
+
+class InnerAngleBracketAllowForwarding extends AngleBracket
+  @extend()
+  allowForwarding: true
+
 # -------------------------
-# [TODO] See vim-mode#795
+tagPattern = /(<(\/?))([^\s>]+)[^>]*>/g
 class Tag extends Pair
   @extend(false)
-  pair: ['>', '<']
+  allowNextLine: true
+  allowForwarding: true
+  adjustInnerRange: false
+  getPattern: ->
+    tagPattern
 
-# class ATag extends Tag
-#   @extend()
+  getPairState: ({match, matchText}) ->
+    [__, __, slash, tagName] = match
+    if slash is ''
+      ['open', tagName]
+    else
+      ['close', tagName]
+
+  getTagStartPoint: (from) ->
+    tagRange = null
+    scanRange = @editor.bufferRangeForBufferRow(from.row)
+    @editor.scanInBufferRange tagPattern, scanRange, ({range, stop}) ->
+      if range.containsPoint(from, true)
+        tagRange = range
+        stop()
+    tagRange?.start ? from
+
+  findTagState: (stack, tagState) ->
+    return null if stack.length is 0
+    for i in [(stack.length - 1)..0]
+      entry = stack[i]
+      if entry.tagState is tagState
+        return entry
+    null
+
+  findOpen: (from,  pattern) ->
+    scanFunc = 'backwardsScanInBufferRange'
+    scanRange = new Range([0, 0], from)
+    stack = []
+    found = null
+    @findPair 'open', {from, pattern, scanFunc, scanRange}, (event) =>
+      {range, stop} = event
+      [pairState, tagName] = @getPairState(event)
+      if pairState is 'close'
+        tagState = pairState + tagName
+        stack.push({tagState, range})
+      else
+        if entry = @findTagState(stack, "close#{tagName}")
+          stack = stack[0...stack.indexOf(entry)]
+        if stack.length is 0
+          found = range
+      stop() if found?
+    found
+
+  findClose: (from,  pattern) ->
+    scanFunc = 'scanInBufferRange'
+    from = @getTagStartPoint(from)
+    scanRange = new Range(from, @editor.buffer.getEndPosition())
+    stack = []
+    found = null
+    @findPair 'close', {from, pattern, scanFunc, scanRange}, (event) =>
+      {range, stop} = event
+      [pairState, tagName] = @getPairState(event)
+      if pairState is 'open'
+        tagState = pairState + tagName
+        stack.push({tagState, range})
+      else
+        if entry = @findTagState(stack, "open#{tagName}")
+          stack = stack[0...stack.indexOf(entry)]
+        else
+          # I'm very torelant for orphan tag like 'br', 'hr', or unclosed tag.
+          stack = []
+        if stack.length is 0
+          if (openStart = entry?.range.start)
+            if @allowForwarding
+              return if openStart.row > from.row
+            else
+              return if openStart.isGreaterThan(from)
+          found = range
+      stop() if found?
+    found
+
+class ATag extends Tag
+  @extend()
 
 class InnerTag extends Tag
   @extend()

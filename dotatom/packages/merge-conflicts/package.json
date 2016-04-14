@@ -1,7 +1,7 @@
 {
   "name": "merge-conflicts",
   "main": "./lib/main",
-  "version": "1.3.7",
+  "version": "1.4.1",
   "private": true,
   "description": "Resolve git conflicts within Atom",
   "contributors": [
@@ -33,16 +33,16 @@
     "url": "https://github.com/smashwilson/merge-conflicts/issues"
   },
   "homepage": "https://github.com/smashwilson/merge-conflicts#readme",
-  "_id": "merge-conflicts@1.3.7",
-  "_shasum": "ae60808270e5145151904550d50e2fcae85b07ed",
-  "_resolved": "file:../d-115103-5993-g6rjfr/package.tgz",
-  "_from": "../d-115103-5993-g6rjfr/package.tgz",
+  "_id": "merge-conflicts@1.4.1",
+  "_shasum": "dcb6bcfc5520382adbe9bdb6c8c6173da9be3605",
+  "_resolved": "file:../d-116314-87165-1frx0o5/package.tgz",
+  "_from": "../d-116314-87165-1frx0o5/package.tgz",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [
       {
         "name": "space-pen",
-        "version": "5.1.1",
+        "version": "5.1.2",
         "path": "node_modules/space-pen/lib/space-pen.js"
       },
       {
@@ -67,7 +67,7 @@
       },
       {
         "name": "es5-ext",
-        "version": "0.10.8",
+        "version": "0.10.11",
         "path": "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/index.js"
       },
       {
@@ -77,7 +77,7 @@
       },
       {
         "name": "es6-symbol",
-        "version": "3.0.1",
+        "version": "3.0.2",
         "path": "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/index.js"
       },
       {
@@ -120,7 +120,6 @@
       ".coffee": [
         "lib/conflict.coffee",
         "lib/conflicted-editor.coffee",
-        "lib/git-bridge.coffee",
         "lib/main.coffee",
         "lib/merge-state.coffee",
         "lib/navigator.coffee",
@@ -132,27 +131,11 @@
         "lib/view/resolver-view.coffee",
         "lib/view/side-view.coffee"
       ],
-      ".json": [
-        "node_modules/space-pen/api.json",
-        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/d/package.json",
-        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/package.json",
-        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/package.json",
-        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/package.json",
-        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es6-iterator/package.json",
-        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es6-symbol/package.json",
-        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/package.json",
-        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/mixto/package.json",
-        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/property-accessors/package.json",
-        "node_modules/space-pen/node_modules/grim/node_modules/emissary/package.json",
-        "node_modules/space-pen/node_modules/grim/package.json",
-        "node_modules/space-pen/node_modules/jquery/bower.json",
-        "node_modules/space-pen/node_modules/jquery/package.json",
-        "node_modules/space-pen/package.json",
-        "node_modules/underscore-plus/node_modules/underscore/package.json",
-        "node_modules/underscore-plus/package.json",
-        "package.json"
-      ],
       ".js": [
+        "lib/git/common.js",
+        "lib/git/gitops.js",
+        "lib/git/index.js",
+        "lib/git/shellout.js",
         "node_modules/space-pen/lib/space-pen.js",
         "node_modules/space-pen/node_modules/grim/lib/deprecation.js",
         "node_modules/space-pen/node_modules/grim/lib/grim.js",
@@ -439,6 +422,8 @@
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/copy.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/count.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/create.js",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/ensure-natural-number-value.js",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/ensure-natural-number.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/eq.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/every.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/filter.js",
@@ -454,6 +439,7 @@
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-copy-deep.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-copy.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-empty.js",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-number-value.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-object.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is-plain-object.js",
         "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/object/is.js",
@@ -671,12 +657,33 @@
         "node_modules/underscore-plus/lib/underscore-plus.js",
         "node_modules/underscore-plus/node_modules/underscore/underscore-min.js",
         "node_modules/underscore-plus/node_modules/underscore/underscore.js"
+      ],
+      ".json": [
+        "node_modules/space-pen/api.json",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/d/package.json",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-iterator/package.json",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/node_modules/es6-symbol/package.json",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es5-ext/package.json",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es6-iterator/package.json",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/node_modules/es6-symbol/package.json",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/es6-weak-map/package.json",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/mixto/package.json",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/node_modules/property-accessors/package.json",
+        "node_modules/space-pen/node_modules/grim/node_modules/emissary/package.json",
+        "node_modules/space-pen/node_modules/grim/package.json",
+        "node_modules/space-pen/node_modules/jquery/bower.json",
+        "node_modules/space-pen/node_modules/jquery/package.json",
+        "node_modules/space-pen/package.json",
+        "node_modules/underscore-plus/node_modules/underscore/package.json",
+        "node_modules/underscore-plus/package.json",
+        "package.json"
       ]
     },
     "folders": [
       {
         "paths": [
           "lib",
+          "lib/git",
           "lib/view",
           "",
           "spec",
@@ -694,7 +701,7 @@
         ],
         "dependencies": {
           "grim": "^1.0.0",
-          "jquery": "^2.1.3",
+          "jquery": "2.1.4",
           "underscore-plus": "1.x"
         }
       },
@@ -897,7 +904,7 @@
         ],
         "dependencies": {
           "es6-iterator": "2",
-          "es6-symbol": "3"
+          "es6-symbol": "~3.0.2"
         }
       },
       {
@@ -920,7 +927,7 @@
         ],
         "dependencies": {
           "d": "~0.1.1",
-          "es5-ext": "~0.10.8"
+          "es5-ext": "~0.10.10"
         }
       },
       {

@@ -1,7 +1,7 @@
 {
   "name": "project-manager",
   "main": "./lib/project-manager",
-  "version": "2.7.6",
+  "version": "2.9.7",
   "description": "Project Manager for easy access and switching between projects in Atom.",
   "repository": {
     "type": "git",
@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "atom-space-pen-views": "^2.0.3",
+    "change-case": "^2.3.1",
     "season": "^5.2.0",
     "underscore-plus": "^1.6.6"
   },
@@ -31,22 +32,53 @@
       }
     }
   },
-  "readme": "# Project Manager\n[![Build status](https://travis-ci.org/danielbrodin/atom-project-manager.svg?branch=master)](https://travis-ci.org/danielbrodin/atom-project-manager/)\n[![apm](https://img.shields.io/apm/dm/project-manager.svg)](https://atom.io/packages/project-manager)\n[![apm](https://img.shields.io/apm/v/project-manager.svg)]()\n\n![Project Manager](https://raw.github.com/danielbrodin/atom-project-manager/master/project-manager.gif)\n\n\nGet easy access to all your projects and manage them with project specific settings and options.\n\n\n## Install\n```\n$ apm install project-manager\n```\nor open Atom and go to Preferences > Install and search for `project-manager`\n\n\n## Use\n### List Projects\n`ctrl-cmd-p` (mac) / `alt-shift-P` (win & linux) or `Project Manager: List Projects` in the Command Palette.\n\nYou can filter projects by `title`, `group` and `template`.\n`group: atom` would list all projects with the group `atom`. Default is `title`\n\n### Save Project\n`Project Manager: Save Project` in the Command Palette and write the title you want to save the project as.\n\n### Edit Projects\nAll projects are saved in a `.cson` file which you can easily reach by searching for `Project Manager: Edit Projects` in the Command Palette.\n\n## Project Settings\n\nsetting    | Type      | Description                                                                                                                                           | Default               \n-----------|-----------|-------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------\n`title`    | `string`  | Projects title. Used in the projects list                                                                                                | `''`                  \n`paths`    | `array`   | The folders that will open in the tree view. First path is the main one that counts as the project.                                                   | `[]`                  \n`settings` | `Object`  | Enables you to set project specific settings. Everything that goes in the `config.cson` file can go here. It also supports scoped settings.           | `{}`                  \n`icon`     | `string`  | Icon that shows in the projects list. It's class-based so can either be a class already provided by Atom like `icon-squirell` or a class of your own. | `'icon-chevron-right'`\n`devMode`  | `boolean` | `true` if project should open in dev mode                                                                                                             | `false`               \n`group`    | `string`  | Adds a group to the projects list that can be used to group and filter projects                                                                       | `null`                \n`template` | `string`  | If you add a project in the `projects.cson` file without `paths` it will count as a template. This way you can easily share settings between projects | `null`                \n\n\n### Example\n```\nprojectmanager:\n  title: 'Project Manager'\n  devMode: true\n  group: 'Atom'\n  template: 'coffeescript-template'\n  paths: [\n    '/path/to/project-manager'\n  ]\n  settings:\n    '*':\n      'editor.tabLength': 4\n\n'coffeescript-template':\n  icon: 'icon-coffeescript'\n  settings:\n    '.source.coffee':\n      'editor.tabLength': 2\n      'editor.preferredLineLength': 80\n```\n\n## Package Settings\nName                          | Setting                                       | Default     | Description                                                                                                                                      \n------------------------------|-----------------------------------------------|-------------|------------\nShow Path                     | `project-manager.showPath`                    | `true`      | Shows each projects paths in the projects list                                                                                                   \nEnvironment Specific Projects | `project-manager.environmentSpecificProjects` | `false`     | If you share your `.atom` folder between computers but don't use the same projects. Will create a `projects.[hostname].cson` for each environment\nSort By                       | `project-manager.sortBy`                      | `'default'` | Will sort the projects list by selected option. Default sorting is the order in which the are                                                    \nClose Current                 | `project-manager.closeCurrent`                | `false`     | Closes the current window before opening a new project.\n\n\n## API\nThe project manager provides a service that you can use in your own Atom packages. To use it, include `project-manager` in the `consumedServices` section of your package.json.\n\n```\n\"consumedServices\": {\n    \"project-manager\": {\n      \"versions\": {\n        \"^2.2.1\": \"consumeProjectManager\"\n      }\n    }\n  }\n```\nThen in your package's main module, call methods on the service\n```\nmodule.exports =\n  doSomethingWithTheCurrentProject: (project) ->\n\n  consumeProjectManager: (PM) ->\n    PM.projects.getCurrent (project) =>\n      if project\n        @doSomethingWithTheCurrentProject(project)\n```\n\n### Methods\n#### `{Projects}`\n- `::getAll`\n  - `{Function} callback` - Callback that receives an `Array` of `{Project}`'s\n- `::getCurrent`\n  - `{Function} callback` - Callback that receives the current `{Project}` or `false` if there is none active\n- `::onUpdate`\n  - `{Function} callback` - Will be called each time a project have been updated\n\n#### `{Project}`\n- `{props}` - Contains all properties of the project like `title`, `paths` and `settings`\n- `::open` - Will open the project\n- `::isCurrent` - Returns `true` if it's the current project\n- `::onUpdate`\n  - `{Function} callback` - Will be called when the project have been updated\n- `::set` - Will set the property on the project\n  - `{String} key`\n  - `{Mixed} value`\n- `::unset` - Will remove the property from the project\n  - `{String} key`\n\n\nPlease let me know if you make something out of it :)\n\n## Contribute\nIf you would like to contribute to the project manager, be it new features or bugs,\nplease do the following:\n\n1. Fork the repository\n2. Create a new topic branch off the master branch that describe what it does\n3. Commit and push the branch\n4. Make a pull request describing what you have done\n5. Now it will hopefully get merged :)\n\nAll PR's should:\n- Pass the [jscs](https://atom.io/packages/linter-jscs) linter\n- Pass the [jshint](https://atom.io/packages/linter-jshint) linter\n- Add a test when it makes sense, which should be most of the time\n\n--------\n\n[![Paypal Donations](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=DR4XQWAZV6M2A&lc=SE&item_name=Project%20Manager&item_number=atom%2dproject%2dmanager&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted) a :beer: if you enjoy using the [project manager](https://github.com/danielbrodin/atom-project-manager) :)\n",
+  "configSchema": {
+    "showPath": {
+      "type": "boolean",
+      "default": true
+    },
+    "closeCurrent": {
+      "type": "boolean",
+      "default": false,
+      "description": "Closes the current window after opening another project"
+    },
+    "environmentSpecificProjects": {
+      "type": "boolean",
+      "default": false
+    },
+    "prettifyTitle": {
+      "type": "boolean",
+      "default": true,
+      "description": "Will suggest a prettified project title on save."
+    },
+    "sortBy": {
+      "type": "string",
+      "description": "Default sorting is the order in which the projects are",
+      "default": "default",
+      "enum": [
+        "default",
+        "title",
+        "group",
+        "last modified"
+      ]
+    }
+  },
+  "readme": "# Project Manager\n[![Build status](https://travis-ci.org/danielbrodin/atom-project-manager.svg?branch=master)](https://travis-ci.org/danielbrodin/atom-project-manager/)\n[![apm](https://img.shields.io/apm/dm/project-manager.svg)](https://atom.io/packages/project-manager)\n[![apm](https://img.shields.io/apm/v/project-manager.svg)]()\n\n![Project Manager](https://raw.github.com/danielbrodin/atom-project-manager/master/project-manager.gif)\n\n\nGet easy access to all your projects and manage them with project specific settings and options.\n\n\n## Install\n```\n$ apm install project-manager\n```\nor open Atom and go to Preferences > Install and search for `project-manager`\n\n\n## Use\n### List Projects\n`ctrl-cmd-p` (mac) / `alt-shift-P` (win & linux) or `Project Manager: List Projects` in the Command Palette.\n\nYou can filter projects by `title`, `group` and `template`.\n`group: atom` would list all projects with the group `atom`. Default is `title`\n\n### Save Project\n`Project Manager: Save Project` in the Command Palette and write the title you want to save the project as.\n\n### Edit Projects\nAll projects are saved in a `.cson` file which you can easily reach by searching for `Project Manager: Edit Projects` in the Command Palette.\n\n## Project Settings\n\nsetting    | Type      | Description                                                                                                                                           | Default               \n-----------|-----------|-------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------\n`title`    | `string`  | Projects title. Used in the projects list                                                                                                | `''`                  \n`paths`    | `array`   | The folders that will open in the tree view. First path is the main one that counts as the project.                                                   | `[]`                  \n`settings` | `Object`  | Enables you to set project specific settings. Everything that goes in the `config.cson` file can go here. It also supports scoped settings.           | `{}`                  \n`icon`     | `string`  | Icon that shows in the projects list. It's class-based so can either be a class already provided by Atom like `icon-squirell` or a class of your own. | `'icon-chevron-right'`\n`devMode`  | `boolean` | `true` if project should open in dev mode                                                                                                             | `false`               \n`group`    | `string`  | Adds a group to the projects list that can be used to group and filter projects                                                                       | `null`                \n`template` | `string`  | If you add a project in the `projects.cson` file without `paths` it will count as a template. This way you can easily share settings between projects | `null`                \n### Local settings file\nAll these settings can be added to a `project.cson` file in the root folder of the project. It follows the below example, but without the project key.\n\n### Example\n```\nprojectmanager:\n  title: 'Project Manager'\n  devMode: true\n  group: 'Atom'\n  template: 'coffeescript-template'\n  paths: [\n    '/path/to/project-manager'\n  ]\n  settings:\n    '*':\n      'editor.tabLength': 4\n\n'coffeescript-template':\n  icon: 'icon-coffeescript'\n  settings:\n    '.source.coffee':\n      'editor.tabLength': 2\n      'editor.preferredLineLength': 80\n```\n\n## Package Settings\nName                          | Setting                                       | Default     | Description                                                                                                                                      \n------------------------------|-----------------------------------------------|-------------|------------\nShow Path                     | `project-manager.showPath`                    | `true`      | Shows each projects paths in the projects list                                                                                                   \nEnvironment Specific Projects | `project-manager.environmentSpecificProjects` | `false`     | If you share your `.atom` folder between computers but don't use the same projects. Will create a `projects.[hostname].cson` for each environment\nSort By                       | `project-manager.sortBy`                      | `'default'` | Will sort the projects list by selected option. Default sorting is the order in which the are                                                    \nClose Current                 | `project-manager.closeCurrent`                | `false`     | Closes the current window before opening a new project.\n\n\n## API\nThe project manager provides a service that you can use in your own Atom packages. To use it, include `project-manager` in the `consumedServices` section of your package.json.\n\n```\n\"consumedServices\": {\n    \"project-manager\": {\n      \"versions\": {\n        \"^2.2.1\": \"consumeProjectManager\"\n      }\n    }\n  }\n```\nThen in your package's main module, call methods on the service\n```\nmodule.exports =\n  doSomethingWithTheCurrentProject: (project) ->\n\n  consumeProjectManager: (PM) ->\n    PM.projects.getCurrent (project) =>\n      if project\n        @doSomethingWithTheCurrentProject(project)\n```\n\n### Methods\n#### `{Projects}`\n- `::getAll`\n  - `{Function} callback` - Callback that receives an `Array` of `{Project}`'s\n- `::getCurrent`\n  - `{Function} callback` - Callback that receives the current `{Project}` or `false` if there is none active\n- `::onUpdate`\n  - `{Function} callback` - Will be called each time a project have been updated\n\n#### `{Project}`\n- `{props}` - Contains all properties of the project like `title`, `paths` and `settings`\n- `::open` - Will open the project\n- `::isCurrent` - Returns `true` if it's the current project\n- `::onUpdate`\n  - `{Function} callback` - Will be called when the project have been updated\n- `::set` - Will set the property on the project\n  - `{String} key`\n  - `{Mixed} value`\n- `::unset` - Will remove the property from the project\n  - `{String} key`\n\n\nPlease let me know if you make something out of it :)\n\n## Contribute\nIf you would like to contribute to the project manager, be it new features or bugs,\nplease do the following:\n\n1. Fork the repository\n2. Create a new topic branch off the master branch that describe what it does\n3. Commit and push the branch\n4. Make a pull request describing what you have done\n5. Now it will hopefully get merged :)\n\nAll PR's should:\n- Pass the [jscs](https://atom.io/packages/linter-jscs) linter\n- Pass the [jshint](https://atom.io/packages/linter-jshint) linter\n- Add a test when it makes sense, which should be most of the time\n\n--------\n\n[![Paypal Donations](https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=DR4XQWAZV6M2A&lc=SE&item_name=Project%20Manager&item_number=atom%2dproject%2dmanager&currency_code=EUR&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted) a :beer: if you enjoy using the [project manager](https://github.com/danielbrodin/atom-project-manager) :)\n",
   "readmeFilename": "README.md",
   "bugs": {
     "url": "https://github.com/danielbrodin/atom-project-manager/issues"
   },
   "homepage": "https://github.com/danielbrodin/atom-project-manager#readme",
-  "_id": "project-manager@2.7.6",
-  "_shasum": "5e820c7c35ef83b685af14c31c71073ac118742e",
-  "_resolved": "file:../d-11615-47531-1qa7l8l/package.tgz",
-  "_from": "../d-11615-47531-1qa7l8l/package.tgz",
+  "_id": "project-manager@2.9.7",
+  "_shasum": "c63269dedd748866a63958f5d78a41e51d7a932f",
+  "_resolved": "file:../d-116314-87194-3vq61u/package.tgz",
+  "_from": "../d-116314-87194-3vq61u/package.tgz",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [
       {
         "name": "atom-space-pen-views",
-        "version": "2.1.1",
+        "version": "2.2.0",
         "path": "node_modules/atom-space-pen-views/lib/main.js"
       },
       {
@@ -120,6 +152,91 @@
         "path": "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/dist/jquery.js"
       },
       {
+        "name": "change-case",
+        "version": "2.3.1",
+        "path": "node_modules/change-case/change-case.js"
+      },
+      {
+        "name": "camel-case",
+        "version": "1.2.2",
+        "path": "node_modules/change-case/node_modules/camel-case/camel-case.js"
+      },
+      {
+        "name": "constant-case",
+        "version": "1.1.2",
+        "path": "node_modules/change-case/node_modules/constant-case/constant-case.js"
+      },
+      {
+        "name": "dot-case",
+        "version": "1.1.2",
+        "path": "node_modules/change-case/node_modules/dot-case/dot-case.js"
+      },
+      {
+        "name": "is-lower-case",
+        "version": "1.1.3",
+        "path": "node_modules/change-case/node_modules/is-lower-case/is-lower-case.js"
+      },
+      {
+        "name": "is-upper-case",
+        "version": "1.1.2",
+        "path": "node_modules/change-case/node_modules/is-upper-case/is-upper-case.js"
+      },
+      {
+        "name": "lower-case",
+        "version": "1.1.3",
+        "path": "node_modules/change-case/node_modules/lower-case/lower-case.js"
+      },
+      {
+        "name": "lower-case-first",
+        "version": "1.0.2",
+        "path": "node_modules/change-case/node_modules/lower-case-first/lower-case-first.js"
+      },
+      {
+        "name": "param-case",
+        "version": "1.1.2",
+        "path": "node_modules/change-case/node_modules/param-case/param-case.js"
+      },
+      {
+        "name": "pascal-case",
+        "version": "1.1.2",
+        "path": "node_modules/change-case/node_modules/pascal-case/pascal-case.js"
+      },
+      {
+        "name": "path-case",
+        "version": "1.1.2",
+        "path": "node_modules/change-case/node_modules/path-case/path-case.js"
+      },
+      {
+        "name": "sentence-case",
+        "version": "1.1.3",
+        "path": "node_modules/change-case/node_modules/sentence-case/sentence-case.js"
+      },
+      {
+        "name": "snake-case",
+        "version": "1.1.2",
+        "path": "node_modules/change-case/node_modules/snake-case/snake-case.js"
+      },
+      {
+        "name": "swap-case",
+        "version": "1.1.2",
+        "path": "node_modules/change-case/node_modules/swap-case/swap-case.js"
+      },
+      {
+        "name": "title-case",
+        "version": "1.1.2",
+        "path": "node_modules/change-case/node_modules/title-case/title-case.js"
+      },
+      {
+        "name": "upper-case",
+        "version": "1.1.3",
+        "path": "node_modules/change-case/node_modules/upper-case/upper-case.js"
+      },
+      {
+        "name": "upper-case-first",
+        "version": "1.1.2",
+        "path": "node_modules/change-case/node_modules/upper-case-first/upper-case-first.js"
+      },
+      {
         "name": "season",
         "version": "5.3.0",
         "path": "node_modules/season/lib/cson.js"
@@ -136,7 +253,7 @@
       },
       {
         "name": "fs-plus",
-        "version": "2.8.1",
+        "version": "2.8.2",
         "path": "node_modules/season/node_modules/fs-plus/lib/fs-plus.js"
       },
       {
@@ -179,6 +296,7 @@
       ".js": [
         "lib/_dialog.js",
         "lib/_save-dialog.js",
+        "lib/cson-db.js",
         "lib/db.js",
         "lib/project-manager.js",
         "lib/project.js",
@@ -711,6 +829,26 @@
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/var/support.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/var/toString.js",
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/src/wrap.js",
+        "node_modules/change-case/change-case.js",
+        "node_modules/change-case/node_modules/camel-case/camel-case.js",
+        "node_modules/change-case/node_modules/constant-case/constant-case.js",
+        "node_modules/change-case/node_modules/dot-case/dot-case.js",
+        "node_modules/change-case/node_modules/is-lower-case/is-lower-case.js",
+        "node_modules/change-case/node_modules/is-upper-case/is-upper-case.js",
+        "node_modules/change-case/node_modules/lower-case/lower-case.js",
+        "node_modules/change-case/node_modules/lower-case-first/lower-case-first.js",
+        "node_modules/change-case/node_modules/param-case/param-case.js",
+        "node_modules/change-case/node_modules/pascal-case/pascal-case.js",
+        "node_modules/change-case/node_modules/path-case/path-case.js",
+        "node_modules/change-case/node_modules/sentence-case/sentence-case.js",
+        "node_modules/change-case/node_modules/sentence-case/vendor/camel-case-regexp.js",
+        "node_modules/change-case/node_modules/sentence-case/vendor/non-word-regexp.js",
+        "node_modules/change-case/node_modules/sentence-case/vendor/trailing-digit-regexp.js",
+        "node_modules/change-case/node_modules/snake-case/snake-case.js",
+        "node_modules/change-case/node_modules/swap-case/swap-case.js",
+        "node_modules/change-case/node_modules/title-case/title-case.js",
+        "node_modules/change-case/node_modules/upper-case/upper-case.js",
+        "node_modules/change-case/node_modules/upper-case-first/upper-case-first.js",
         "node_modules/season/lib/cson.js",
         "node_modules/season/lib/csonc.js",
         "node_modules/season/node_modules/cson-parser/lib/cson-parser.js",
@@ -785,6 +923,23 @@
         "node_modules/atom-space-pen-views/node_modules/space-pen/node_modules/jquery/package.json",
         "node_modules/atom-space-pen-views/node_modules/space-pen/package.json",
         "node_modules/atom-space-pen-views/package.json",
+        "node_modules/change-case/node_modules/camel-case/package.json",
+        "node_modules/change-case/node_modules/constant-case/package.json",
+        "node_modules/change-case/node_modules/dot-case/package.json",
+        "node_modules/change-case/node_modules/is-lower-case/package.json",
+        "node_modules/change-case/node_modules/is-upper-case/package.json",
+        "node_modules/change-case/node_modules/lower-case/package.json",
+        "node_modules/change-case/node_modules/lower-case-first/package.json",
+        "node_modules/change-case/node_modules/param-case/package.json",
+        "node_modules/change-case/node_modules/pascal-case/package.json",
+        "node_modules/change-case/node_modules/path-case/package.json",
+        "node_modules/change-case/node_modules/sentence-case/package.json",
+        "node_modules/change-case/node_modules/snake-case/package.json",
+        "node_modules/change-case/node_modules/swap-case/package.json",
+        "node_modules/change-case/node_modules/title-case/package.json",
+        "node_modules/change-case/node_modules/upper-case/package.json",
+        "node_modules/change-case/node_modules/upper-case-first/package.json",
+        "node_modules/change-case/package.json",
         "node_modules/season/node_modules/cson-parser/node_modules/coffee-script/bower.json",
         "node_modules/season/node_modules/cson-parser/node_modules/coffee-script/package.json",
         "node_modules/season/node_modules/cson-parser/package.json",
@@ -810,6 +965,7 @@
         ],
         "dependencies": {
           "atom-space-pen-views": "^2.0.3",
+          "change-case": "^2.3.1",
           "season": "^5.2.0",
           "underscore-plus": "^1.6.6"
         }
@@ -1091,6 +1247,147 @@
         "dependencies": {
           "mixto": "1.x",
           "es6-weak-map": "^0.1.2"
+        }
+      },
+      {
+        "paths": [
+          "node_modules/change-case"
+        ],
+        "dependencies": {
+          "camel-case": "^1.1.1",
+          "constant-case": "^1.1.0",
+          "dot-case": "^1.1.0",
+          "is-lower-case": "^1.1.0",
+          "is-upper-case": "^1.1.0",
+          "lower-case": "^1.1.1",
+          "lower-case-first": "^1.0.0",
+          "param-case": "^1.1.0",
+          "pascal-case": "^1.1.0",
+          "path-case": "^1.1.0",
+          "sentence-case": "^1.1.1",
+          "snake-case": "^1.1.0",
+          "swap-case": "^1.1.0",
+          "title-case": "^1.1.0",
+          "upper-case": "^1.1.1",
+          "upper-case-first": "^1.1.0"
+        }
+      },
+      {
+        "paths": [
+          "node_modules/change-case/node_modules/camel-case"
+        ],
+        "dependencies": {
+          "sentence-case": "^1.1.1",
+          "upper-case": "^1.1.1"
+        }
+      },
+      {
+        "paths": [
+          "node_modules/change-case/node_modules/constant-case"
+        ],
+        "dependencies": {
+          "snake-case": "^1.1.0",
+          "upper-case": "^1.1.1"
+        }
+      },
+      {
+        "paths": [
+          "node_modules/change-case/node_modules/dot-case"
+        ],
+        "dependencies": {
+          "sentence-case": "^1.1.2"
+        }
+      },
+      {
+        "paths": [
+          "node_modules/change-case/node_modules/is-lower-case"
+        ],
+        "dependencies": {
+          "lower-case": "^1.1.0"
+        }
+      },
+      {
+        "paths": [
+          "node_modules/change-case/node_modules/is-upper-case"
+        ],
+        "dependencies": {
+          "upper-case": "^1.1.0"
+        }
+      },
+      {
+        "paths": [
+          "node_modules/change-case/node_modules/lower-case-first"
+        ],
+        "dependencies": {
+          "lower-case": "^1.1.2"
+        }
+      },
+      {
+        "paths": [
+          "node_modules/change-case/node_modules/param-case"
+        ],
+        "dependencies": {
+          "sentence-case": "^1.1.2"
+        }
+      },
+      {
+        "paths": [
+          "node_modules/change-case/node_modules/pascal-case"
+        ],
+        "dependencies": {
+          "camel-case": "^1.1.1",
+          "upper-case-first": "^1.1.0"
+        }
+      },
+      {
+        "paths": [
+          "node_modules/change-case/node_modules/path-case"
+        ],
+        "dependencies": {
+          "sentence-case": "^1.1.2"
+        }
+      },
+      {
+        "paths": [
+          "node_modules/change-case/node_modules/sentence-case",
+          "node_modules/change-case/node_modules/sentence-case/vendor"
+        ],
+        "dependencies": {
+          "lower-case": "^1.1.1"
+        }
+      },
+      {
+        "paths": [
+          "node_modules/change-case/node_modules/snake-case"
+        ],
+        "dependencies": {
+          "sentence-case": "^1.1.2"
+        }
+      },
+      {
+        "paths": [
+          "node_modules/change-case/node_modules/swap-case"
+        ],
+        "dependencies": {
+          "lower-case": "^1.1.1",
+          "upper-case": "^1.1.1"
+        }
+      },
+      {
+        "paths": [
+          "node_modules/change-case/node_modules/title-case"
+        ],
+        "dependencies": {
+          "sentence-case": "^1.1.1",
+          "upper-case": "^1.0.3"
+        }
+      },
+      {
+        "paths": [
+          "node_modules/change-case/node_modules/upper-case-first"
+        ],
+        "dependencies": {
+          "upper-case": "^1.1.1"
         }
       },
       {

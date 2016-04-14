@@ -1,7 +1,7 @@
 {
   "name": "vim-mode-plus",
   "main": "./lib/main",
-  "version": "0.23.0",
+  "version": "0.25.0",
   "description": "vim-mode improved",
   "license": "MIT",
   "private": true,
@@ -44,10 +44,10 @@
     "url": "https://github.com/t9md/atom-vim-mode-plus/issues"
   },
   "homepage": "https://github.com/t9md/atom-vim-mode-plus#readme",
-  "_id": "vim-mode-plus@0.23.0",
-  "_shasum": "f88cbc28c035d38c5a28b0e21137358435d50da0",
-  "_resolved": "file:../d-116210-64259-159se3s/package.tgz",
-  "_from": "../d-116210-64259-159se3s/package.tgz",
+  "_id": "vim-mode-plus@0.25.0",
+  "_shasum": "8fae6d1d0f823b7f94ec944615e2c43d72519485",
+  "_resolved": "file:../d-116314-87221-ujt2vy/package.tgz",
+  "_from": "../d-116314-87221-ujt2vy/package.tgz",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [
@@ -138,7 +138,7 @@
       },
       {
         "name": "fs-plus",
-        "version": "2.8.1",
+        "version": "2.8.2",
         "path": "node_modules/fs-plus/lib/fs-plus.js"
       },
       {
@@ -238,7 +238,8 @@
         "lib/text-object.coffee",
         "lib/utils.coffee",
         "lib/vim-state.coffee",
-        "lib/visual-blockwise.coffee"
+        "lib/visual-blockwise.coffee",
+        "working.coffee"
       ],
       ".js": [
         "node_modules/atom-space-pen-views/lib/main.js",
