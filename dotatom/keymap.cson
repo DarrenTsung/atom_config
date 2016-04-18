@@ -7,8 +7,8 @@
 ### MAPPINGS ###
 'body':
   'ctrl-[': 'core:cancel'
-
-'atom-workspace':
+  # 'ctrl-cmd-l': 'pane:show-previous-recently-used-item'
+  # 'ctrl-cmd-h': 'pane:show-next-recently-used-item'
   'ctrl-cmd-h': 'history-tracker:go-backwards-in-history'
   'ctrl-cmd-l': 'history-tracker:go-forward-in-history'
 

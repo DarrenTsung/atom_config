@@ -35,7 +35,6 @@
     fontSize: 13
     invisibles: {}
     scrollPastEnd: true
-    tabLength: 4
     tabType: "soft"
   "exception-reporting":
     userId: "44048cfb-4890-b4a9-ea94-754b28c3f60f"
@@ -81,7 +80,8 @@
   tabs: {}
   "tree-view":
     hideIgnoredNames: true
-  "vim-mode": {}
+  "vim-mode":
+    useClipboardAsDefaultRegister: false
   "vim-mode-plus":
     flashOnUndoRedo: true
     highlightSearch: true
@@ -97,6 +97,7 @@
   editor:
     tabLength: 4
 ".coffee.source":
+  tabLength: 2
   "wrapper-snippets":
     if:
       body: '''
@@ -142,6 +143,9 @@
         }
       '''
       name: "if"
+".litcoffee.source":
+  editor:
+    tabLength: 4
 ".nant-build.source":
   editor:
     tabLength: 4
