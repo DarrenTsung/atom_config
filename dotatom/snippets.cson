@@ -179,6 +179,23 @@
       #endregion
     """
 
+  'RecycleCleanup':
+    'prefix': 'rcleanup'
+    'body': """
+      // PRAGMA MARK - IRecycleCleanupSubscriber Implementation
+      public void OnRecycleCleanup() {
+        ${1:Cleanup here}
+      }
+    """
+  'RecycleSetup':
+    'prefix': 'rsetup'
+    'body': """
+      // PRAGMA MARK - IRecycleSetupSubscriber Implementation
+      public void OnRecycleSetup() {
+        ${1:Setup here}
+      }
+    """
+
   'HideInInspector':
     'prefix': 'hide'
     'body': '[HideInInspector]'

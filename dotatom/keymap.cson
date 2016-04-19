@@ -1,7 +1,6 @@
 ### UN-MAPPINGS ###
 'atom-workspace atom-text-editor:not([mini])':
   'ctrl-o': 'lazy-unity-helper:jump-to-definition'
-  'shift-cmd-h': 'pane:show-previous-item'
   'shift-cmd-l': 'pane:show-next-item'
 
 ### MAPPINGS ###
@@ -11,6 +10,9 @@
   # 'ctrl-cmd-h': 'pane:show-next-recently-used-item'
   'ctrl-cmd-h': 'history-tracker:go-backwards-in-history'
   'ctrl-cmd-l': 'history-tracker:go-forward-in-history'
+
+  'shift-cmd-h': 'pane:show-previous-item'
+  'shift-cmd-l': 'pane:show-next-item'
 
 'atom-text-editor.vim-mode-plus:not(.insert-mode)':
   'ctrl-i': 'vim-mode-plus:auto-indent'
