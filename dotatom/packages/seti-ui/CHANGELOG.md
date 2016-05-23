@@ -1,5 +1,129 @@
 # Changelog
 
+## 1.2.2
+- Remove hover cursor in tree view
+
+## 1.2.1
+- Fix auto-complete overlay for spell check #242
+- Fix selected state in tree view for compact and no icon modes. #283
+- Fix wording on setting to disable animations
+
+
+## 1.2
+- Change input color to black
+- Compact mode adjustments:
+  - Smaller status bar
+  - Less space around icons
+- Add Twig icon #282
+- Add Elm icon #281
+- Add sticky project root headers #273
+- Change font setting to say "Default Atom Font" instead of "SF UI Text" to make it more clear it is using the default.
+
+## 1.1.2
+- Fix Linter rule link badge
+
+## 1.1.1
+- Fix selected directory style in compact mode
+
+## 1.1.0
+- Adjust compact view
+  - Settings vies: remove padding & reduce font size
+  - Apply compact view to split panel
+  - Tree view "current file" highlight too tall in compact view #265
+  - Fix tab close button in compact mode
+  - Adjust placeholder height in compact mode
+- Add settings
+  - Choose system font
+  - Disable animations
+- Remove sticky project header until bugs can be sorted
+- Make tree highlight color more distinct
+- Remove button in .btn selector
+- TeX icon support improvement
+
+## 1.0.4
+- Change header positioning to support top-aligned tool-bar
+- Fix autocomplete-plus highlight style
+
+## 1.0.3
+- Use css ison for .sss file
+- Add .icon-partial mixin for better partial name matching
+- Remove border from site root folder
+
+## 1.0.2
+- Fix lint label
+
+## 1.0.1
+- Fix verion error
+
+## 1.0.0
+- UI Overhaul:
+  - Larger tabs
+  - More space in sidebar
+  - File icons now display in fuzzy finder & find & replace
+  - Improve system views such as settings & panels
+  - New styling for Find & Replace
+  - Pin project folder to top
+  - Additional theme color options:
+    - Blue (Default)
+    - Green
+    - Orange
+    - Pink
+    - Purple
+    - Steel
+    - Yellow
+  - Add Roboto font for UI text
+  - Custom styling for plugins:
+    - Autocomplete Plus
+    - Deprecation Cop
+    - Linter
+    - Pigments
+    - Time Cop
+- Refactor code base:
+  - Add config for user settings:
+    - Disable compact mode
+    - Enable/Disable Icons
+    - Set theme color
+    - Enable hiding tabs
+    - Enable fully hiding cvs hidden files
+  - Add gulp script for building file icons
+- Add CONTRIBUTING.md for directions on how to contribute
+- Update README
+- Update screenshots
+- Add file icons:
+  - php.inc
+  - Swift
+  - .gitattributes
+  - C
+  - C++
+  - Rust
+  - gulpfile.babel.js
+  - Grails
+  - PerlScript
+  - ECMAScript
+  - Scale
+  - Java
+  - SBT
+  - jscs
+  - jshint
+  - direnv
+  - editorconfig
+  - LaTeX
+  - Ocaml
+  - LiveScript
+  - Vala
+  - HackLang
+  - Shell
+  - Puppet
+  - Haskell
+  - Lua
+  - Typescript
+  - Go
+  - C#
+  - liquid
+  - Haml
+  - Media Files (audio, video, image)
+  - Font Files
+
 ## 0.9.2
 - Add cold fusion support
 - Add Haml icon
@@ -17,7 +141,7 @@
 
 ## 0.8.0
 - Update settings view
-- Limit CPU usage of <progress> elements
+- Limit CPU usage of `<progress>` elements
 - Add .yaml as extension for YAML file icon
 - Alias .es and .es6 to js
 

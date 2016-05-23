@@ -1,4 +1,5 @@
-# Refactoring status: 100%
+{Range} = require 'atom'
+
 Base = require './base'
 
 class InsertMode extends Base
@@ -18,32 +19,43 @@ class InsertRegister extends InsertMode
   execute: ->
     @editor.transact =>
       for selection in @editor.getSelections()
-        text = @vimState.register.getText(@input, selection)
-        selection.insertText text
+        text = @vimState.register.getText(@getInput(), selection)
+        selection.insertText(text)
 
 class InsertLastInserted extends InsertMode
   @extend()
+  @description: """
+  Insert text inserted in latest insert-mode.
+  Equivalent to *i_CTRL-A* of pure Vim
+  """
   execute: ->
-    @editor.insertText @vimState.register.getText('.')
+    text = @vimState.register.getText('.')
+    @editor.insertText(text)
 
 class CopyFromLineAbove extends InsertMode
   @extend()
-  rowTranslation: -1
+  @description: """
+  Insert character of same-column of above line.
+  Equivalent to *i_CTRL-Y* of pure Vim
+  """
+  rowDelta: -1
 
-  getTextInScreenRange: (range) ->
-    bufferRange = @editor.bufferRangeForScreenRange(range)
-    @editor.getTextInBufferRange(bufferRange)
+  getTargetRange: (cursor, translation) ->
+    point = cursor.getBufferPosition().translate(translation)
+    Range.fromPointWithDelta(point, 0, 1)
 
   execute: ->
-    lastRow = @editor.getLastBufferRow()
+    translation = [@rowDelta, 0]
     @editor.transact =>
-      for cursor in @editor.getCursors()
-        {row, column} = cursor.getScreenPosition()
-        row += @rowTranslation
-        continue unless (0 <= row <= lastRow)
-        range = [[row, column], [row, column+1]]
-        cursor.selection.insertText @getTextInScreenRange(range)
+      for selection in @editor.getSelections()
+        range = @getTargetRange(selection.cursor, translation)
+        if text = @editor.getTextInBufferRange(range)
+          selection.insertText(text)
 
 class CopyFromLineBelow extends CopyFromLineAbove
   @extend()
-  rowTranslation: +1
+  @description: """
+  Insert character of same-column of above line.
+  Equivalent to *i_CTRL-E* of pure Vim
+  """
+  rowDelta: +1

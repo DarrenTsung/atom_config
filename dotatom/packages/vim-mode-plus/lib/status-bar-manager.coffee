@@ -1,15 +1,13 @@
-# Refactoring status: 80%
-{Disposable, CompositeDisposable} = require 'atom'
 {ElementBuilder} = require './utils'
 
-ContentsByMode =
-  'insert': ["insert", "Insert"]
-  'insert.replace': ["insert", "Replace"]
-  'normal': ["normal", "Normal"]
-  'visual': ["visual", "Visual"]
-  'visual.characterwise': ["visual", "Visual Char"]
-  'visual.linewise': ["visual", "Visual Line"]
-  'visual.blockwise': ["visual", "Visual Block"]
+modeToContent =
+  "normal": "Normal"
+  'insert': "Insert"
+  'insert.replace': "Replace"
+  'visual': "Visual"
+  "visual.characterwise": "Visual Char"
+  "visual.linewise": "Visual Line"
+  "visual.blockwise": "Visual Block"
 
 module.exports =
 class StatusBarManager
@@ -17,20 +15,17 @@ class StatusBarManager
   prefix: 'status-bar-vim-mode-plus'
 
   constructor: ->
-    (@container = @div(id: "#{@prefix}-container", classList: ['inline-block']))
-    .appendChild(@element = @div(id: @prefix))
+    @container = @div(id: "#{@prefix}-container", classList: ['inline-block'])
+    @container.appendChild(@element = @div(id: @prefix))
 
   initialize: (@statusBar) ->
 
   update: (mode, submode) ->
     modeString = mode
     modeString += "." + submode if submode?
-    if newContents = ContentsByMode[modeString]
-      [className, text] = newContents
-      @element.className = "#{@prefix}-#{className}"
-      @element.textContent = text
+    @element.className = "#{@prefix}-#{mode}"
+    @element.textContent = modeToContent[modeString]
 
-  # Private
   attach: ->
     @tile = @statusBar.addRightTile(item: @container, priority: 20)
 

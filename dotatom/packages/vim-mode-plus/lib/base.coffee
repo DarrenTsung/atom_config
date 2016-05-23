@@ -1,16 +1,15 @@
-# Refactoring status: 100%
 _ = require 'underscore-plus'
 Delegato = require 'delegato'
 {CompositeDisposable} = require 'atom'
+{
+  getVimEofBufferPosition
+  getVimLastBufferRow
+  getVimLastScreenRow
+} = require './utils'
 
 settings = require './settings'
-selectList = require './select-list'
-getEditorState = null # set in Base.init()
-
-run = (klass, properties={}) ->
-  if vimState = getEditorState(atom.workspace.getActiveTextEditor())
-    # Reason: https://github.com/t9md/atom-vim-mode-plus/issues/85
-    vimState.operationStack.run(klass, properties)
+selectList = null # delay
+getEditorState = null # set by Base.init()
 
 vimStateMethods = [
   "onDidChangeInput"
@@ -27,87 +26,106 @@ vimStateMethods = [
   "onDidSelectTarget"
   "onDidSetTarget"
   "onDidFinishOperation"
+  "onDidCancelSelectList"
   "subscribe"
   "isMode"
+  "hasCount"
+  "getBlockwiseSelections"
+  "updateSelectionProperties"
 ]
 
 class Base
   Delegato.includeInto(this)
-  recordable: false
-  repeated: false
-  defaultCount: 1
-  requireInput: false
-  requireTarget: false
-  operator: null
-  asTarget: false
-  context: {}
-  @commandPrefix: 'vim-mode-plus'
-  @commandScope: 'atom-text-editor'
-
   @delegatesMethods vimStateMethods..., toProperty: 'vimState'
 
   constructor: (@vimState, properties) ->
     {@editor, @editorElement} = @vimState
-    @vimState.hover.setPoint()
-    if hover = @hover?[settings.get('showHoverOnOperateIcon')]
-      @addHover(hover)
     _.extend(this, properties)
+    if settings.get('showHoverOnOperate')
+      hover = @hover?[settings.get('showHoverOnOperateIcon')]
+      if hover? and not @isComplete()
+        @addHover(hover)
 
   # Operation processor execute only when isComplete() return true.
   # If false, operation processor postpone its execution.
   isComplete: ->
-    if (@requireInput and not @input?)
-      return false
-
-    if @requireTarget
-      @target?.isComplete()
+    if (@isRequireInput() and not @hasInput())
+      false
+    else if @isRequireTarget()
+      # When this function is called in Base::constructor
+      # tagert is still string like `MoveToRight`, in this case isComplete
+      # is not available.
+      @getTarget()?.isComplete?()
     else
       true
 
-  isRecordable: ->
-    @recordable
+  target: null
+  hasTarget: -> @target?
+  getTarget: -> @target
 
-  isRepeated: ->
-    @repeated
+  requireTarget: false
+  isRequireTarget: -> @requireTarget
 
-  setRepeated: ->
-    @repeated = true
+  requireInput: false
+  isRequireInput: -> @requireInput
+
+  recordable: false
+  isRecordable: -> @recordable
+
+  repeated: false
+  isRepeated: -> @repeated
+  setRepeated: -> @repeated = true
 
   # Intended to be used by TextObject or Motion
+  operator: null
+  hasOperator: -> @operator?
+  getOperator: -> @operator
+  setOperator: (@operator) -> @operator
   isAsOperatorTarget: ->
-    @operator? and not @operator.instanceof('Select')
+    @hasOperator() and not @getOperator().instanceof('Select')
 
   abort: ->
-    throw new OperationAbortedError('Aborted')
+    throw new OperationAbortedError()
+
+  # Count
+  # -------------------------
+  defaultCount: 1
+  getDefaultCount: ->
+    @defaultCount
 
   getCount: ->
     # Setting count as instance variable allows operation repeatable with same count.
-    @count ?= @vimState.getCount() ? @defaultCount
+    @count ?= @vimState.getCount() ? @getDefaultCount()
 
   isDefaultCount: ->
-    @getCount() is @defaultCount
+    # Don't call getCount() since its has side-effect to update @count to cache.
+    @count is @getDefaultCount()
 
-  isCountSpecified: ->
-    @vimState.hasCount()
-
+  # Misc
+  # -------------------------
   countTimes: (fn) ->
-    _.times @getCount(), (num) ->
-      fn(num+1)
+    return if (last = @getCount()) < 1
+
+    stopped = false
+    stop = ->
+      stopped = true
+    for count in [1..last]
+      isFinal = count is last
+      fn({count, isFinal, stop})
+      break if stopped
 
   activateMode: (mode, submode) ->
     @onDidFinishOperation =>
       @vimState.activate(mode, submode)
 
   addHover: (text, {replace}={}) ->
-    if settings.get('showHoverOnOperate')
-      replace ?= false
-      if replace
-        @vimState.hover.replaceLastSection(text)
-      else
-        @vimState.hover.add(text)
+    if replace ? false
+      @vimState.hover.replaceLastSection(text)
+    else
+      @vimState.hover.add(text)
 
-  new: (klassName, properties={}) ->
-    klass = Base.getClass(klassName)
+  new: (name, properties={}) ->
+    klass = Base.getClass(name)
     new klass(@vimState, properties)
 
   cancelOperation: ->
@@ -117,10 +135,14 @@ class Base
     @vimState.operationStack.process()
 
   focusSelectList: (options={}) ->
-    @vimState.onDidCancelSelectList =>
+    @onDidCancelSelectList =>
       @cancelOperation()
-
+    selectList ?= require './select-list'
     selectList.show(@vimState, options)
+
+  input: null
+  hasInput: -> @input?
+  getInput: -> @input
 
   focusInput: (options={}) ->
     options.charsMax ?= 1
@@ -129,21 +151,44 @@ class Base
 
     # From 2nd addHover, we replace last section of hover
     # to sync content with input mini editor.
-    firstInput = true
+    replace = false
     @onDidChangeInput (input) =>
-      @addHover(input, replace: not firstInput)
-      firstInput = false
+      @addHover(input, {replace})
+      replace = true
 
     @onDidCancelInput =>
       @cancelOperation()
 
     @vimState.input.focus(options)
 
+  getVimEofBufferPosition: ->
+    getVimEofBufferPosition(@editor)
+
+  getVimLastBufferRow: ->
+    getVimLastBufferRow(@editor)
+
+  getVimLastScreenRow: ->
+    getVimLastScreenRow(@editor)
+
   instanceof: (klassName) ->
     this instanceof Base.getClass(klassName)
 
-  directInstanceof: (klassName) ->
-    this.constructor is Base.getClass(klassName)
+  isOperator: ->
+    @instanceof('Operator')
+
+  isMotion: ->
+    @instanceof('Motion')
+
+  isTextObject: ->
+    @instanceof('TextObject')
+
+  getName: ->
+    @constructor.name
+
+  toString: ->
+    str = @getName()
+    str += ", target=#{@getTarget().toString()}" if @hasTarget()
+    str
 
   emitWillSelectTarget: ->
     @vimState.emitter.emit 'will-select-target'
@@ -162,7 +207,7 @@ class Base
 
     require(lib) for lib in [
       './operator', './motion', './text-object',
-      './insert-mode', './misc-commands', './scroll', './visual-blockwise'
+      './insert-mode', './misc-command'
     ]
     for __, klass of @getRegistries() when klass.isCommand()
       @subscriptions.add klass.registerCommand()
@@ -177,12 +222,15 @@ class Base
 
   registries = {Base}
   @extend: (@command=true) ->
-    if (@name of registries) and (not @suppressWarning)
+    if (name of registries) and (not @suppressWarning)
       console.warn "Duplicate constructor #{@name}"
     registries[@name] = this
 
-  @getClass: (klassName) ->
-    registries[klassName]
+  @getClass: (name) ->
+    if klass = registries[name]
+      klass
+    else
+      throw new Error("class '#{name}' not found")
 
   @getRegistries: ->
     registries
@@ -190,14 +238,32 @@ class Base
   @isCommand: ->
     @command
 
+  @commandPrefix: 'vim-mode-plus'
   @getCommandName: ->
     @commandPrefix + ':' + _.dasherize(@name)
 
+  @getCommandNameWithoutPrefix: ->
+    _.dasherize(@name)
+
+  @commandScope: 'atom-text-editor'
   @getCommandScope: ->
     @commandScope
 
+  @description
+  @getDesctiption: ->
+    if @hasOwnProperty("description")
+      @description
+    else
+      null
+
   @registerCommand: ->
-    atom.commands.add(@getCommandScope(), @getCommandName(), => run(this))
+    atom.commands.add(@getCommandScope(), @getCommandName(), (event) => @run(event))
+
+  @run: (event) ->
+    if vimState = getEditorState(atom.workspace.getActiveTextEditor())
+      vimState.domEvent = event
+      # Reason: https://github.com/t9md/atom-vim-mode-plus/issues/85
+      vimState.operationStack.run(this)
 
 class OperationAbortedError extends Base
   @extend(false)

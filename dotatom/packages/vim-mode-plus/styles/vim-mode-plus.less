@@ -28,7 +28,7 @@
 
 atom-text-editor.vim-mode-plus.normal-mode,
 atom-text-editor.vim-mode-plus.operator-pending-mode,
-atom-text-editor.vim-mode-plus.visual-mode,
+atom-text-editor.vim-mode-plus.visual-mode
 {
   &::shadow, // shadow-DOM enabled
   &           // shadow-DOM disabled
@@ -89,7 +89,7 @@ atom-text-editor.vim-mode-plus.insert-mode.replace.is-focused
   }
 }
 
-atom-text-editor.vim-mode-plus.operator-pending-mode
+atom-text-editor.vim-mode-plus.operator-pending-mode,
 {
   &::shadow, // shadow-DOM enabled
   &           // shadow-DOM disabled
@@ -100,7 +100,8 @@ atom-text-editor.vim-mode-plus.operator-pending-mode
   }
 }
 
-atom-text-editor.vim-mode-plus.operator-pending-mode.is-focused
+atom-text-editor.vim-mode-plus.operator-pending-mode.is-focused,
+atom-text-editor.vim-mode-plus-input-char-waiting
 {
   &::shadow, // shadow-DOM enabled
   &           // shadow-DOM disabled
@@ -117,7 +118,7 @@ atom-text-editor.vim-mode-plus.operator-pending-mode.is-focused
 
 // Flash ranges e.g. flashing yanked range.
 // =========================
-atom-text-editor::shadow {
+atom-text-editor, atom-text-editor::shadow {
   .vim-mode-plus-flash .region {
     z-index: 1;
     background-color: fadeout(@syntax-selection-flash-color, 50%);
@@ -216,7 +217,8 @@ atom-text-editor[mini].vim-mode-plus-search {
     border-radius: @component-border-radius;
   }
 }
-atom-text-editor::shadow {
+
+atom-text-editor, atom-text-editor::shadow {
   .vim-mode-plus-search-match .region {
     .vim-mode-plus.round-box;
     background-color: transparent;
@@ -237,14 +239,15 @@ atom-text-editor::shadow {
     border: 1px solid fadeout(@syntax-result-marker-color, 70%);
     background-color: @syntax-selection-color;
   }
+  .vim-mode-plus-range-marker .region {
+    background-color: fadeout(darken(@syntax-color-added, 10%), 80%);
+    // background-color: fadeout(darken(@syntax-selection-flash-color, 10%), 80%);
+  }
 }
 
 // Maximize Pane
 // =========================
-atom-workspace.vim-mode-plus-pane-maximized {
-  .tab-bar {
-    display: none;
-  }
+.vim-mode-plus-maximize-pane() {
   atom-pane-container {
     position: relative;
     atom-pane {
@@ -259,6 +262,19 @@ atom-workspace.vim-mode-plus-pane-maximized {
         z-index: 100;
       }
     }
+  }
+}
+
+.hide-tab-bar() {
+  .tab-bar {
+    display: none;
+  }
+}
+
+atom-workspace.vim-mode-plus-pane-maximized {
+  .vim-mode-plus-maximize-pane();
+  &.hide-tab-bar {
+    .hide-tab-bar()
   }
 }
 

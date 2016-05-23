@@ -1,16 +1,20 @@
-# Refactoring status: 95%
 {Range, Point} = require 'atom'
 _ = require 'underscore-plus'
 
 Base = require './base'
 swrap = require './selection-wrapper'
+globalState = require './global-state'
 {
-  sortRanges, sortRangesByEnd, countChar, pointIsAtEndOfLine, getEolBufferPositionForRow
+  sortRanges, sortRangesByEndPosition, countChar, pointIsAtEndOfLine,
   getTextToPoint
   getIndentLevelForBufferRow
   getCodeFoldRowRangesContainesForRow
   getBufferRangeForRowRange
   isIncludeFunctionScopeForRow
+  pointIsSurroundedByWhitespace
+  getWordRegExpForPointWithCursor
+  getStartPositionForPattern
+  getEndPositionForPattern
 } = require './utils'
 
 class TextObject extends Base
@@ -18,9 +22,8 @@ class TextObject extends Base
   allowSubmodeChange: true
 
   constructor: ->
-    @constructor::inner = @constructor.name.startsWith('Inner')
+    @constructor::inner = @getName().startsWith('Inner')
     super
-    @onDidSetTarget (@operator) => @operator
     @initialize?()
 
   isInner: ->
@@ -33,39 +36,46 @@ class TextObject extends Base
     @allowSubmodeChange
 
   isLinewise: ->
-    submode = if @isAllowSubmodeChange()
-      swrap.detectVisualModeSubmode(@editor)
+    if @isAllowSubmodeChange()
+      swrap.detectVisualModeSubmode(@editor) is 'linewise'
     else
-      @vimState.submode
-    submode is 'linewise'
+      @vimState.submode is 'linewise'
 
   select: ->
     for selection in @editor.getSelections()
       @selectTextObject(selection)
+    @updateSelectionProperties() if @isMode('visual')
 
 # -------------------------
-# [FIXME] make it expandable
 class Word extends TextObject
   @extend(false)
-  selectTextObject: (selection) ->
-    wordRegex = @wordRegExp ? selection.cursor.wordRegExp()
-    if @isInner()
-      @selectInner(selection, wordRegex)
+
+  getPattern: (selection) ->
+    point = swrap(selection).getNormalizedBufferPosition()
+    if pointIsSurroundedByWhitespace(@editor, point)
+      /[\t ]*/
     else
-      @selectA(selection, wordRegex)
+      @wordRegExp ? getWordRegExpForPointWithCursor(selection.cursor, point)
 
-  selectInner: (selection, wordRegex=null) ->
-    selection.selectWord()
+  selectTextObject: (selection) ->
+    swrap(selection).setBufferRangeSafely(@getRange(selection))
 
-  selectA: (selection, wordRegex=null) ->
-    @selectInner(selection, wordRegex)
-    scanRange = selection.cursor.getCurrentLineBufferRange()
-    headPoint = selection.getHeadBufferPosition()
-    scanRange.start = headPoint
-    @editor.scanInBufferRange /\s+/, scanRange, ({range, stop}) ->
-      if headPoint.isEqual(range.start)
-        selection.selectToBufferPosition range.end
-        stop()
+  getRange: (selection) ->
+    pattern = @getPattern(selection)
+    from = swrap(selection).getNormalizedBufferPosition()
+    options = containedOnly: true
+    start = getStartPositionForPattern(@editor, from, pattern, options)
+    end = getEndPositionForPattern(@editor, from, pattern, options)
+
+    start ?= from
+    end ?= from
+    if @isA() and endOfSpace = getEndPositionForPattern(@editor, end, /\s+/, options)
+      end = endOfSpace
+
+    unless start.isEqual(end)
+      new Range(start, end)
+    else
+      null
 
 class AWord extends Word
   @extend()
@@ -77,9 +87,6 @@ class InnerWord extends Word
 class WholeWord extends Word
   @extend(false)
   wordRegExp: /\S+/
-  selectInner: (selection, wordRegex) ->
-    range = selection.cursor.getCurrentWordBufferRange({wordRegex})
-    swrap(selection).setBufferRangeSafely range
 
 class AWholeWord extends WholeWord
   @extend()
@@ -92,14 +99,13 @@ class InnerWholeWord extends WholeWord
 class SmartWord extends Word
   @extend(false)
   wordRegExp: /[\w-]+/
-  selectInner: (selection, wordRegex) ->
-    range = selection.cursor.getCurrentWordBufferRange({wordRegex})
-    swrap(selection).setBufferRangeSafely range
 
 class ASmartWord extends SmartWord
+  @description: "A word that consists of alphanumeric chars(`/[A-Za-z0-9_]/`) and hyphen `-`"
   @extend()
 
 class InnerSmartWord extends SmartWord
+  @description: "Currently No diff from `a-smart-word`"
   @extend()
 
 # -------------------------
@@ -234,13 +240,9 @@ class Pair extends TextObject
   getPointToSearchFrom: (selection, searchFrom) ->
     switch searchFrom
       when 'head'
-        point = selection.getHeadBufferPosition()
-        # When selection is not empty, we have to start to search one column left
-        if (not selection.isEmpty()) and (not selection.isReversed()) and (point.column > 0)
-          point = @editor.clipScreenPosition(point.translate([0, -1]), {clip: 'backward'})
-        point
+        swrap(selection).getNormalizedBufferPosition()
       when 'start'
-        selection.getBufferRange().start
+        swrap(selection).getBufferPositionFor('start')
 
   # Allow override @allowForwarding by 2nd argument.
   getRange: (selection, options={}) ->
@@ -289,6 +291,7 @@ class InnerAnyPair extends AnyPair
 # -------------------------
 class AnyPairAllowForwarding extends AnyPair
   @extend(false)
+  @description: "Range surrounded by auto-detected paired chars from enclosed and forwarding area"
   allowForwarding: true
   allowNextLine: false
   skipEmptyPair: false
@@ -724,3 +727,65 @@ class ALatestChange extends LatestChange
 # No diff from ALatestChange
 class InnerLatestChange extends LatestChange
   @extend()
+
+# -------------------------
+class SearchMatchForward extends TextObject
+  @extend()
+
+  getRange: (selection) ->
+    unless pattern = globalState.lastSearchPattern
+      return null
+
+    point = selection.getBufferRange().end
+    scanRange = [point.row, @getVimEofBufferPosition()]
+    found = null
+    @editor.scanInBufferRange pattern, scanRange, ({range, stop}) ->
+      if range.end.isGreaterThan(point)
+        found = range
+        stop()
+    found
+
+  selectTextObject: (selection) ->
+    return unless range = @getRange(selection)
+
+    if selection.isEmpty()
+      reversed = @backward
+      swrap(selection).setBufferRange(range, {reversed})
+      selection.cursor.autoscroll()
+    else
+      swrap(selection).mergeBufferRange(range)
+
+class SearchMatchBackward extends SearchMatchForward
+  @extend()
+  backward: true
+
+  getRange: (selection) ->
+    unless pattern = globalState.lastSearchPattern
+      return null
+
+    point = selection.getBufferRange().start
+    scanRange = [[point.row, Infinity], [0, 0]]
+    found = null
+    @editor.backwardsScanInBufferRange pattern, scanRange, ({range, stop}) ->
+      if range.start.isLessThan(point)
+        found = range
+        stop()
+    found
+
+# [FIXME] Currently vB range is treated as vC range, how I should do?
+class PreviousSelection extends TextObject
+  @extend()
+  backward: true
+
+  select: ->
+    return unless range = @vimState.mark.getRange('<', '>')
+    @editor.getLastSelection().setBufferRange(range)
+
+class MarkedRange extends TextObject
+  @extend()
+  backward: true
+
+  select: ->
+    ranges = @vimState.getRangeMarkers().map((m) -> m.getBufferRange())
+    if ranges.length
+      @editor.setSelectedBufferRanges(ranges)

@@ -1,14 +1,13 @@
 Delegato = require 'delegato'
 _ = require 'underscore-plus'
-{Emitter, Disposable, CompositeDisposable, Range, Point} = require 'atom'
-{basename} = require 'path'
+{Emitter, Disposable, CompositeDisposable, Range} = require 'atom'
 
-{Hover} = require './hover'
-{Input, SearchInput} = require './input'
 settings = require './settings'
-{haveSomeSelection, highlightRanges, getVisibleBufferRange} = require './utils'
-swrap = require './selection-wrapper'
 globalState = require './global-state'
+{HoverElement} = require './hover'
+{InputElement, SearchInputElement} = require './input'
+{haveSomeSelection, highlightRanges, getVisibleBufferRange, matchScopes} = require './utils'
+swrap = require './selection-wrapper'
 
 OperationStack = require './operation-stack'
 MarkManager = require './mark-manager'
@@ -16,6 +15,7 @@ ModeManager = require './mode-manager'
 RegisterManager = require './register-manager'
 SearchHistoryManager = require './search-history-manager'
 CursorStyleManager = require './cursor-style-manager'
+BlockwiseSelection = null # delay
 
 packageScope = 'vim-mode-plus'
 
@@ -32,15 +32,16 @@ class VimState
     @emitter = new Emitter
     @subscriptions = new CompositeDisposable
     @modeManager = new ModeManager(this)
-    @count = null
     @mark = new MarkManager(this)
     @register = new RegisterManager(this)
-    @hover = new Hover(this)
-    @hoverSearchCounter = new Hover(this)
+    @rangeMarkers = []
 
+    @hover = new HoverElement().initialize(this)
+    @hoverSearchCounter = new HoverElement().initialize(this)
     @searchHistory = new SearchHistoryManager(this)
-    @input = new Input(this)
-    @searchInput = new SearchInput(this)
+    @input = new InputElement().initialize(this)
+
+    @searchInput = new SearchInputElement().initialize(this)
     @operationStack = new OperationStack(this)
     @cursorStyleManager = new CursorStyleManager(this)
     @blockwiseSelections = []
@@ -50,7 +51,7 @@ class VimState
       @refreshHighlightSearch()
 
     @editorElement.classList.add packageScope
-    if settings.get('startInInsertMode')
+    if settings.get('startInInsertMode') or matchScopes(@editorElement, settings.get('startInInsertModeScopes'))
       @activate('insert')
     else
       @activate('normal')
@@ -63,39 +64,82 @@ class VimState
   getBlockwiseSelections: ->
     @blockwiseSelections
 
-  getLastBlockwiseSelections: ->
+  getLastBlockwiseSelection: ->
     _.last(@blockwiseSelections)
 
   getBlockwiseSelectionsOrderedByBufferPosition: ->
     @getBlockwiseSelections().sort (a, b) ->
-      a.getTop().compare(b.getTop())
+      a.getStartSelection().compare(b.getStartSelection())
 
   clearBlockwiseSelections: ->
     @blockwiseSelections = []
 
-  addBlockwiseSelection: (blockwiseSelection) ->
-    @blockwiseSelections.push(blockwiseSelection)
+  addBlockwiseSelectionFromSelection: (selection) ->
+    BlockwiseSelection ?= require './blockwise-selection'
+    @blockwiseSelections.push(new BlockwiseSelection(selection))
+
+  selectBlockwise: ->
+    for selection in @editor.getSelections()
+      @addBlockwiseSelectionFromSelection(selection)
+    @updateSelectionProperties()
+
+  # Other
+  # -------------------------
+  selectLinewise: ->
+    swrap.expandOverLine(@editor, preserveGoalColumn: true)
 
   # Count
   # -------------------------
-  getCount: ->
-    @count
-
-  hasCount: ->
-    @count?
+  count: null
+  hasCount: -> @count?
+  getCount: -> @count
 
   setCount: (number) ->
     @count ?= 0
     @count = (@count * 10) + number
     @hover.add number
-    @updateEditorElement()
+    @toggleClassList('with-count', @hasCount())
 
   resetCount: ->
     @count = null
-    @updateEditorElement()
+    @toggleClassList('with-count', @hasCount())
 
-  updateEditorElement: (kind) ->
-    @editorElement.classList.toggle('with-count', @hasCount())
+  # Mark
+  # -------------------------
+  startCharInput: (@charInputAction) ->
+    @inputCharSubscriptions = new CompositeDisposable()
+    @inputCharSubscriptions.add @swapClassName('vim-mode-plus-input-char-waiting')
+    @inputCharSubscriptions.add atom.commands.add @editorElement,
+      'core:cancel': => @resetCharInput()
+
+  setInputChar: (char) ->
+    switch @charInputAction
+      when 'save-mark' then @saveMark(char)
+      when 'move-to-mark' then @moveToMark(char)
+      when 'move-to-mark-line' then @moveToMarkLine(char)
+    @resetCharInput()
+
+  resetCharInput: ->
+    @inputCharSubscriptions?.dispose()
+
+  saveMark: (char) ->
+    @mark.set(char, @editor.getCursorBufferPosition())
+
+  moveToMark: (char) ->
+    @operationStack.run("MoveToMark", input: char)
+
+  moveToMarkLine: (char) ->
+    @operationStack.run("MoveToMarkLine", input: char)
+
+  # -------------------------
+  toggleClassList: (className, bool) ->
+    @editorElement.classList.toggle(className, bool)
+
+  swapClassName: (className) ->
+    oldClassName = @editorElement.className
+    @editorElement.className = className
+    new Disposable =>
+      @editorElement.className = oldClassName
 
   # All subscriptions here is celared on each operation finished.
   # -------------------------
@@ -128,15 +172,26 @@ class VimState
   onDidFailToSetTarget: (fn) -> @emitter.on('did-fail-to-set-target', fn)
   onDidDestroy: (fn) -> @emitter.on('did-destroy', fn)
 
+  # * `fn` {Function} to be called when mark was set.
+  #   * `name` Name of mark such as 'a'.
+  #   * `bufferPosition`: bufferPosition where mark was set.
+  #   * `editor`: editor where mark was set.
+  # Returns a {Disposable} on which `.dispose()` can be called to unsubscribe.
+  #
+  #  Usage:
+  #   onDidSetMark ({name, bufferPosition}) -> do something..
+  onDidSetMark: (fn) -> @emitter.on('did-set-mark', fn)
+
   destroy: ->
     return if @destroyed
     @destroyed = true
     @subscriptions.dispose()
 
     if @editor.isAlive()
-      @activate('normal') # reset to base mdoe.
+      @resetNormalMode()
+      @reset()
       @editorElement.component?.setInputEnabled(true)
-      @editorElement.classList.remove packageScope, 'normal-mode'
+      @editorElement.classList.remove(packageScope, 'normal-mode')
 
     @hover?.destroy?()
     @hoverSearchCounter?.destroy?()
@@ -154,55 +209,75 @@ class VimState
       @hover, @hoverSearchCounter, @operationStack,
       @searchHistory, @cursorStyleManager
       @input, @search, @modeManager, @operationRecords, @register
-      @count
+      @count, @rangeMarkers
       @editor, @editorElement, @subscriptions,
+      @inputCharSubscriptions
       @highlightSearchSubscription
     } = {}
     @emitter.emit 'did-destroy'
 
   observeSelection: ->
-    handleSelectionChange = =>
-      return unless @editor?
-      return if @operationStack.isProcessing()
+    isInterestingEvent = ({target, type}) =>
+      if @mode is 'insert'
+        false
+      else
+        @editor? and
+          target is @editorElement and
+          not @isMode('visual', 'blockwise') and
+          not type.startsWith('vim-mode-plus:')
 
+    onInterestingEvent = (fn) ->
+      (event) -> fn() if isInterestingEvent(event)
+
+    _checkSelection = =>
+      return if @operationStack.isProcessing()
       if haveSomeSelection(@editor)
-        @activate('visual', 'characterwise') if @isMode('normal')
+        submode = swrap.detectVisualModeSubmode(@editor)
+        if @isMode('visual', submode)
+          @updateCursorsVisibility()
+        else
+          @activate('visual', submode)
       else
         @activate('normal') if @isMode('visual')
 
-    selectionWatcher = null
-    handleMouseDown = =>
-      selectionWatcher?.dispose()
-      point = @editor.getLastCursor().getBufferPosition()
-      tailRange = Range.fromPointWithDelta(point, 0, +1)
-      selectionWatcher = @editor.onDidChangeSelectionRange ({selection}) =>
-        handleSelectionChange()
-        selection.setBufferRange(selection.getBufferRange().union(tailRange))
-        @refreshCursors()
+    _preserveCharacterwise = =>
+      for selection in @editor.getSelections()
+        swrap(selection).preserveCharacterwise()
 
-    handleMouseUp = ->
-      selectionWatcher?.dispose()
-      selectionWatcher = null
+    checkSelection = onInterestingEvent(_checkSelection)
+    preserveCharacterwise = onInterestingEvent(_preserveCharacterwise)
 
-    @editorElement.addEventListener 'mousedown', handleMouseDown
-    @editorElement.addEventListener 'mouseup', handleMouseUp
+    @editorElement.addEventListener('mouseup', checkSelection)
     @subscriptions.add new Disposable =>
-      @editorElement.removeEventListener 'mousedown', handleMouseDown
-      @editorElement.removeEventListener 'mouseup', handleMouseUp
+      @editorElement.removeEventListener('mouseup', checkSelection)
+    @subscriptions.add atom.commands.onWillDispatch(preserveCharacterwise)
+    @subscriptions.add atom.commands.onDidDispatch(checkSelection)
 
-    @subscriptions.add atom.commands.onDidDispatch ({target, type}) =>
-      if target is @editorElement and not type.startsWith('vim-mode-plus:')
-        handleSelectionChange() unless selectionWatcher?
+  resetNormalMode: ->
+    @editor.clearSelections()
+    @activate('normal')
+    @main.clearRangeMarkerForEditors() if settings.get('clearRangeMarkerOnResetNormalMode')
+    @main.clearHighlightSearchForEditors() if settings.get('clearHighlightSearchOnResetNormalMode')
 
   reset: ->
     @resetCount()
+    @resetCharInput()
     @register.reset()
     @searchHistory.reset()
     @hover.reset()
     @operationStack.reset()
 
-  refreshCursors: ->
+  updateCursorsVisibility: ->
     @cursorStyleManager.refresh()
+
+  updateSelectionProperties: ({force}={}) ->
+    selections = @editor.getSelections()
+    unless (force ? true)
+      selections = selections.filter (selection) ->
+        not swrap(selection).getCharacterwiseHeadPosition()?
+
+    for selection in selections
+      swrap(selection).preserveCharacterwise()
 
   # highlightSearch
   # -------------------------
@@ -211,22 +286,43 @@ class VimState
       marker.destroy()
     @highlightSearchMarkers = null
 
-  highlightSearch: ->
-    scanRange = getVisibleBufferRange(@editor)
-    pattern = globalState.highlightSearchPattern
+  hasHighlightSearch: ->
+    @highlightSearchMarkers?
+
+  getHighlightSearch: ->
+    @highlightSearchMarkers
+
+  highlightSearch: (pattern, scanRange) ->
     ranges = []
     @editor.scanInBufferRange pattern, scanRange, ({range}) ->
       ranges.push(range)
-
-    highlightRanges @editor, ranges,
+    markers = highlightRanges @editor, ranges,
+      invalidate: 'inside'
       class: 'vim-mode-plus-highlight-search'
+    markers
 
   refreshHighlightSearch: ->
-    # NOTE: endRow become undefined if @editorElement is not yet attached.
-    # e.g. Beging called immediately after open file.
     [startRow, endRow] = @editorElement.getVisibleRowRange()
-    return unless (startRow? and endRow?)
+    return unless scanRange = getVisibleBufferRange(@editor)
+    @clearHighlightSearch()
+    return if matchScopes(@editorElement, settings.get('highlightSearchExcludeScopes'))
 
-    @clearHighlightSearch() if @highlightSearchMarkers
-    if settings.get('highlightSearch') and globalState.highlightSearchPattern?
-      @highlightSearchMarkers = @highlightSearch()
+    if settings.get('highlightSearch') and @main.highlightSearchPattern?
+      @highlightSearchMarkers = @highlightSearch(@main.highlightSearchPattern, scanRange)
+
+  # rangeMarkers for narrowRange
+  # -------------------------
+  addRangeMarkers: (markers) ->
+    @rangeMarkers.push(markers...)
+    @toggleClassList('with-range-marker', @hasRangeMarkers())
+
+  hasRangeMarkers: ->
+    @rangeMarkers.length > 0
+
+  getRangeMarkers: (markers) ->
+    @rangeMarkers
+
+  clearRangeMarkers: ->
+    marker.destroy() for marker in @rangeMarkers
+    @rangeMarkers = []
+    @toggleClassList('with-range-marker', @hasRangeMarkers())

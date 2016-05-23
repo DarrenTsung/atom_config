@@ -1,0 +1,19 @@
+"detectivematch-unity":
+  title: "DetectiveMatch-Unity"
+  paths: [
+    "/Users/darren/Projects/storm8/s8unity_shared"
+    "/Users/darren/Projects/storm8/detectivematch"
+  ]
+"detectivematch-server":
+  title: "DetectiveMatch-Server"
+  paths: [
+    "/Users/darren/Projects/storm8/phpdev"
+    "/Users/darren/Projects/storm8/casualdev/base"
+    "/Users/darren/Projects/storm8/casualdev/detectivematch"
+  ]
+"bingo-unity":
+  title: "Bingo-Unity"
+  paths: [
+    "/Users/darren/Projects/storm8/bingo"
+    "/Users/darren/Projects/storm8/s8unity_shared"
+  ]

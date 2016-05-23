@@ -1,8 +1,10 @@
-# Refactoring status: 70%
 _ = require 'underscore-plus'
-{Range, Point} = require 'atom'
+{Range, Point, Disposable} = require 'atom'
 {inspect} = require 'util'
 swrap = require '../lib/selection-wrapper'
+
+KeymapManager = atom.keymaps.constructor
+{normalizeKeystrokes} = require(atom.config.resourcePath + "/node_modules/atom-keymap/lib/helpers")
 
 supportedModeClass = [
   'normal-mode'
@@ -14,7 +16,6 @@ supportedModeClass = [
   'characterwise'
 ]
 
-packageName = 'vim-mode-plus'
 class SpecError
   constructor: (@message) ->
     @name = 'SpecError'
@@ -27,58 +28,88 @@ getView = (model) ->
 dispatch = (target, command) ->
   atom.commands.dispatch(target, command)
 
-mockPlatform = (editorElement, platform) ->
+withMockPlatform = (target, platform, fn) ->
   wrapper = document.createElement('div')
   wrapper.className = platform
-  wrapper.appendChild(editorElement)
+  wrapper.appendChild(target)
+  fn()
+  target.parentNode.removeChild(target)
 
-unmockPlatform = (editorElement) ->
-  editorElement.parentNode.removeChild(editorElement)
+buildKeydownEvent = (key, options) ->
+  KeymapManager.buildKeydownEvent(key, options)
 
-dispatchKeyboardEvent = (target, eventArgs...) ->
-  e = document.createEvent('KeyboardEvent')
-  e.initKeyboardEvent(eventArgs...)
-  # 0 is the default, and it's valid ASCII, but it's wrong.
-  if e.keyCode is 0
-    Object.defineProperty(e, 'keyCode', get: -> undefined)
-  target.dispatchEvent e
+buildKeydownEventFromKeystroke = (keystroke, target) ->
+  modifier = ['ctrl', 'alt', 'shift', 'cmd']
+  parts = if keystroke is '-'
+    ['-']
+  else
+    keystroke.split('-')
 
-dispatchTextEvent = (target, eventArgs...) ->
-  e = document.createEvent('TextEvent')
-  e.initTextEvent(eventArgs...)
-  target.dispatchEvent e
+  options = {target}
+  key = null
+  for part in parts
+    if part in modifier
+      options[part] = true
+    else
+      key = part
+  key = ' ' if key is 'space'
+  buildKeydownEvent(key, options)
 
-keydown = (key, {element, ctrl, shift, alt, meta, raw}={}) ->
-  unless key is 'escape' or raw?
-    key = "U+#{key.charCodeAt(0).toString(16)}"
-  element ?= document.activeElement
+buildTextInputEvent = (key) ->
   eventArgs = [
-    false, # bubbles
-    true, # cancelable
-    null, # view
-    key,  # key
-    0,    # location
-    ctrl, alt, shift, meta
+    true # bubbles
+    true # cancelable
+    window # view
+    key  # key char
   ]
+  event = document.createEvent('TextEvent')
+  event.initTextEvent("textInput", eventArgs...)
+  event
 
-  canceled = not dispatchKeyboardEvent(element, 'keydown', eventArgs...)
-  # [FIXME] I think I can remove keypress event dispatch.
-  dispatchKeyboardEvent(element, 'keypress', eventArgs...)
-  unless canceled
-    if dispatchTextEvent(element, 'textInput', eventArgs...)
-      element.value += key
-  dispatchKeyboardEvent(element, 'keyup', eventArgs...)
+getHiddenInputElementForEditor = (editor) ->
+  editorElement = atom.views.getView(editor)
+  editorElement.component.hiddenInputComponent.getDomNode()
+
+# FIX orignal characterForKeyboardEvent(it can't handle 'space')
+characterForKeyboardEvent = (event) ->
+  unless event.ctrlKey or event.altKey or event.metaKey
+    if key = atom.keymaps.keystrokeForKeyboardEvent(event)
+      key = ' ' if key is 'space'
+      key = key[key.length - 1] if key.startsWith('shift-')
+      key if key.length is 1
+
+# --[START] I want to use this in future
+newKeydown = (key, target) ->
+  target ?= document.activeElement
+  event = buildKeydownEventFromKeystroke(key, target)
+  atom.keymaps.handleKeyboardEvent(event)
+
+  # unless event.defaultPrevented
+  #   editor = atom.workspace.getActiveTextEditor()
+  #   target = getHiddenInputElementForEditor(editor)
+  #   char = ' ' if key is 'space'
+  #   char ?= characterForKeyboardEvent(event)
+  #   target.dispatchEvent(buildTextInputEvent(char)) if char?
+
+newKeystroke = (keystrokes, target) ->
+  for key in normalizeKeystrokes(keystrokes).split(/\s+/)
+    newKeydown(key, target)
+# --[END] I want to use this in future
+
+keydown = (key, options) ->
+  event = buildKeydownEvent(key, options)
+  atom.keymaps.handleKeyboardEvent(event)
 
 _keystroke = (keys, event) ->
   if keys in ['escape', 'backspace']
-    keydown keys, event
+    keydown(keys, event)
   else
     for key in keys.split('')
       if key.match(/[A-Z]/)
         event.shift = true
       else
         delete event.shift
-      keydown key, event
+      keydown(key, event)
 
 isPoint = (obj) ->
   if obj instanceof Point
@@ -121,21 +152,15 @@ getVimState = (args...) ->
     when 2 then [file, callback] = args
 
   waitsForPromise ->
-    atom.packages.activatePackage(packageName)
+    atom.packages.activatePackage('vim-mode-plus')
 
   waitsForPromise ->
     file = atom.project.resolvePath(file) if file
-    atom.workspace.open(file).then (e) ->
-      editor = e
+    atom.workspace.open(file).then (e) -> editor = e
 
   runs ->
-    pack = atom.packages.getActivePackage(packageName)
-    main = pack.mainModule
+    main = atom.packages.getActivePackage('vim-mode-plus').mainModule
     vimState = main.getEditorState(editor)
-    {editorElement} = vimState
-    editorElement.addEventListener 'keydown', (e) ->
-      atom.keymaps.handleKeyboardEvent(e)
-
     callback(vimState, new VimEditor(vimState))
 
 class TextData
@@ -317,8 +342,9 @@ class VimEditor
       expect(@editorElement.classList.contains(m)).toBe(false)
 
   # Public
+  # options
+  # - waitsForFinish
   keystroke: (keys, options={}) =>
-    {element} = options
     if options.waitsForFinish
       finished = false
       @vimState.onDidFinishOperation -> finished = true
@@ -329,35 +355,19 @@ class VimEditor
 
     # keys must be String or Array
     # Not support Object for keys to avoid ambiguity.
-    element ?= @editorElement
-    mocked = null
-    keys = [keys] unless _.isArray(keys)
+    target = @editorElement
 
-    for k in keys
+    for k in toArray(keys)
       if _.isString(k)
-        _keystroke(k, {element})
+        newKeystroke(k, target)
       else
         switch
-          when k.platform?
-            mockPlatform(element, k.platform)
-            mocked = true
-          when k.char?
-            chars =
-              # [FIXME] Cause insertText('escape'), useless.
-              if k.char in ['', 'escape']
-                toArray(k.char)
-              else
-                k.char.split('')
-            for c in chars
-              @vimState.input.view.editor.insertText(c)
+          when k.input?
+            @vimState.input.editor.insertText(k.input)
           when k.search?
-            {editor, editorElement} = @vimState.searchInput.view
-            editor.insertText(k.search)
-            atom.commands.dispatch(editorElement, 'core:confirm')
-          when k.ctrl? then _keystroke(k.ctrl, {ctrl: true, element})
-          when k.cmd? then _keystroke(k.cmd, {meta: true, element})
-          when k.raw? then _keystroke(k.raw, {raw: true, element})
-    if mocked
-      unmockPlatform(element)
+            @vimState.searchInput.editor.insertText(k.search)
+            atom.commands.dispatch(@vimState.searchInput.editorElement, 'core:confirm')
+          else
+            newKeystroke(k, target)
 
-module.exports = {getVimState, getView, dispatch, TextData}
+module.exports = {getVimState, getView, dispatch, TextData, withMockPlatform}

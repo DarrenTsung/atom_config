@@ -1,33 +1,42 @@
 _ = require 'underscore-plus'
 {
-  selectVisibleBy
-  sortRanges
   getIndex
   highlightRanges
   smartScrollToBufferPosition
+  getVisibleBufferRange
 } = require './utils'
-settings = require './settings'
 
 class MatchList
   index: null
   entries: null
 
-  constructor: (@vimState, ranges, index) ->
-    {@editor, @editorElement} = @vimState
+  @fromScan: (editor, {fromPoint, pattern, direction, countOffset}) ->
+    index = 0
+    ranges = []
+    editor.scan pattern, ({range}) ->
+      ranges.push range
+
+    if direction is 'backward'
+      reversed = ranges.slice().reverse()
+      current = _.detect(reversed, ({start}) -> start.isLessThan(fromPoint))
+      current ?= _.last(ranges)
+    else if direction is 'forward'
+      current = _.detect(ranges, ({start}) -> start.isGreaterThan(fromPoint))
+      current ?= ranges[0]
+
+    index = ranges.indexOf(current)
+    index = getIndex(index + countOffset, ranges)
+    new this(editor, ranges, index)
+
+  constructor: (@editor, ranges, @index) ->
     @entries = []
     return unless ranges.length
+    @entries = ranges.map (range) =>
+      new Match(@editor, range)
 
-    # ranges are initially not sorted, so we sort and adjust index here.
-    current = ranges[getIndex(index, ranges)]
-    ranges = sortRanges(ranges)
-    @index = ranges.indexOf(current)
-
-    [first, others..., last] = ranges
-    for range in ranges
-      @entries.push new Match @vimState, range,
-        first: range is first
-        last: range is last
-        current: range is current
+    [first, others..., last] = @entries
+    first.first = true
+    last?.last = true
 
   isEmpty: ->
     @entries.length is 0
@@ -44,58 +53,37 @@ class MatchList
     match.current = true
     match
 
+  getCurrentStartPosition: ->
+    @get().getStartPoint()
+
   getVisible: ->
-    selectVisibleBy @editor, @entries, (m) ->
-      m.range
+    range = getVisibleBufferRange(@editor)
+    @entries.filter (match) ->
+      range.intersectsWith(match.range)
 
-  getOffSetPixelHeight: (lineDelta=0) ->
-    scrolloff = 2
-    @editor.getLineHeightInPixels() * (2 + lineDelta)
-
-  # make prev entry of first visible entry to bottom of screen
-  scroll: (direction) ->
-    switch direction
-      when 'next'
-        return if (match = _.last(@getVisible())).isLast()
-        step = +1
-        offsetPixel = @getOffSetPixelHeight()
-      when 'prev'
-        return if (match = _.first(@getVisible())).isFirst()
-        step = -1
-        offsetPixel = (@editorElement.getHeight() - @getOffSetPixelHeight(1))
-
-    @setIndex (@entries.indexOf(match) + step)
-    point = @editor.screenPositionForBufferPosition match.getStartPoint()
-    scrollTop = @editorElement.pixelPositionForScreenPosition(point).top
-    @editor.setScrollTop (scrollTop -= offsetPixel)
-
-  show: ->
+  refresh: ->
     @reset()
-    for m in @getVisible()
-      m.show()
+    for match in @getVisible()
+      match.show()
 
   reset: ->
-    m.reset() for m in @entries
+    for match in @entries
+      match.reset()
 
   destroy: ->
-    m.destroy() for m in @entries
+    for match in @entries
+      match.destroy()
     {@entries, @index, @editor} = {}
 
-  showHover: ({timeout}) ->
-    current = @get()
-    if settings.get('showHoverSearchCounter')
-      @vimState.hoverSearchCounter.withTimeout current.range.start,
-        text: "#{@index + 1}/#{@entries.length}"
-        classList: current.getClassList()
-        timeout: timeout
+  getCounterText: ->
+    "#{@index + 1}/#{@entries.length}"
 
 class Match
   first: false
   last: false
   current: false
 
-  constructor: (@vimState, @range, {@first, @last, @current}) ->
-    {@editor} = @vimState
+  constructor: (@editor, @range) ->
 
   getClassList: ->
     # first and last is exclusive, prioritize 'first'.
@@ -104,10 +92,6 @@ class Match
     classes.push('last') if (not @first and @last)
     classes.push('current') if @current
     classes
-
-  isFirst: -> @first
-  isLast: -> @last
-  isCurrent: -> @current
 
   compare: (other) ->
     @range.compare(other.range)
@@ -118,38 +102,31 @@ class Match
   getStartPoint: ->
     @range.start
 
-  visit: ->
+  scrollToStartPoint: ->
     point = @getStartPoint()
+    @editor.unfoldBufferRow(point.row)
     smartScrollToBufferPosition(@editor, point)
-    if @editor.isFoldedAtBufferRow(point.row)
-      @editor.unfoldBufferRow point.row
 
   # Flash only single match at the given moment.
   markersForFlash = null
-  flash: ->
+  flash: (options) ->
     markersForFlash?[0]?.destroy()
-    if settings.get('flashOnSearch')
-      markersForFlash = highlightRanges @editor, @range,
-        class: 'vim-mode-plus-flash'
-        timeout: settings.get('flashOnSearchDuration')
+    markersForFlash = highlightRanges @editor, @range,
+      class: options.class
+      timeout: options.timeout
 
   show: ->
     classes = ['vim-mode-plus-search-match'].concat(@getClassList()...)
-
-    @marker = @editor.markBufferRange @range,
-      invalidate: 'never'
-      persistent: false
-
+    @marker = @editor.markBufferRange(@range)
     @editor.decorateMarker @marker,
       type: 'highlight'
       class: classes.join(" ")
 
   reset: ->
     @marker?.destroy()
-    @marker = null
 
   destroy: ->
-    @marker?.destroy()
-    {@marker, @vimState, @range, @editor, @first, @last, @current} = {}
+    @reset()
+    {@marker, @range, @editor, @first, @last, @current} = {}
 
 module.exports = {MatchList}

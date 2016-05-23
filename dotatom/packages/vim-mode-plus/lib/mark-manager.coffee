@@ -26,12 +26,17 @@ class MarkManager
     if start? and end?
       new Range(start, end)
 
+  setRange: (startMark, endMark, range) ->
+    {start, end} = Range.fromObject(range)
+    @set(startMark, start)
+    @set(endMark, end)
+
   # [FIXME] Need to support Global mark with capital name [A-Z]
   set: (name, point) ->
     return unless @isValid(name)
-    point = @editor.clipBufferPosition(point)
-    @marks[name] = @editor.markBufferPosition point,
-      invalidate: 'never',
-      persistent: false
+    bufferPosition = @editor.clipBufferPosition(point)
+    @marks[name] = @editor.markBufferPosition(bufferPosition)
+    event = {name, bufferPosition, @editor}
+    @vimState.emitter.emit('did-set-mark', event)
 
 module.exports = MarkManager

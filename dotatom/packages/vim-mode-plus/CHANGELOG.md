@@ -1,3 +1,150 @@
+# 0.41.0:
+- New: Add service `observeVimStates`, `onDidAddVimState` and `vimState::onDidSetMark` #276
+
+# 0.40.1:
+- Breaking: Rename `split-character` to `split-by-character`.
+- Fix: `ctrl-y`, `ctrl-e`. Just follow original vim-mode fix. #275
+
+# 0.40.0:
+- Improve: Test spec now support more concise keystroke syntax and all spec rewritten to use new keystroke #270
+- New: add experimental `startInInsertModeScopes` configuration to selectively start in `insert-mode` for specified scopes.
+
+# 0.39.0:
+- Improve: Now selectAllInRangeMarker can pick word from visual selection.
+- Improve: selectAllInRangeMarker can switch regex's word boundary option \b based if in visual-mode.
+- New: Motion YankToLastCharacterOfLine for user who don't like default `Y` include newline #265.
+- New: New setting option to suppress highlightSearch for certain scopes
+- Improve: No longer use custom marker property since it's deprecated in v1.9.0 #242
+- Improve: Use display-layer methods #242
+- Improve: Use clipDirection instead of clip for screenPosition clipping #242
+- Fix: `w` now can move to next line in CRLF file #267
+
+# 0.38.0:
+- Improve: #259 `*`, `#` now pick search word under cursor in the same manner where selection.selectWord() pick word.
+- Breaking: #259 Remove hidden `vim-mode-plus.iskeyword` configuration option.
+- Fix: Make `MoveToMark` executable from command-pallate #252, #254.
+- Improve: highlightSearch no longer extend highlight marker even when character inserted at intersecting tail.
+- Improve: #262 Now `maximize-pane` can maximize none-editor paneItem such as setting-view, markdown-preview.
+- Breaking: #262 `maximize-pane` is mapped from `ctrl-w z`(for all) and `cmd-enter`(for mac) by default.
+- New: #262 New config `hideTabBarOnMaximizePane`(enabled by default). Disabling it keep tab-bar when maximized.
+- Fix: #258 `f` command occasionally throw error, so I simply revert to former code which use panel to attach hidden mini-editor.
+
+# 0.37.1:
+- Fix: #258 `f`, `F` fail after paneItem change then back to original paneItem.
+
+# 0.37.0:
+- Fix: #252, #254 No longer use input mini editor for single char input for mark
+- Internal: make command event accessible via vimState while running command
+- Improve: If hide option is set on Input::focus() it don't add Panel
+- Fix: #253 fix `r` in vB
+
+# 0.36.0:
+- Internal: Eliminate view/model separation for Hover and HoverElement.
+- New: `SearchMatchForward`(`gn`), `SearchMatchBackward`(`gN`) text-object. #241
+- Fix: Don't clear maximized state when active item changed in same pane #244
+- New: AddSelection operator #245
+- Dev: add `npm run watch`
+- New: Preserve `<`, `>` mark for visual start and end.
+- New: PreviousSelection text-object vB still not supported #246
+- New: MarkRange operator and MarkedRange text-object #249
+- New: Config option to clear HighlightSearch and RangeMarker on `escape` in normal-mode. #250
+- Improve: Support `InsertAtStartOfSelection` from vC mode, no longer need to enter vB only for insert at start of selection.
+- Breaking: MoveTo(Previous/Next)FoldStart no longer linewise motion.
+- New: General insertion operator `MotionByTarget`
+- New Experimental new Operator `SetCursorsToStartOfTarget` and MarkedRange precomposed version.
+- Internal: Do editorElement className update manually.
+
+# 0.35.1:
+- Fix: Ignore `mouseup` event handling on `insert` mode #240
+
+# 0.35.0:
+- Internal: Gradually making motion into pure point calculator #225
+- Improve: Operate on same range on `.` repeat even if `stayOnTransformString` was enabled #235
+- New: MoveToColumn motion. Default keymap is `|`. #230
+- Improve: `dblclick` correctly activate visual mode, simplify mouse event observer. #228
+- Improve: Better integration with Atom's native commands(e.g `cmd-l`) #239
+
+# 0.34.0:
+- Fix: `gg`, `GG` throw error when destination row was blank line. #233
+- Fix: Critical bug TextBuffer.history pollyfilled multiple times because of incorrect guard #229
+
+# 0.33.0:
+- Support: set minimum engines to 1.7.0 above.
+- Internal: Cleanup blockwise-selection.
+- Internal: Now modeManager::activate take only true mode(no longer handle `reset`, `previous` as former version).
+- Breaking: Rename `activate-previous-visual-mode` to `select-previous-selection`
+- Experiment: Trying to not depend on atom's Selection::selectWord. #225
+- Experiment: Trying being independent from atom's imperative cursor motion. #225
+- Breaking: #224 remove Move(Up|Down)ToNonBlank
+- Fix: Don't move cursor up when inserting single white space at column 0 #226
+- Fix: To support Atom v1.7.0, polyfill for TextBuffer::history.getChangesSinceCheckPoint #229
+- Fix: `cc`, `S` ignore auto indent on Atom v1.7.0 #231
+
+# 0.32.1:
+- Fix: Uncaught error on `y`, `gU` etc.. in `vB` when `stayOnYank`, `stayOnOperator` enabled #221.
+
+# 0.32.0:
+- Improve: Further coverage of `gv` support. Not yet complete but much better.
+- Improve: Respect `stayOnYank`, `stanOnOperate` on `visual-mode` #221
+- Fix: `TransformStringByExternalCommand` throw error on `OperationStack::finish` because of incorrect argument.
+- Fix: Correctly unfocus input mini editor when `SurroundAnyPair` can't find(detect) pair chars..
+- Internal: Update charactewrise selection properties in `visual-mode` selection modification by Motion, TextObject.
+- Improve: Don't flash in `visual-mode` even if `flashOnOperate` have enabled.
+
+# 0.31.0:                   
+- Fix: Guard for calling `refreshHighlightSearch` against destroyed editor #196
+- Internal: Quit model, view separation for `Input` and `SearchInput`
+- Rename: `misc-commands.coffee` to `misc-command.coffee`
+- Internal: move `scroll.coffee` code to `misc-command.coffee`
+- New: add `SmartWord` based motions(`MoveToNextSmartWord`, `MoveToPreviousSmartWord`, `MoveToEndOfSmartWord`)
+- Fix: `goalColumn` incorrectly reset on `vL` mode. #220
+- Improve: keep `goalColumn` in `vL` to `vC`, `vC` to `n`.
+
+# 0.30.0
+- Fix: No longer necessary to set `editor.useShadowDOM` enabled to use vmp #218
+- New: [Experimental] Set `yank-pending`, `delete-pending` scope for granular keymap setting #215.
+
+# 0.29.0
+- Improve: cleanup `operation-stack.coffee`
+- Internal: New convention. use `Operator::mutateSelection`
+- Improve: Reduce complexity for MoveToNextWord #200
+- Internal: improve Base::countTimes pass isLast as 2nd arg
+- Fix: For `$` motion with count now correctly move to end of line of Nth line blow.
+- Improve: Now support all motion in `visual-blockwise` #213
+- Internal: Remove many visual-blockwise special code #213
+
+# 0.28.0
+- Internal: Each command class can answer its description.
+- Internal: Generate summary table for all commands.
+- Internal: Remove VisualBlockwise class #210.
+- Improve: `c` on visual-blockwise now keep multi-cursors.
+- Fix: null guard in case Patch is not yet available for >=Atom v1.7.0-beta0
+
+# 0.27.0
+- Internal: Refactoring many parts(Search, MatchList, ModeManager, OperationStack) #200
+- Improve: Support upcoming Atom 1.7+ text-buffer change #206, #203
+- New: New Motion for alphaNumeric word family #207
+  - MoveToNextAlphanumericWord for `w`
+  - MoveToPreviousAlphanumericWord for `b`
+  - MoveToEndOfAlphanumericWord for `e`
+- Fix: Tweak L(MoveToBottomOfScreen) motion don't cause scroll.
+- Internal: Reuse Select, CurrentSelection instance, hope improve #162
+- Internal: Introduce Sugar methods on Base.prototype for instanceof check
+
+# 0.26.1
+- Fix: `n`, `N` in different editor cause `flashScreen` is not function.
+
+# 0.26.0
+- Breaking: Remove scroll among search matched feature #201
+- Breaking: Literal input mode in Search input field is now achieved by standard selector-specific keymap.
+ User who used this feature in older version need to update keymap selector to `atom-text-editor.vim-mode-plus-search:not(.literal-mode)`.
+ See example in [wiki/Keymap-example](https://github.com/t9md/atom-vim-mode-plus/wiki/Keymap-example)
+- Internal: cleanup `Search`, `SearchCurrentWord`.
+- Fix: Use new pane split feature from Atom v1.6.0 #204
+- Support: set minimum engines to 1.6.0 above #204
+- Breaking: Remove semi-broken `disableInputMethodExceptInsertMode` setting #205
+- Fix: `o` after `Vjj` then `cmd-shift-d` display cursor incorrect position(cosmetic). #202
+
 # 0.25.0
 - Improve: #192 Keep original visible area as much as possible when scrolling by `n`, `N`, `/`, `?` to avoid mental context switching
 - New: delete/change-any-pair-allow-forwarding. More powerful version of existing `change-surround-any-pair` and `delete-surround-any-pair` #194

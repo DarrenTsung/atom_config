@@ -22,64 +22,64 @@ describe "Motion Scroll", ->
       jasmine.attachToDOM(editorElement)
 
   afterEach ->
-    vimState.activate('reset')
+    vimState.resetNormalMode()
 
   describe "the ctrl-u keybinding", ->
     it "moves the screen down by half screen size and keeps cursor onscreen", ->
-      ensure [ctrl: 'u'],
+      ensure 'ctrl-u',
         scrollTop: 300
         cursor: [32, 0]
 
     it "selects on visual mode", ->
       set cursor: [42, 1]
-      ensure ['v', ctrl: 'u'],
+      ensure 'v ctrl-u',
         selectedText: text.getLines([32..42], chomp: true)
 
     it "selects on linewise mode", ->
-      ensure ['V', ctrl: 'u'],
+      ensure 'V ctrl-u',
         selectedText: text.getLines([32..42])
 
   describe "the ctrl-b keybinding", ->
     it "moves screen up one page", ->
-      ensure {ctrl: 'b'},
+      ensure 'ctrl-b',
         scrollTop: 200
         cursor: [22, 0]
 
     it "selects on visual mode", ->
       set cursor: [42, 1]
-      ensure ['v', {ctrl: 'b'}],
+      ensure 'v ctrl-b',
         selectedText: text.getLines([22..42], chomp: true)
 
     it "selects on linewise mode", ->
-      ensure ['V', {ctrl: 'b'}],
+      ensure 'V ctrl-b',
         selectedText: text.getLines([22..42])
 
   describe "the ctrl-d keybinding", ->
     it "moves the screen down by half screen size and keeps cursor onscreen", ->
-      ensure [ctrl: 'd'],
+      ensure 'ctrl-d',
         scrollTop: 500
         cursor: [52, 0]
 
     it "selects on visual mode", ->
       set cursor: [42, 1]
-      ensure ['v', ctrl: 'd'],
+      ensure 'v ctrl-d',
         selectedText: text.getLines([42..52], chomp: true).slice(1, -1)
 
     it "selects on linewise mode", ->
-      ensure ['V', ctrl: 'd'],
+      ensure 'V ctrl-d',
         selectedText: text.getLines([42..52])
 
   describe "the ctrl-f keybinding", ->
     it "moves screen down one page", ->
-      ensure [ctrl: 'f'],
+      ensure 'ctrl-f',
         scrollTop: 600
         cursor: [62, 0]
 
     it "selects on visual mode", ->
       set cursor: [42, 1]
-      ensure ['v', ctrl: 'f'],
+      ensure 'v ctrl-f',
         selectedText: text.getLines([42..62], chomp: true).slice(1, -1)
 
     it "selects on linewise mode", ->
-      ensure ['V', ctrl: 'f'],
+      ensure 'V ctrl-f',
         selectedText: text.getLines([42..62])

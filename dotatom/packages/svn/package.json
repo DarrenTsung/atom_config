@@ -1,7 +1,7 @@
 {
   "name": "svn",
   "main": "./lib/svn",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Marks lines/files in the editor gutter/treeview that have been added, edited, or deleted since the last commit.",
   "keywords": [
     "svn",
@@ -46,10 +46,10 @@
     "url": "https://github.com/andischerer/atom-svn/issues"
   },
   "homepage": "https://github.com/andischerer/atom-svn#readme",
-  "_id": "svn@0.0.9",
-  "_shasum": "384b74d632a97798ba2ab69db45f61a06b172a95",
-  "_resolved": "file:../d-116025-63969-ktesee/package.tgz",
-  "_from": "../d-116025-63969-ktesee/package.tgz",
+  "_id": "svn@0.0.10",
+  "_shasum": "807981bc73f479a45c00b3e05f5e146d6e59d377",
+  "_resolved": "file:../d-11649-54824-wwozve/package.tgz",
+  "_from": "../d-11649-54824-wwozve/package.tgz",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [

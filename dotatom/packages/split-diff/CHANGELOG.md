@@ -1,4 +1,54 @@
-## ?.?.? - ???
+## 0.8.3 - 2016-05-16
+* Fixed loading modal appearing forever after diff computes quickly #47
+
+## 0.8.2 - 2016-05-16
+* Fixed left editor remains soft wrapped #46
+* Fixed "Copy to Left" command not working #45
+
+## 0.8.1 - 2016-05-14
+* Remove typo in main package file #44 - thanks valepu!
+
+## 0.8.0 - 2016-05-13
+* Added "Copy to Right" and "Copy to Left" palette commands, which partially adds #14
+* Fixed error when trying to diff using a non-git repo #43
+
+## 0.7.5 - 2016-04-21
+* Improved highlighting performance
+* Fixed diffing huge files freezes editor #6
+* Added loading indicator for files that are taking over one second to diff
+* Fixed failure when diffing a file located in a git directory, but isn't tracked #36
+
+## 0.7.4 - 2016-04-16
+* Fixed no paste help message for two empty editors #35
+* Added close pane and untitled file on toggle #30
+
+## 0.7.3 - 2016-04-11
+* Now using placeholder text to display help message #32
+* Fixed a bug where diff was updated twice on initial run
+* Fixed a bug where scroll was not synced on initial run
+* Added setting to sync horizontal scrolling #29
+
+## 0.7.2 - 2016-04-08
+* Fixed package disabling immediately in 1.7 beta #28
+
+## 0.7.1 - 2016-04-06
+* Fixed next/previous diff starting from beginning of file after change #25
+
+## 0.7.0 - 2016-04-05
+* Added ability to display diff of git changes #8
+* Fixed deprecations about TextEditor #24 - thanks itiut!
+* Fixed reenabling soft wrap throwing an exception
+
+## 0.6.3 - 2016-03-30
+* Removed debugging print statement #23 - thanks itiut!
+
+## 0.6.2 - 2016-03-26
+* Refactored for #18 to use block decorations for space between chunks
+* Changed setting/code for "Diff Line Characters" to "Show Word Diff"
+* Fixed a bug where next/prev diff wouldn't be reset between sessions
+* Updated demo gif
+
+## 0.6.1 - 2016-03-24
 * Added Left/Right Editor Color settings
 * Fixed a bug where char diff would be at the wrong position
 * Updated application and context menus to be smarter

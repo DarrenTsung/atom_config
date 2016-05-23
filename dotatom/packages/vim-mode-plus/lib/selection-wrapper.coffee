@@ -1,38 +1,102 @@
 _ = require 'underscore-plus'
-{Range} = require 'atom'
+{Range, Disposable} = require 'atom'
 {isLinewiseRange} = require './utils'
 
+propertyStorage = null
+
+getClipOptions = (editor, direction) ->
+  if editor.displayLayer?
+    {clipDirection: direction}
+  else
+    switch direction
+      when 'backward' then {clip: direction}
+      when 'forward' then {clip: direction, wrapBeyondNewlines: true}
+
 class SelectionWrapper
-  scope: 'vim-mode-plus'
+  @init: ->
+    propertyStorage = new Map()
+    new Disposable ->
+      propertyStorage.clear()
+      propertyStorage = null
 
   constructor: (@selection) ->
 
-  getProperties: ->
-    @selection.marker.getProperties()[@scope] ? {}
+  hasProperties: ->
+    propertyStorage.has(@selection)
 
-  setProperties: (newProp) ->
-    prop = {}
-    prop[@scope] = newProp
-    @selection.marker.setProperties prop
+  getProperties: ->
+    propertyStorage.get(@selection) ? {}
+
+  setProperties: (prop) ->
+    propertyStorage.set(@selection, prop)
 
   resetProperties: ->
-    @setProperties null
+    propertyStorage?.delete(@selection)
 
   setBufferRangeSafely: (range) ->
     if range
-      @setBufferRange(range, {autoscroll: false})
+      @setBufferRange(range)
       if @selection.isLastSelection()
         @selection.cursor.autoscroll()
 
   getBufferRange: ->
     @selection.getBufferRange()
 
+  getNormalizedBufferPosition: ->
+    point = @selection.getHeadBufferPosition()
+    if @isForwarding()
+      {editor} = @selection
+      screenPoint = editor.screenPositionForBufferPosition(point).translate([0, -1])
+      options = getClipOptions(editor, 'backward')
+      editor.bufferPositionForScreenPosition(screenPoint, options)
+    else
+      point
+
+  # Return function to dispose(=revert) normalization.
+  normalizeBufferPosition: ->
+    head = @selection.getHeadBufferPosition()
+    point = @getNormalizedBufferPosition()
+    @selection.modifySelection =>
+      @selection.cursor.setBufferPosition(point)
+
+    new Disposable =>
+      unless head.isEqual(point)
+        @selection.modifySelection =>
+          @selection.cursor.setBufferPosition(head)
+
+  getBufferPositionFor: (which, {fromProperty}={}) ->
+    fromProperty ?= false
+    if fromProperty and @hasProperties()
+      {head, tail} = @getProperties()
+      if head.isGreaterThanOrEqual(tail)
+        [start, end] = [tail, head]
+      else
+        [start, end] = [head, tail]
+    else
+      {start, end} = @selection.getBufferRange()
+      head = @selection.getHeadBufferPosition()
+      tail = @selection.getTailBufferPosition()
+
+    switch which
+      when 'start' then start
+      when 'end' then end
+      when 'head' then head
+      when 'tail' then tail
+
+  # options: {fromProperty}
+  setBufferPositionTo: (which, options) ->
+    point = @getBufferPositionFor(which, options)
+    @selection.cursor.setBufferPosition(point)
+
+  mergeBufferRange: (range, option) ->
+    @setBufferRange(@getBufferRange().union(range), option)
+
   reverse: ->
     @setReversedState(not @selection.isReversed())
 
-    {head, tail} = @getProperties().characterwise ? {}
+    {head, tail} = @getProperties()
     if head? and tail?
-      @setProperties characterwise: head: tail, tail: head
+      @setProperties(head: tail, tail: head)
 
   setReversedState: (reversed) ->
     @setBufferRange @getBufferRange(), {autoscroll: true, reversed, preserveFolds: true}
@@ -58,7 +122,7 @@ class SelectionWrapper
     if preserveGoalColumn
       {goalColumn} = @selection.cursor
 
-    @selectRowRange @selection.getBufferRowRange()
+    @selectRowRange(@selection.getBufferRowRange())
     @selection.cursor.goalColumn = goalColumn if goalColumn
 
   getBufferRangeForTailRow: ->
@@ -73,66 +137,69 @@ class SelectionWrapper
       {editor} = @selection
       start = @selection.getTailScreenPosition()
       end = if @selection.isReversed()
-        editor.clipScreenPosition(start.translate([0, -1]), {clip: 'backward'})
+        options = getClipOptions(editor, 'backward')
+        editor.clipScreenPosition(start.translate([0, -1]), options)
       else
-        editor.clipScreenPosition(start.translate([0, +1]), {clip: 'forward', wrapBeyondNewlines: true})
+        options = getClipOptions(editor, 'forward')
+        editor.clipScreenPosition(start.translate([0, +1]), options)
+
       editor.bufferRangeForScreenRange([start, end])
 
   preserveCharacterwise: ->
-    {characterwise} = @detectCharacterwiseProperties()
-    endPoint = if @selection.isReversed() then 'tail' else 'head'
-    point = characterwise[endPoint].translate([0, -1])
-    characterwise[endPoint] = @selection.editor.clipBufferPosition(point)
-    @setProperties {characterwise}
+    properties = @detectCharacterwiseProperties()
+    unless @selection.isEmpty()
+      endPoint = if @selection.isReversed() then 'tail' else 'head'
+      # In case selection is empty, I don't want to translate end position
+      # [FIXME] Check if removing this translation logic can simplify code?
+      point = properties[endPoint].translate([0, -1])
+      properties[endPoint] = @selection.editor.clipBufferPosition(point)
+    @setProperties(properties)
 
   detectCharacterwiseProperties: ->
-    characterwise:
-      head: @selection.getHeadBufferPosition()
-      tail: @selection.getTailBufferPosition()
+    head: @selection.getHeadBufferPosition()
+    tail: @selection.getTailBufferPosition()
 
   getCharacterwiseHeadPosition: ->
-    @getProperties().characterwise?.head
+    @getProperties().head
 
-  selectByProperties: (properties) ->
-    {head, tail} = properties.characterwise
+  selectByProperties: ({head, tail}) ->
     # No problem if head is greater than tail, Range constructor swap start/end.
     @setBufferRange([tail, head])
-    @setReversedState(true) if head.isLessThan(tail)
+    @setReversedState(head.isLessThan(tail))
+
+  # Equivalent to
+  # "not (selection.isReversed() or selection.isEmpty())"
+  isForwarding: ->
+    head = @selection.getHeadBufferPosition()
+    tail = @selection.getTailBufferPosition()
+    head.isGreaterThan(tail)
 
   restoreCharacterwise: (options={}) ->
     {preserveGoalColumn} = options
     {goalColumn} = @selection.cursor if preserveGoalColumn
 
-    unless characterwise = @getProperties().characterwise
-      return
-    {head, tail} = characterwise
-    [start, end] = if @selection.isReversed()
-      [head, tail]
-    else
-      [tail, head]
-    [start.row, end.row] = @selection.getBufferRowRange()
-    @setBufferRange([start, end], {preserveFolds: true})
+    {head, tail} = @getProperties()
+    return unless head? and tail?
+
     if @selection.isReversed()
-      @reverse()
-      @selection.selectRight()
-      @reverse()
+      [start, end] = [head, tail]
     else
-      @selection.selectRight()
-    # [NOTE] Important! reset to null after restored.
+      [start, end] = [tail, head]
+    [start.row, end.row] = @selection.getBufferRowRange()
+
+    editor = @selection.editor
+    screenPoint = editor.screenPositionForBufferPosition(end).translate([0, 1])
+    options = getClipOptions(editor, 'forward')
+    end = editor.bufferPositionForScreenPosition(screenPoint, options)
+
+    @setBufferRange([start, end], {preserveFolds: true})
     @resetProperties()
     @selection.cursor.goalColumn = goalColumn if goalColumn
-
 
   # Only for setting autoscroll option to false by default
   setBufferRange: (range, options={}) ->
     options.autoscroll ?= false
     @selection.setBufferRange(range, options)
-
-  isBlockwiseHead: ->
-    @getProperties().blockwise?.head
-
-  isBlockwiseTail: ->
-    @getProperties().blockwise?.tail
 
   # Return original text
   replace: (text) ->
@@ -162,26 +229,27 @@ class SelectionWrapper
       when not @selection.isEmpty() then 'characterwise'
       else null
 
-  switchToLinewise: (fn) ->
-    @preserveCharacterwise()
-    @expandOverLine(preserveGoalColumn: true)
-    fn()
-    @restoreCharacterwise()
-
 swrap = (selection) ->
   new SelectionWrapper(selection)
+
+swrap.init = ->
+  SelectionWrapper.init()
 
 swrap.setReversedState = (editor, reversed) ->
   editor.getSelections().forEach (selection) ->
     swrap(selection).setReversedState(reversed)
 
-swrap.expandOverLine = (editor) ->
+swrap.expandOverLine = (editor, options) ->
   editor.getSelections().forEach (selection) ->
-    swrap(selection).expandOverLine()
+    swrap(selection).expandOverLine(options)
 
 swrap.reverse = (editor) ->
   editor.getSelections().forEach (selection) ->
     swrap(selection).reverse()
+
+swrap.resetProperties = (editor) ->
+  editor.getSelections().forEach (selection) ->
+    swrap(selection).resetProperties()
 
 swrap.detectVisualModeSubmode = (editor) ->
   selections = editor.getSelections()

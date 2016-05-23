@@ -20,13 +20,18 @@ getOffset = (submode, cursor, isSoftWrapped) ->
         traversal.column -= 1
     when 'linewise'
       bufferPoint = swrap(selection).getCharacterwiseHeadPosition()
+      # FIXME need to update original getCharacterwiseHeadPosition?
+      # to reflect outer vmp command modify linewise selection?
+      [startRow, endRow] = selection.getBufferRowRange()
+      if selection.isReversed()
+        bufferPoint.row = startRow
 
       traversal = if isSoftWrapped
         screenPoint = editor.screenPositionForBufferPosition(bufferPoint)
         screenPoint.traversalFrom(cursor.getScreenPosition())
       else
         bufferPoint.traversalFrom(cursor.getBufferPosition())
-  if not selection.isReversed() and cursor.isAtBeginningOfLine()
+  if not selection.isReversed() and cursor.isAtBeginningOfLine() and submode isnt 'blockwise'
     traversal.row = -1
   traversal
 
@@ -59,7 +64,7 @@ class CursorStyleManager
 
     cursors = cursorsToShow = @editor.getCursors()
     if submode is 'blockwise'
-      cursorsToShow = @vimState.getBlockwiseSelections().map (bs) -> bs.getHead().cursor
+      cursorsToShow = @vimState.getBlockwiseSelections().map (bs) -> bs.getHeadSelection().cursor
 
     # update visibility
     for cursor in cursors
@@ -72,7 +77,7 @@ class CursorStyleManager
     # But corresponding cursorsComponent(HTML element) is added in sync.
     # So to modify style of cursorsComponent, we have to make sure corresponding cursorsComponent
     # is available by component in sync to model.
-    @editorElement.component.updateSync()
+    @editorElement.component.updateSync() if submode in ['characterwise', 'blockwise']
 
     # [FIXME] In spec mode, we skip here since not all spec have dom attached.
     return if isSpecMode

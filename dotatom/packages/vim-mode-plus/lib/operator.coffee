@@ -1,15 +1,12 @@
-# Libraries
-# -------------------------
 LineEndingRegExp = /(?:\n|\r\n)$/
 
 _ = require 'underscore-plus'
 {Point, Range, CompositeDisposable, BufferedProcess} = require 'atom'
 
 {
-  haveSomeSelection, getVimEofBufferPosition
+  haveSomeSelection
   moveCursorLeft, moveCursorRight
   highlightRanges, getNewTextRangeFromCheckpoint
-  preserveSelectionStartPoints
   isEndsWithNewLineForBufferRow
 } = require './utils'
 swrap = require './selection-wrapper'
@@ -22,36 +19,44 @@ class OperatorError extends Base
   constructor: (@message) ->
     @name = 'Operator Error'
 
-# General Operator
 # -------------------------
 class Operator extends Base
   @extend(false)
   recordable: true
-  target: null
   flashTarget: true
   trackChange: false
   requireTarget: true
+  finalMode: "normal"
+  finalSubmode: null
 
   setMarkForChange: ({start, end}) ->
     @vimState.mark.set('[', start)
     @vimState.mark.set(']', end)
 
   needFlash: ->
-    @flashTarget and settings.get('flashOnOperate') and
-      not (@constructor.name in settings.get('flashOnOperateBlacklist'))
+    if not @isMode('visual') and @flashTarget and settings.get('flashOnOperate')
+      @getName() not in settings.get('flashOnOperateBlacklist')
+    else
+      false
 
   needTrackChange: ->
     @trackChange
 
   # [FIXME]
-  # For TextObject isLinewise result is changed before / after select.
-  # This mean @needStay return value change depending on when you call.
+  # For TextObject, isLinewise result is changed before / after select.
+  # This mean return value may change depending on when you call.
   needStay: ->
+    return true if @keepCursorPosition
+
     param = if @instanceof('TransformString')
       "stayOnTransformString"
     else
-      "stayOn#{@constructor.name}"
-    settings.get(param) or (@stayOnLinewise and @target.isLinewise?())
+      "stayOn#{@getName()}"
+
+    if @isMode('visual', 'linewise')
+      settings.get(param)
+    else
+      settings.get(param) or (@stayOnLinewise and @target.isLinewise?())
 
   constructor: ->
     super
@@ -62,27 +67,30 @@ class Operator extends Base
     @initialize?()
     @setTarget @new(@target) if _.isString(@target)
 
-  markSelectedBufferRange: ->
-    @editor.markBufferRange @editor.getSelectedBufferRange(),
-      invalidate: 'never'
-      persistent: false
+  restorePoint: (selection) ->
+    if @wasNeedStay
+      swrap(selection).setBufferPositionTo('head', fromProperty: true)
+    else
+      swrap(selection).setBufferPositionTo('start', fromProperty: true)
 
   observeSelectAction: ->
-    if @needStay()
-      @onWillSelectTarget =>
-        @restorePoint = preserveSelectionStartPoints(@editor)
-    else
-      @onDidSelectTarget =>
-        @restorePoint = preserveSelectionStartPoints(@editor)
+    # Select operator is used only in visual-mode.
+    # visual-mode selection modification should be handled by Motion::select(), TextObject::select()
+    unless @instanceof('Select')
+      if @wasNeedStay = @needStay() # [FIXME] dirty cache
+        unless @isMode('visual')
+          @onWillSelectTarget => @updateSelectionProperties()
+      else
+        @onDidSelectTarget => @updateSelectionProperties()
 
     if @needFlash()
       @onDidSelectTarget =>
-        @flash @editor.getSelectedBufferRanges()
+        @flash(@editor.getSelectedBufferRanges())
 
     if @needTrackChange()
       marker = null
       @onDidSelectTarget =>
-        marker = @markSelectedBufferRange()
+        marker = @editor.markBufferRange(@editor.getSelectedBufferRange())
 
       @onDidFinishOperation =>
         @setMarkForChange(range) if (range = marker.getBufferRange())
@@ -91,11 +99,10 @@ class Operator extends Base
   setTarget: (@target) ->
     unless _.isFunction(@target.select)
       @vimState.emitter.emit('did-fail-to-set-target')
-      targetName = @target.constructor.name
-      operatorName = @constructor.name
-      message = "Failed to set '#{targetName}' as target for Operator '#{operatorName}'"
-      throw new OperatorError(message)
+      throw new OperatorError("#{@getName()} cannot set #{@target.getName()} as target")
+    @target.setOperator(this)
     @emitDidSetTarget(this)
+    this
 
   # Return true unless all selection is empty.
   # -------------------------
@@ -116,16 +123,27 @@ class Operator extends Base
       @vimState.register.set({text, selection})
 
   flash: (ranges) ->
-    if @flashTarget and settings.get('flashOnOperate')
-      highlightRanges @editor, ranges,
-        class: 'vim-mode-plus-flash'
-        timeout: settings.get('flashOnOperateDuration')
+    highlightRanges @editor, ranges,
+      class: 'vim-mode-plus-flash'
+      timeout: settings.get('flashOnOperateDuration')
 
-  eachSelection: (fn) ->
-    return unless @selectTarget()
-    @editor.transact =>
-      for selection in @editor.getSelections()
-        fn(selection)
+  mutateSelections: (fn) ->
+    if @selectTarget()
+      @editor.transact =>
+        fn(selection) for selection in @editor.getSelections()
+
+  execute: ->
+    # We need to preserve selection before selection is cleared as a result of mutation.
+    if @isMode('visual')
+      lastSelection = if @isMode('visual', 'blockwise')
+        @vimState.getLastBlockwiseSelection()
+      else
+        @editor.getLastSelection()
+      @vimState.modeManager.preservePreviousSelection(lastSelection)
+
+    @mutateSelections (selection) =>
+      @mutateSelection(selection)
+    @activateMode(@finalMode, @finalSubmode)
 
 # -------------------------
 class Select extends Operator
@@ -135,7 +153,7 @@ class Select extends Operator
   execute: ->
     @selectTarget()
     return if @isMode('operator-pending') or @isMode('visual', 'blockwise')
-    unless @isMode('visual')
+    if not @isMode('visual')
       submode = swrap.detectVisualModeSubmode(@editor)
       @activateMode('visual', submode)
     else
@@ -146,7 +164,22 @@ class Select extends Operator
 
 class SelectLatestChange extends Select
   @extend()
+  @description: "Select latest yanked or changed range"
   target: 'ALatestChange'
+
+class SelectPreviousSelection extends Operator
+  @extend()
+  requireTarget: false
+  recordable: false
+  @description: "Select last selected visual area in current buffer"
+  execute: ->
+    {properties, submode} = @vimState.modeManager.getPreviousSelectionInfo()
+    return unless properties? and submode?
+
+    selection = @editor.getLastSelection()
+    swrap(selection).selectByProperties(properties)
+    @editor.scrollToScreenRange(selection.getScreenRange(), {center: true})
+    @activateMode('visual', submode)
 
 # -------------------------
 class Delete extends Operator
@@ -155,23 +188,21 @@ class Delete extends Operator
   trackChange: true
   flashTarget: false
 
-  execute: ->
-    @eachSelection (selection) =>
-      {cursor} = selection
-      wasLinewise = swrap(selection).isLinewise()
-      @setTextToRegisterForSelection(selection)
-      selection.deleteSelectedText()
+  mutateSelection: (selection) =>
+    {cursor} = selection
+    wasLinewise = swrap(selection).isLinewise()
+    @setTextToRegisterForSelection(selection)
+    selection.deleteSelectedText()
 
-      vimEof = getVimEofBufferPosition(@editor)
-      if cursor.getBufferPosition().isGreaterThan(vimEof)
-        cursor.setBufferPosition([vimEof.row, 0])
-
-      cursor.skipLeadingWhitespace() if wasLinewise
-    @activateMode('normal')
+    vimEof = @getVimEofBufferPosition()
+    if cursor.getBufferPosition().isGreaterThan(vimEof)
+      cursor.setBufferPosition([vimEof.row, 0])
+    cursor.skipLeadingWhitespace() if wasLinewise
 
 class DeleteRight extends Delete
   @extend()
   target: 'MoveRight'
+  hover: null
 
 class DeleteLeft extends Delete
   @extend()
@@ -180,6 +211,23 @@ class DeleteLeft extends Delete
 class DeleteToLastCharacterOfLine extends Delete
   @extend()
   target: 'MoveToLastCharacterOfLine'
+  initialize: ->
+    if @isVisualBlockwise = @isMode('visual', 'blockwise')
+      @requireTarget = false
+
+  execute: ->
+    if @isVisualBlockwise
+      pointByBlockwiseSelection = new Map
+      @getBlockwiseSelections().forEach (bs) ->
+        bs.removeEmptySelections()
+        bs.setPositionForSelections('start')
+        pointByBlockwiseSelection.set(bs, bs.getStartSelection().getHeadBufferPosition())
+
+    super
+
+    if @isVisualBlockwise
+      pointByBlockwiseSelection.forEach (point, bs) ->
+        bs.setHeadBufferPosition(point)
 
 # -------------------------
 class TransformString extends Operator
@@ -189,12 +237,7 @@ class TransformString extends Operator
   setPoint: true
   autoIndent: false
 
-  execute: ->
-    @eachSelection (selection) =>
-      @mutate(selection)
-    @activateMode('normal')
-
-  mutate: (selection) ->
+  mutateSelection: (selection) ->
     text = @getNewText(selection.getText(), selection)
     selection.insertText(text, {@autoIndent})
     @restorePoint(selection) if @setPoint
@@ -235,6 +278,12 @@ class LowerCase extends TransformString
   getNewText: (text) ->
     text.toLowerCase()
 
+# DUP meaning with SplitString need consolidate.
+class SplitByCharacter extends TransformString
+  @extend()
+  getNewText: (text) ->
+    text.split('').join(' ')
+
 class CamelCase extends TransformString
   @extend()
   displayName: 'Camelize'
@@ -244,6 +293,7 @@ class CamelCase extends TransformString
 
 class SnakeCase extends TransformString
   @extend()
+  @description: "CamelCase -> camel_case"
   displayName: 'Underscore _'
   hover: icon: ':snake-case:', emoji: ':snake:'
   getNewText: (text) ->
@@ -258,12 +308,14 @@ class DashCase extends TransformString
 
 class TitleCase extends TransformString
   @extend()
+  @description: "CamelCase -> Camel Case"
   displayName: 'Titlize'
   getNewText: (text) ->
     _.humanizeEventName(_.dasherize(text))
 
 class EncodeUriComponent extends TransformString
   @extend()
+  @description: "URI encode string"
   displayName: 'Encode URI Component %'
   hover: icon: 'encodeURI', emoji: 'encodeURI'
   getNewText: (text) ->
@@ -271,6 +323,7 @@ class EncodeUriComponent extends TransformString
 
 class DecodeUriComponent extends TransformString
   @extend()
+  @description: "Decode URL encoded string"
   displayName: 'Decode URI Component %%'
   hover: icon: 'decodeURI', emoji: 'decodeURI'
   getNewText: (text) ->
@@ -294,7 +347,7 @@ class TransformStringByExternalCommand extends TransformString
     @stdoutBySelection = new Map
     restorePoint = null
     unless @isMode('visual')
-      restorePoint = preserveSelectionStartPoints(@editor)
+      @updateSelectionProperties()
       @target.select()
 
     running = finished = 0
@@ -311,7 +364,7 @@ class TransformStringByExternalCommand extends TransformString
             resolve() if (running is finished)
 
           @runExternalCommand {command, args, stdout, exit, stdin}
-          restorePoint?(selection)
+          @restorePoint(selection) unless @isMode('visual')
 
   runExternalCommand: (options) ->
     {stdin} = options
@@ -347,8 +400,8 @@ class TransformStringByExternalCommand extends TransformString
 # -------------------------
 class TransformStringBySelectList extends Operator
   @extend()
+  @description: "Transform string by specified oprator selected from select-list"
   requireInput: true
-  requireTarget: true
   # Member of transformers can be either of
   # - Operation class name: e.g 'CamelCase'
   # - Operation class itself: e.g. CamelCase
@@ -389,6 +442,7 @@ class TransformStringBySelectList extends Operator
 
   execute: ->
     # NEVER be executed since operationStack is replaced with selected transformer
+    throw new Error("#{@getName()} should not be executed")
 
 class TransformWordBySelectList extends TransformStringBySelectList
   @extend()
@@ -396,11 +450,13 @@ class TransformWordBySelectList extends TransformStringBySelectList
 
 class TransformSmartWordBySelectList extends TransformStringBySelectList
   @extend()
+  @description: "Transform InnerSmartWord by `transform-string-by-select-list`"
   target: "InnerSmartWord"
 
 # -------------------------
 class ReplaceWithRegister extends TransformString
   @extend()
+  @description: "Replace target with specified register value"
   hover: icon: ':replace-with-register:', emoji: ':pencil:'
   getNewText: (text) ->
     @vimState.register.getText()
@@ -408,6 +464,7 @@ class ReplaceWithRegister extends TransformString
 # Save text to register before replace
 class SwapWithRegister extends TransformString
   @extend()
+  @description: "Swap register value with target"
   getNewText: (text, selection) ->
     newText = @vimState.register.getText()
     @setTextToRegister(text, selection)
@@ -418,39 +475,36 @@ class Indent extends TransformString
   @extend()
   hover: icon: ':indent:', emoji: ':point_right:'
   stayOnLinewise: false
+  indentFunction: "indentSelectedRows"
 
-  mutate: (selection) ->
-    @indent(selection)
+  mutateSelection: (selection) ->
+    selection[@indentFunction]()
     @restorePoint(selection)
     unless @needStay()
       selection.cursor.moveToFirstCharacterOfLine()
 
-  indent: (selection) ->
-    selection.indentSelectedRows()
-
 class Outdent extends Indent
   @extend()
   hover: icon: ':outdent:', emoji: ':point_left:'
-  indent: (selection) ->
-    selection.outdentSelectedRows()
+  indentFunction: "outdentSelectedRows"
 
 class AutoIndent extends Indent
   @extend()
   hover: icon: ':auto-indent:', emoji: ':open_hands:'
-  indent: (selection) ->
-    selection.autoIndentSelectedRows()
+  indentFunction: "autoIndentSelectedRows"
 
 # -------------------------
 class ToggleLineComments extends TransformString
   @extend()
   hover: icon: ':toggle-line-comments:', emoji: ':mute:'
-  mutate: (selection) ->
+  mutateSelection: (selection) ->
     selection.toggleLineComments()
     @restorePoint(selection)
 
 # -------------------------
 class Surround extends TransformString
   @extend()
+  @description: "Surround target by specified character like `(`, `[`, `\"`"
   displayName: "Surround ()"
   pairs: [
     ['[', ']']
@@ -503,35 +557,37 @@ class Surround extends TransformString
 
 class SurroundWord extends Surround
   @extend()
+  @description: "Surround **word**"
   target: 'InnerWord'
 
 class SurroundSmartWord extends Surround
   @extend()
+  @description: "Surround **smart-word**"
   target: 'InnerSmartWord'
 
 class MapSurround extends Surround
   @extend()
+  @description: "Surround each word(`/\w+/`) within target"
   mapRegExp: /\w+/g
-  execute: ->
-    @eachSelection (selection) =>
-      scanRange = selection.getBufferRange()
-      @editor.scanInBufferRange @mapRegExp, scanRange, ({matchText, replace}) =>
-        replace(@getNewText(matchText))
-      @restorePoint(selection) if @setPoint
-    @activateMode('normal')
+
+  mutateSelection: (selection) ->
+    scanRange = selection.getBufferRange()
+    @editor.scanInBufferRange @mapRegExp, scanRange, ({matchText, replace}) =>
+      replace(@getNewText(matchText))
+    @restorePoint(selection) if @setPoint
 
 class DeleteSurround extends Surround
   @extend()
+  @description: "Delete specified surround character like `(`, `[`, `\"`"
   pairChars: ['[]', '()', '{}'].join('')
   requireTarget: false
 
   onConfirm: (@input) ->
     # FIXME: dont manage allowNextLine independently. Each Pair text-object can handle by themselvs.
-    target = @new 'Pair',
+    @setTarget @new 'Pair',
       pair: @getPair(@input)
       inner: false
-      allowNextLine: @input in @pairChars
-    @setTarget(target)
+      allowNextLine: (@input in @pairChars)
     @processOperation()
 
   getNewText: (text) ->
@@ -545,15 +601,18 @@ class DeleteSurround extends Surround
 
 class DeleteSurroundAnyPair extends DeleteSurround
   @extend()
+  @description: "Delete surround character by auto-detect paired char from cursor enclosed pair"
   requireInput: false
   target: 'AAnyPair'
 
 class DeleteSurroundAnyPairAllowForwarding extends DeleteSurroundAnyPair
   @extend()
+  @description: "Delete surround character by auto-detect paired char from cursor enclosed pair and forwarding pair within same line"
   target: 'AAnyPairAllowForwarding'
 
 class ChangeSurround extends DeleteSurround
   @extend()
+  @description: "Change surround character, specify both from and to pair char"
   charsMax: 2
   char: null
 
@@ -568,27 +627,29 @@ class ChangeSurround extends DeleteSurround
 
 class ChangeSurroundAnyPair extends ChangeSurround
   @extend()
+  @description: "Change surround character, from char is auto-detected"
   charsMax: 1
   target: "AAnyPair"
 
   initialize: ->
     @onDidSetTarget =>
-      @restore = preserveSelectionStartPoints(@editor)
+      @updateSelectionProperties()
       @target.select()
       unless haveSomeSelection(@editor)
-        @vimState.reset()
+        @vimState.input.cancel()
         @abort()
       @addHover(@editor.getSelectedText()[0])
     super
 
   onConfirm: (@char) ->
-    # Clear pre-selected selection to start @eachSelection from non-selection.
-    @restore(selection) for selection in @editor.getSelections()
+    # Clear pre-selected selection to start mutation non-selection.
+    @restorePoint(selection) for selection in @editor.getSelections()
     @input = @char
     @processOperation()
 
 class ChangeSurroundAnyPairAllowForwarding extends ChangeSurroundAnyPair
   @extend()
+  @description: "Change surround character, from char is auto-detected from enclosed and forwarding area"
   target: "AAnyPairAllowForwarding"
 
 # -------------------------
@@ -598,31 +659,36 @@ class Yank extends Operator
   trackChange: true
   stayOnLinewise: true
 
-  execute: ->
-    @eachSelection (selection) =>
-      # We need to preserve selection before selection cleared by @restorePoint()
-      if selection.isLastSelection() and @isMode('visual')
-        @vimState.modeManager.preservePreviousSelection(selection)
-      @setTextToRegisterForSelection(selection)
-      @restorePoint(selection)
-    @activateMode('normal')
+  mutateSelection: (selection) ->
+    @setTextToRegisterForSelection(selection)
+    @restorePoint(selection)
 
 class YankLine extends Yank
   @extend()
   target: 'MoveToRelativeLine'
 
+class YankToLastCharacterOfLine extends Yank
+  @extend()
+  target: 'MoveToLastCharacterOfLine'
+
 # -------------------------
 # FIXME
 # Currently native editor.joinLines() is better for cursor position setting
 # So I use native methods for a meanwhile.
-class Join extends Operator
+class Join extends TransformString
   @extend()
-  requireTarget: false
-  execute: ->
-    @editor.transact =>
-      _.times @getCount(), =>
-        @editor.joinLines()
-    @activateMode('normal')
+  target: "MoveToRelativeLine"
+  flashTarget: false
+
+  needStay: -> false
+
+  mutateSelection: (selection) ->
+    if swrap(selection).isLinewise()
+      range = selection.getBufferRange()
+      selection.setBufferRange(range.translate([0, 0], [-1, Infinity]))
+    selection.joinLines()
+    end = selection.getBufferRange().end
+    selection.cursor.setBufferPosition(end.translate([0, -1]))
 
 class JoinWithKeepingSpace extends TransformString
   @extend()
@@ -632,7 +698,7 @@ class JoinWithKeepingSpace extends TransformString
   initialize: ->
     @setTarget @new("MoveToRelativeLineWithMinimum", {min: 1})
 
-  mutate: (selection) ->
+  mutateSelection: (selection) ->
     [startRow, endRow] = selection.getBufferRowRange()
     swrap(selection).expandOverLine()
     rows = for row in [startRow..endRow]
@@ -648,6 +714,7 @@ class JoinWithKeepingSpace extends TransformString
 
 class JoinByInput extends JoinWithKeepingSpace
   @extend()
+  @description: "Transform multi-line to single-line by with specified separator character"
   hover: icon: ':join:', emoji: ':couple:'
   requireInput: true
   input: null
@@ -660,6 +727,7 @@ class JoinByInput extends JoinWithKeepingSpace
     rows.join(" #{@input} ")
 
 class JoinByInputWithKeepingSpace extends JoinByInput
+  @description: "Join lines without padding space between each line"
   @extend()
   trim: false
   join: (rows) ->
@@ -669,6 +737,7 @@ class JoinByInputWithKeepingSpace extends JoinByInput
 # String suffix in name is to avoid confusion with 'split' window.
 class SplitString extends TransformString
   @extend()
+  @description: "Split single-line into multi-line by splitting specified separator chars"
   hover: icon: ':split-string:', emoji: ':hocho:'
   requireInput: true
   input: null
@@ -685,7 +754,8 @@ class SplitString extends TransformString
 
 class Reverse extends TransformString
   @extend()
-  mutate: (selection) ->
+  @description: "Reverse lines(e.g reverse selected three line)"
+  mutateSelection: (selection) ->
     swrap(selection).expandOverLine()
     textForRows = swrap(selection).lineTextForBufferRows()
     newText = textForRows.reverse().join("\n") + "\n"
@@ -700,23 +770,10 @@ class Repeat extends Operator
 
   execute: ->
     @editor.transact =>
-      _.times @getCount(), =>
+      @countTimes =>
         if operation = @vimState.operationStack.getRecorded()
           operation.setRepeated()
           operation.execute()
-
-# -------------------------
-class Mark extends Operator
-  @extend()
-  hover: icon: ':mark:', emoji: ':round_pushpin:'
-  requireInput: true
-  requireTarget: false
-  initialize: ->
-    @focusInput()
-
-  execute: ->
-    @vimState.mark.set(@input, @editor.getCursorBufferPosition())
-    @activateMode('normal')
 
 # -------------------------
 # [FIXME?]: inconsistent behavior from normal operator
@@ -743,7 +800,7 @@ class Increase extends Operator
         newRanges.push ranges
 
     if (newRanges = _.flatten(newRanges)).length
-      @flash newRanges
+      @flash(newRanges) if @needFlash()
     else
       atom.beep()
 
@@ -778,7 +835,7 @@ class IncrementNumber extends Operator
       newRanges = for selection in @editor.getSelectionsOrderedByBufferPosition()
         @replaceNumber(selection.getBufferRange(), pattern)
     if (newRanges = _.flatten(newRanges)).length
-      @flash newRanges
+      @flash(newRanges) if @needFlash()
     else
       atom.beep()
     for selection in @editor.getSelections()
@@ -822,9 +879,9 @@ class PutBefore extends Operator
           linewise: (type is 'linewise') or @isMode('visual', 'linewise')
           select: @selectPastedText
         @setMarkForChange(newRange)
-        @flash newRange
+        @flash(newRange) if @needFlash()
 
-    if @selectPastedText# and haveSomeSelection(@editor)
+    if @selectPastedText
       submode = swrap.detectVisualModeSubmode(@editor)
       unless @isMode('visual', submode)
         @activateMode('visual', submode)
@@ -886,10 +943,12 @@ class PutAfter extends PutBefore
 
 class PutBeforeAndSelect extends PutBefore
   @extend()
+  @description: "Paste before then select"
   selectPastedText: true
 
 class PutAfterAndSelect extends PutAfter
   @extend()
+  @description: "Paste after then select"
   selectPastedText: true
 
 # Replace
@@ -901,19 +960,23 @@ class Replace extends Operator
   flashTarget: false
   trackChange: true
   requireInput: true
-  requireTarget: false
 
   initialize: ->
-    @setTarget @new('MoveRight') if @isMode('normal')
+    @setTarget(@new('MoveRight')) if @isMode('normal')
     @focusInput()
 
+  getInput: ->
+    input = super
+    input = "\n" if input is ''
+    input
+
   execute: ->
-    @input = "\n" if @input is ''
-    @eachSelection (selection) =>
-      text = selection.getText().replace(/./g, @input)
+    input = @getInput()
+    @mutateSelections (selection) =>
+      text = selection.getText().replace(/./g, input)
       unless (@target.instanceof('MoveRight') and (text.length < @getCount()))
         selection.insertText(text, autoIndentNewline: true)
-      @restorePoint(selection) unless @input is "\n"
+      @restorePoint(selection) unless input is "\n"
 
     # FIXME this is very imperative, handling in very lower level.
     # find better place for operator in blockwise move works appropriately.
@@ -924,6 +987,59 @@ class Replace extends Operator
 
     @activateMode('normal')
 
+class AddSelection extends Operator
+  @extend()
+
+  execute: ->
+    lastSelection = @editor.getLastSelection()
+    lastSelection.selectWord() unless @isMode('visual')
+    word = @editor.getSelectedText()
+    return if word is ''
+    return unless @selectTarget()
+
+    ranges = []
+    pattern = if @isMode('visual')
+      ///#{_.escapeRegExp(word)}///g
+    else
+      ///\b#{_.escapeRegExp(word)}\b///g
+
+    for selection in @editor.getSelections()
+      scanRange = selection.getBufferRange()
+      @editor.scanInBufferRange pattern, scanRange, ({range}) ->
+        ranges.push(range)
+
+    if ranges.length
+      @editor.setSelectedBufferRanges(ranges)
+      unless @isMode('visual', 'characterwise')
+        @activateMode('visual', 'characterwise')
+
+class SelectAllInRangeMarker extends AddSelection
+  @extend()
+  requireTarget: false
+  target: "MarkedRange"
+  flashTarget: false
+
+class SetCursorsToStartOfTarget extends Operator
+  @extend()
+  flashTarget: false
+  mutateSelection: (selection) ->
+    swrap(selection).setBufferPositionTo('start')
+
+class SetCursorsToStartOfMarkedRange extends SetCursorsToStartOfTarget
+  @extend()
+  flashTarget: false
+  target: "MarkedRange"
+
+class MarkRange extends Operator
+  @extend()
+  keepCursorPosition: true
+
+  mutateSelection: (selection) ->
+    range = selection.getBufferRange()
+    marker = highlightRanges(@editor, range, class: 'vim-mode-plus-range-marker')
+    @vimState.addRangeMarkers(marker)
+    @restorePoint(selection)
+
 # Insert entering operation
 # -------------------------
 class ActivateInsertMode extends Operator
@@ -931,7 +1047,7 @@ class ActivateInsertMode extends Operator
   requireTarget: false
   flashTarget: false
   checkpoint: null
-  submode: null
+  finalSubmode: null
   supportInsertionCount: true
 
   observeWillDeactivateMode: ->
@@ -999,19 +1115,11 @@ class ActivateInsertMode extends Operator
         range = getNewTextRangeFromCheckpoint(@editor, @getCheckpoint('undo'))
         @textByOperator = if range? then @editor.getTextInBufferRange(range) else ''
       @setCheckpoint('insert')
-      @vimState.activate('insert', @submode)
-
-class InsertAtLastInsert extends ActivateInsertMode
-  @extend()
-  execute: ->
-    if (point = @vimState.mark.get('^'))
-      @editor.setCursorBufferPosition(point)
-      @editor.scrollToCursorPosition({center: true})
-    super
+      @vimState.activate('insert', @finalSubmode)
 
 class ActivateReplaceMode extends ActivateInsertMode
   @extend()
-  submode: 'replace'
+  finalSubmode: 'replace'
 
   repeatInsert: (selection, text) ->
     for char in text when (char isnt "\n")
@@ -1038,26 +1146,13 @@ class InsertAtBeginningOfLine extends ActivateInsertMode
     @editor.moveToFirstCharacterOfLine()
     super
 
-class InsertByMotion extends ActivateInsertMode
+class InsertAtLastInsert extends ActivateInsertMode
   @extend()
-  requireTarget: true
   execute: ->
-    if @target.instanceof('Motion')
-      @target.execute()
-    if @instanceof('InsertAfterByMotion')
-      moveCursorRight(cursor) for cursor in @editor.getCursors()
+    if (point = @vimState.mark.get('^'))
+      @editor.setCursorBufferPosition(point)
+      @editor.scrollToCursorPosition({center: true})
     super
-
-class InsertAfterByMotion extends InsertByMotion
-  @extend()
-
-class InsertAtPreviousFoldStart extends InsertByMotion
-  @extend()
-  target: 'MoveToPreviousFoldStart'
-
-class InsertAtNextFoldStart extends InsertAtPreviousFoldStart
-  @extend()
-  target: 'MoveToNextFoldStart'
 
 class InsertAboveWithNewline extends ActivateInsertMode
   @extend()
@@ -1075,6 +1170,58 @@ class InsertBelowWithNewline extends InsertAboveWithNewline
   @extend()
   insertNewline: ->
     @editor.insertNewlineBelow()
+
+# Advanced Insertion
+# -------------------------
+class InsertByTarget extends ActivateInsertMode
+  @extend(false)
+  requireTarget: true
+  which: null # one of ['start', 'end', 'head', 'tail']
+  execute: ->
+    @selectTarget()
+    if @isMode('visual', 'blockwise')
+      @getBlockwiseSelections().forEach (bs) =>
+        bs.removeEmptySelections()
+        bs.setPositionForSelections(@which)
+    else
+      for selection in @editor.getSelections()
+        swrap(selection).setBufferPositionTo(@which)
+    super
+
+class InsertAtStartOfTarget extends InsertByTarget
+  @extend()
+  which: 'start'
+
+# Alias for backward compatibility
+class InsertAtStartOfSelection extends InsertAtStartOfTarget
+  @extend()
+
+class InsertAtEndOfTarget extends InsertByTarget
+  @extend()
+  which: 'end'
+
+# Alias for backward compatibility
+class InsertAtEndOfSelection extends InsertAtEndOfTarget
+  @extend()
+
+class InsertAtHeadOfTarget extends InsertByTarget
+  @extend()
+  which: 'head'
+
+class InsertAtTailOfTarget extends InsertByTarget
+  @extend()
+  which: 'tail'
+
+class InsertAtPreviousFoldStart extends InsertAtHeadOfTarget
+  @extend()
+  @description: "Move to previous fold start then enter insert-mode"
+  target: 'MoveToPreviousFoldStart'
+
+class InsertAtNextFoldStart extends InsertAtHeadOfTarget
+  @extend()
+  @description: "Move to next fold start then enter insert-mode"
+  target: 'MoveToNextFoldStart'
+
 # -------------------------
 class Change extends ActivateInsertMode
   @extend()
@@ -1082,10 +1229,16 @@ class Change extends ActivateInsertMode
   trackChange: true
   supportInsertionCount: false
 
+  # [FIXME] #231 workaround until Selection::insertText("\n", {autoIndent: true}) auto-indent again.
+  getAutoIndentedTextForNewLine: (selection, text) ->
+    range = selection.getBufferRange()
+    desiredIndentLevel = @editor.languageMode.suggestedIndentForLineAtBufferRow(range.start.row, text)
+    @editor.buildIndentString(desiredIndentLevel) + text
+
   execute: ->
     @selectTarget()
     text = ''
-    if @target.instanceof('TextObject') or @target.instanceof('Motion')
+    if @target.isTextObject() or @target.isMotion()
       text = "\n" if (swrap.detectVisualModeSubmode(@editor) is 'linewise')
     else
       text = "\n" if @target.isLinewise?()
@@ -1093,6 +1246,7 @@ class Change extends ActivateInsertMode
     @editor.transact =>
       for selection in @editor.getSelections()
         @setTextToRegisterForSelection(selection)
+        text = @getAutoIndentedTextForNewLine(selection, text) if text is "\n"
         range = selection.insertText(text, autoIndent: true)
         selection.cursor.moveLeft() unless range.isEmpty()
     super
@@ -1108,3 +1262,15 @@ class SubstituteLine extends Change
 class ChangeToLastCharacterOfLine extends Change
   @extend()
   target: 'MoveToLastCharacterOfLine'
+
+  initialize: ->
+    if @isVisualBlockwise = @isMode('visual', 'blockwise')
+      @requireTarget = false
+    super
+
+  execute: ->
+    if @isVisualBlockwise
+      @getBlockwiseSelections().forEach (bs) ->
+        bs.removeEmptySelections()
+        bs.setPositionForSelections('start')
+    super

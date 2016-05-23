@@ -1,4 +1,4 @@
-{getVimState, dispatch, TextData} = require './spec-helper'
+{getVimState, dispatch, TextData, getView} = require './spec-helper'
 settings = require '../lib/settings'
 globalState = require '../lib/global-state'
 
@@ -12,7 +12,7 @@ describe "Motion Search", ->
       {set, ensure, keystroke} = _vim
 
   afterEach ->
-    vimState.activate('reset')
+    vimState.resetNormalMode()
 
   describe "the / keybinding", ->
     pane = null
@@ -61,7 +61,7 @@ describe "Motion Search", ->
 
       it 'works with selection in visual mode', ->
         set text: 'one two three'
-        ensure ['v/', search: 'th'], cursor: [0, 9]
+        ensure ['v /', search: 'th'], cursor: [0, 9]
         ensure 'd', text: 'hree'
 
       it 'extends selection when repeating search in visual mode', ->
@@ -71,25 +71,24 @@ describe "Motion Search", ->
           line3
           """
 
-        ensure ['v/', {search: 'line'}],
+        ensure ['v /', search: 'line'],
           selectedBufferRange: [[0, 0], [1, 1]]
         ensure 'n',
           selectedBufferRange: [[0, 0], [2, 1]]
 
       it 'searches to the correct column in visual linewise mode', ->
-        ensure ['V/', {search: 'ef'}],
+        ensure ['V /', search: 'ef'],
           selectedText: "abc\ndef\n",
           characterwiseHead: [1, 1]
           cursor: [2, 0]
           mode: ['visual', 'linewise']
 
       it 'not extend linwise selection if search matches on same line', ->
-        # settings.set 'incrementalSearch', true
         set text: """
           abc def
           def\n
           """
-        ensure ['V/', {search: 'ef'}],
+        ensure ['V /', search: 'ef'],
           selectedText: "abc def\n",
 
       describe "case sensitivity", ->
@@ -169,10 +168,10 @@ describe "Motion Search", ->
 
       describe "composing", ->
         it "composes with operators", ->
-          ensure ['d/', search: 'def'], text: "def\nabc\ndef\n"
+          ensure ['d /', search: 'def'], text: "def\nabc\ndef\n"
 
         it "repeats correctly with operators", ->
-          ensure ['d/', search: 'def', '.'],
+          ensure ['d /', search: 'def', '.'],
             text: "def\n"
 
     describe "when reversed as ?", ->
@@ -215,10 +214,9 @@ describe "Motion Search", ->
       beforeEach ->
         ensure ['/', search: 'def'], cursor: [1, 0]
         ensure ['/', search: 'abc'], cursor: [2, 0]
-        inputEditor = vimState.searchInput.view.editorElement
+        inputEditor = vimState.searchInput.editorElement
 
       it "allows searching history in the search field", ->
-        _editor = inputEditor.getModel()
         keystroke '/'
         ensureInputEditor 'core:move-up', text: 'abc'
         ensureInputEditor 'core:move-up', text: 'def'
@@ -230,6 +228,49 @@ describe "Motion Search", ->
         ensureInputEditor 'core:move-up', text: 'def'
         ensureInputEditor 'core:move-down', text: 'abc'
         ensureInputEditor 'core:move-down', text: ''
+
+    describe "highlightSearch", ->
+      textForMarker = (marker) ->
+        editor.getTextInBufferRange(marker.getBufferRange())
+
+      ensureHightlightSearch = (options) ->
+        markers = vimState.getHighlightSearch()
+        if options.length?
+          expect(markers).toHaveLength(options.length)
+
+        if options.text?
+          text = markers.map (marker) -> textForMarker(marker)
+          expect(text).toEqual(options.text)
+
+        if options.mode?
+          ensure {mode: options.mode}
+
+      beforeEach ->
+        jasmine.attachToDOM(getView(atom.workspace))
+        settings.set('highlightSearch', true)
+        expect(vimState.hasHighlightSearch()).toBe(false)
+        ensure ['/', search: 'def'], cursor: [1, 0]
+
+      describe "clearHighlightSearch command", ->
+        it "clear highlightSearch marker", ->
+          ensureHightlightSearch length: 2, text: ["def", "def"], mode: 'normal'
+          dispatch(editorElement, 'vim-mode-plus:clear-highlight-search')
+          expect(vimState.hasHighlightSearch()).toBe(false)
+
+      describe "clearHighlightSearchOnResetNormalMode", ->
+        describe "default setting", ->
+          it "it won't clear highlightSearch", ->
+            ensureHightlightSearch length: 2, text: ["def", "def"], mode: 'normal'
+            dispatch(editorElement, 'vim-mode-plus:reset-normal-mode')
+            ensureHightlightSearch length: 2, text: ["def", "def"], mode: 'normal'
+
+        describe "when enabled", ->
+          it "it clear highlightSearch on reset-normal-mode", ->
+            settings.set('clearHighlightSearchOnResetNormalMode', true)
+            ensureHightlightSearch length: 2, text: ["def", "def"], mode: 'normal'
+            dispatch(editorElement, 'vim-mode-plus:reset-normal-mode')
+            expect(vimState.hasHighlightSearch()).toBe(false)
+            ensure mode: 'normal'
 
   describe "the * keybinding", ->
     beforeEach ->
@@ -254,16 +295,25 @@ describe "Motion Search", ->
       describe "with words that contain 'non-word' characters", ->
         it "moves cursor to next occurence of word under cursor", ->
           set
-            text: "abc\n@def\nabc\n@def\n"
+            text: """
+            abc
+            @def
+            abc
+            @def\n
+            """
             cursorBuffer: [1, 0]
           ensure '*', cursorBuffer: [3, 0]
 
         it "doesn't move cursor unless next match has exact word ending", ->
           set
-            text: "abc\n@def\nabc\n@def1\n"
+            text: """
+            abc
+            @def
+            abc
+            @def1\n
+            """
             cursorBuffer: [1, 1]
-          # this is because of the default isKeyword value of vim-mode-plus that includes @
-          ensure '*', cursorBuffer: [1, 0]
+          ensure '*', cursorBuffer: [1, 1]
 
         # FIXME: This behavior is different from the one found in
         # vim. This is because the word boundary match in Javascript
@@ -431,10 +481,10 @@ describe "Motion Search", ->
           set text: "(_(_)_)"
         it 'behave inclusively when is at open pair', ->
           set cursor: [0, 2]
-          ensure 'd%', text: "(__)"
+          ensure 'd %', text: "(__)"
         it 'behave inclusively when is at open pair', ->
           set cursor: [0, 4]
-          ensure 'd%', text: "(__)"
+          ensure 'd %', text: "(__)"
       describe "cursor is at pair char", ->
         it "cursor is at open pair, it move to closing pair", ->
           set cursor: [0, 0]

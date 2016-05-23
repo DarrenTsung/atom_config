@@ -1,4 +1,3 @@
-# Refactoring status: 100%
 globalState = require './global-state'
 settings = require './settings'
 
@@ -28,7 +27,7 @@ class RegisterManager
 
   reset: ->
     @name = null
-    @updateEditorElement()
+    @vimState.toggleClassList('with-register', @hasName())
 
   destroy: ->
     @subscriptionBySelection.forEach (disposable) ->
@@ -121,10 +120,14 @@ class RegisterManager
   getName: ->
     @name ? settings.get('defaultRegister')
 
+  hasName: ->
+    @name?
+
   setName: ->
     @vimState.hover.add '"'
-    @updateEditorElement()
-    @vimState.onDidConfirmInput (@name) => @vimState.hover.add(@name)
+    @vimState.onDidConfirmInput (@name) =>
+      @vimState.toggleClassList('with-register', @hasName())
+      @vimState.hover.add(@name)
     @vimState.onDidCancelInput => @vimState.hover.reset()
     @vimState.input.focus({charsMax: 1})
 
@@ -136,8 +139,5 @@ class RegisterManager
     else
       # [FIXME] should characterwise or line and character
       'character'
-
-  updateEditorElement: ->
-    @editorElement.classList.toggle('with-register', @name?)
 
 module.exports = RegisterManager

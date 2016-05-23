@@ -1,43 +1,32 @@
-# Refactoring status: 95%
 _ = require 'underscore-plus'
 {Emitter, Range, CompositeDisposable, Disposable} = require 'atom'
 Base = require './base'
-BlockwiseSelection = require './blockwise-selection'
 swrap = require './selection-wrapper'
 {moveCursorLeft} = require './utils'
 settings = require './settings'
 
 class ModeManager
   mode: 'insert' # Native atom is not modal editor and its default is 'insert'
+  submode: null
+
+  vimState: null
+  editor: null
+  editorElement: null
+
+  emitter: null
+  deactivator: null
+
+  replacedCharsBySelection: null
+  previousSelectionProperties: null
+  previousVisualModeSubmode: null
 
   constructor: (@vimState) ->
     {@editor, @editorElement} = @vimState
     @emitter = new Emitter
 
-    @onDidActivateMode ({mode, submode}) =>
-      @updateEditorElement()
-
-      if settings.get('disableInputMethodExceptInsertMode')
-        # [FIXME] See #98.
-        if @hiddenInputElement ?= @editorElement.component?.hiddenInputComponent.getDomNode()
-          if mode is 'insert'
-            @hiddenInputElement.removeAttribute('type')
-          else
-            @hiddenInputElement.setAttribute('type', 'password')
-
-      @vimState.statusBarManager.update(mode, submode)
-      @vimState.refreshCursors()
-
-  updateEditorElement: ->
-    for mode in ['normal', 'insert', 'visual', 'operator-pending']
-      @editorElement.classList.toggle("#{mode}-mode", mode is @mode)
-    for submode in ['characterwise', 'linewise', 'blockwise', 'replace']
-      @editorElement.classList.toggle(submode, submode is @submode)
-
   isMode: (mode, submodes) ->
     if submodes?
-      submodes = [submodes] unless _.isArray(submodes)
-      (@mode is mode) and (@submode in submodes)
+      (@mode is mode) and (@submode in [].concat(submodes))
     else
       @mode is mode
 
@@ -52,32 +41,33 @@ class ModeManager
   # -------------------------
   activate: (mode, submode=null) ->
     @emitter.emit 'will-activate-mode', {mode, submode}
-    if mode is 'reset'
-      @editor.clearSelections()
-      mode = 'normal'
-    else if (mode is 'visual')
-      if submode is @submode
-        mode = 'normal'
-        submode = null
-      else if submode is 'previous'
-        submode = @restorePreviousSelection?() ? 'characterwise'
 
-    # Deactivate old mode
-    if (mode isnt @mode)
-      @emitter.emit 'will-deactivate-mode', {@mode, @submode}
-      @deactivator?.dispose()
-      @emitter.emit 'did-deactivate-mode', {@mode, @submode}
+    if (mode is 'visual') and (submode is @submode)
+      [mode, submode] = ['normal', null]
 
-    # Activate
+    @deactivate() if (mode isnt @mode)
+
     @deactivator = switch mode
       when 'normal' then @activateNormalMode()
       when 'insert' then @activateInsertMode(submode)
       when 'visual' then @activateVisualMode(submode)
-      when 'operator-pending' then new Disposable # Nothing to do.
 
-    # Now update mode variables and update CSS selectors.
+    @editorElement.classList.remove("#{@mode}-mode")
+    @editorElement.classList.remove(@submode)
+
     [@mode, @submode] = [mode, submode]
+
+    @editorElement.classList.add("#{@mode}-mode")
+    @editorElement.classList.add(@submode) if @submode?
+
+    @vimState.statusBarManager.update(@mode, @submode)
+    @vimState.updateCursorsVisibility()
     @emitter.emit 'did-activate-mode', {@mode, @submode}
+
+  deactivate: ->
+    @emitter.emit 'will-deactivate-mode', {@mode, @submode}
+    @deactivator?.dispose()
+    @emitter.emit 'did-deactivate-mode', {@mode, @submode}
 
   # Normal
   # -------------------------
@@ -91,13 +81,15 @@ class ModeManager
   # -------------------------
   activateInsertMode: (submode=null) ->
     @editorElement.component.setInputEnabled(true)
-    replaceModeDeactivator = @activateReplaceMode() if (submode is 'replace')
+    replaceModeDeactivator = @activateReplaceMode() if submode is 'replace'
 
     new Disposable =>
       replaceModeDeactivator?.dispose()
       replaceModeDeactivator = null
       # When escape from insert-mode, cursor move Left.
-      moveCursorLeft(cursor) for cursor in @editor.getCursors()
+      needSpecialCareToPreventWrapLine = atom.config.get('editor.atomicSoftTabs') ? true
+      for cursor in @editor.getCursors()
+        moveCursorLeft(cursor, {needSpecialCareToPreventWrapLine})
 
   activateReplaceMode: ->
     @replacedCharsBySelection = {}
@@ -120,61 +112,63 @@ class ModeManager
 
   # Visual
   # -------------------------
+  # At this point @submode is not yet updated to final submode.
   activateVisualMode: (submode) ->
-    # If submode shift within visual mode, we first restore characterwise range
-    # At this phase @submode is not yet updated to requested submode.
     if @submode?
-      @restoreCharacterwiseRange()
-    else
-      @editor.selectRight() if @editor.getLastSelection().isEmpty()
-    # Preserve characterwise range to restore afterward.
-    for selection in @editor.getSelections()
-      swrap(selection).preserveCharacterwise()
+      @selectCharacterwise()
+    else if @editor.getLastSelection().isEmpty()
+      @editor.selectRight()
 
-    # Update selection area to final submode.
+    @vimState.updateSelectionProperties(force: false)
+
     switch submode
       when 'linewise'
-        swrap.expandOverLine(@editor)
+        @vimState.selectLinewise()
       when 'blockwise'
-        unless swrap(@editor.getLastSelection()).isLinewise()
-          for selection in @editor.getSelections()
-            @vimState.addBlockwiseSelection(new BlockwiseSelection(selection))
+        @vimState.selectBlockwise() unless swrap(@editor.getLastSelection()).isLinewise()
 
     new Disposable =>
-      @restoreCharacterwiseRange()
+      @normalizeSelections(preservePreviousSelection: true)
+      selection.clear(autoscroll: false) for selection in @editor.getSelections()
 
-      unless (selection = @editor.getLastSelection()).isEmpty()
-        @preservePreviousSelection(selection)
-
-      @editor.getSelections().forEach (selection) ->
-        swrap(selection).resetProperties()
-        # `vc`, `vs` make selection empty
-        if (not selection.isReversed() and not selection.isEmpty())
-          selection.selectLeft()
-        selection.clear(autoscroll: false)
-
-  # Prepare function to restore selection by `gv`
   preservePreviousSelection: (selection) ->
-    properties = swrap(selection).detectCharacterwiseProperties()
-    submode = @submode
-    @restorePreviousSelection = =>
-      selection = @editor.getLastSelection()
-      swrap(selection).selectByProperties(properties)
-      @editor.scrollToScreenRange(selection.getScreenRange(), {center: true})
-      submode
+    properties = if selection.isBlockwise?()
+      selection.getCharacterwiseProperties()
+    else
+      swrap(selection).detectCharacterwiseProperties()
+    @previousSelectionProperties = properties
+    @previousVisualModeSubmode = @submode
 
-  restoreCharacterwiseRange: ->
-    return if @submode is 'characterwise'
+  getPreviousSelectionInfo: ->
+    properties = @previousSelectionProperties
+    submode = @previousVisualModeSubmode
+    {properties, submode}
+
+  selectCharacterwise: ->
     switch @submode
       when 'linewise'
-        @editor.getSelections().forEach (selection) ->
-          swrap(selection).restoreCharacterwise() unless selection.isEmpty()
+        for selection in @editor.getSelections() when not selection.isEmpty()
+          swrap(selection).restoreCharacterwise(preserveGoalColumn: true)
       when 'blockwise'
-        for blockwiseSelection in @vimState.getBlockwiseSelections()
-          # When all selection is empty, we don't want to loose multi-cursor
-          # by restoreing characterwise range.
-          unless blockwiseSelection.selections.every((selection) -> selection.isEmpty())
-            blockwiseSelection.restoreCharacterwise()
+        for bs in @vimState.getBlockwiseSelections()
+          bs.restoreCharacterwise()
         @vimState.clearBlockwiseSelections()
+
+  normalizeSelections: ({preservePreviousSelection}={}) ->
+    if preservePreviousSelection
+      range = @editor.getLastSelection().getBufferRange()
+      @vimState.mark.setRange('<', '>', range)
+    @selectCharacterwise()
+    swrap.resetProperties(@editor)
+    if preservePreviousSelection and not @editor.getLastSelection().isEmpty()
+      @preservePreviousSelection(@editor.getLastSelection())
+
+    # We selectRight()ed in visual-mode, so reset this effect here.
+    # `vc`, `vs` make selection empty.
+    selections = @editor.getSelections()
+    for selection in selections when swrap(selection).isForwarding()
+      selection.modifySelection ->
+        # [FIXME] SCATTERED_CURSOR_ADJUSTMENT
+        moveCursorLeft(selection.cursor, {allowWrap: true, preserveGoalColumn: true})
 
 module.exports = ModeManager

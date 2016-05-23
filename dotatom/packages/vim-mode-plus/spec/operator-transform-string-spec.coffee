@@ -1,4 +1,3 @@
-# Refactoring status: 80%
 {getVimState, dispatch} = require './spec-helper'
 settings = require '../lib/settings'
 
@@ -12,7 +11,7 @@ describe "Operator TransformString", ->
       {set, ensure, keystroke} = vim
 
   afterEach ->
-    vimState.activate('reset')
+    vimState.resetNormalMode()
 
   describe 'the ~ keybinding', ->
     beforeEach ->
@@ -34,27 +33,27 @@ describe "Operator TransformString", ->
         cursor: [[0, 2], [1, 2]]
 
     it 'takes a count', ->
-      ensure '4~',
+      ensure '4 ~',
         text: 'AbC\nxYz'
         cursor: [[0, 2], [1, 2]]
 
     describe "in visual mode", ->
       it "toggles the case of the selected text", ->
         set cursorBuffer: [0, 0]
-        ensure 'V~', text: 'AbC\nXyZ'
+        ensure 'V ~', text: 'AbC\nXyZ'
 
     describe "with g and motion", ->
       it "toggles the case of text, won't move cursor", ->
         set cursorBuffer: [0, 0]
-        ensure 'g~2l', text: 'Abc\nXyZ', cursor: [0, 0]
+        ensure 'g ~ 2 l', text: 'Abc\nXyZ', cursor: [0, 0]
 
       it "g~~ toggles the line of text, won't move cursor", ->
         set cursorBuffer: [0, 1]
-        ensure 'g~~', text: 'AbC\nXyZ', cursor: [0, 1]
+        ensure 'g ~ ~', text: 'AbC\nXyZ', cursor: [0, 1]
 
       it "g~g~ toggles the line of text, won't move cursor", ->
         set cursorBuffer: [0, 1]
-        ensure 'g~g~', text: 'AbC\nXyZ', cursor: [0, 1]
+        ensure 'g ~ g ~', text: 'AbC\nXyZ', cursor: [0, 1]
 
   describe 'the U keybinding', ->
     beforeEach ->
@@ -63,39 +62,39 @@ describe "Operator TransformString", ->
         cursorBuffer: [0, 0]
 
     it "makes text uppercase with g and motion, and won't move cursor", ->
-      ensure 'gUl', text: 'ABc\nXyZ', cursor: [0, 0]
-      ensure 'gUe', text: 'ABC\nXyZ', cursor: [0, 0]
+      ensure 'g U l', text: 'ABc\nXyZ', cursor: [0, 0]
+      ensure 'g U e', text: 'ABC\nXyZ', cursor: [0, 0]
       set cursorBuffer: [1, 0]
-      ensure 'gU$', text: 'ABC\nXYZ', cursor: [1, 0]
+      ensure 'g U $', text: 'ABC\nXYZ', cursor: [1, 0]
 
     it "makes the selected text uppercase in visual mode", ->
-      ensure 'VU', text: 'ABC\nXyZ'
+      ensure 'V U', text: 'ABC\nXyZ'
 
     it "gUU upcase the line of text, won't move cursor", ->
       set cursorBuffer: [0, 1]
-      ensure 'gUU', text: 'ABC\nXyZ', cursor: [0, 1]
+      ensure 'g U U', text: 'ABC\nXyZ', cursor: [0, 1]
 
     it "gUgU upcase the line of text, won't move cursor", ->
       set cursorBuffer: [0, 1]
-      ensure 'gUgU', text: 'ABC\nXyZ', cursor: [0, 1]
+      ensure 'g U g U', text: 'ABC\nXyZ', cursor: [0, 1]
 
   describe 'the u keybinding', ->
     beforeEach ->
       set text: 'aBc\nXyZ', cursorBuffer: [0, 0]
 
     it "makes text lowercase with g and motion, and won't move cursor", ->
-      ensure 'gu$', text: 'abc\nXyZ', cursor: [0, 0]
+      ensure 'g u $', text: 'abc\nXyZ', cursor: [0, 0]
 
     it "makes the selected text lowercase in visual mode", ->
-      ensure 'Vu', text: 'abc\nXyZ'
+      ensure 'V u', text: 'abc\nXyZ'
 
     it "guu downcase the line of text, won't move cursor", ->
       set cursorBuffer: [0, 1]
-      ensure 'guu', text: 'abc\nXyZ', cursor: [0, 1]
+      ensure 'g u u', text: 'abc\nXyZ', cursor: [0, 1]
 
     it "gugu downcase the line of text, won't move cursor", ->
       set cursorBuffer: [0, 1]
-      ensure 'gugu', text: 'abc\nXyZ', cursor: [0, 1]
+      ensure 'g u g u', text: 'abc\nXyZ', cursor: [0, 1]
 
   describe "the > keybinding", ->
     beforeEach ->
@@ -111,7 +110,7 @@ describe "Operator TransformString", ->
 
       describe "when followed by a >", ->
         it "indents the current line", ->
-          ensure '>>',
+          ensure '> >',
             text: "12345\nabcde\n  ABCDE"
             cursor: [2, 2]
 
@@ -121,13 +120,13 @@ describe "Operator TransformString", ->
 
       describe "when followed by a >", ->
         it "indents the current line", ->
-          ensure '>>',
+          ensure '> >',
             text: "  12345\nabcde\nABCDE"
             cursor: [0, 2]
 
       describe "when followed by a repeating >", ->
         beforeEach ->
-          keystroke '3>>'
+          keystroke '3 > >'
 
         it "indents multiple lines at once", ->
           ensure
@@ -141,7 +140,7 @@ describe "Operator TransformString", ->
     describe "in visual mode", ->
       beforeEach ->
         set cursor: [0, 0]
-        keystroke 'V>'
+        keystroke 'V >'
 
       it "indents the current line and exits visual mode", ->
         ensure
@@ -152,19 +151,64 @@ describe "Operator TransformString", ->
       it "allows repeating the operation", ->
         ensure '.', text: "    12345\nabcde\nABCDE"
 
+    describe "in visual mode and stayOnTransformString enabled", ->
+      beforeEach ->
+        settings.set('stayOnTransformString', true)
+        set cursor: [0, 0]
+
+      it "indents the currrent selection and exits visual mode", ->
+        ensure 'v j >',
+          mode: 'normal'
+          cursor: [1, 0]
+          text: """
+            12345
+            abcde
+          ABCDE
+          """
+      it "when repeated, operate on same range when cursor was not moved", ->
+        ensure 'v j >',
+          mode: 'normal'
+          cursor: [1, 0]
+          text: """
+            12345
+            abcde
+          ABCDE
+          """
+        ensure '.',
+          mode: 'normal'
+          cursor: [1, 0]
+          text: """
+              12345
+              abcde
+          ABCDE
+          """
+      it "when repeated, operate on relative range from cursor position with same extent when cursor was moved", ->
+        ensure 'v j >',
+          mode: 'normal'
+          cursor: [1, 0]
+          text: """
+            12345
+            abcde
+          ABCDE
+          """
+        ensure 'l .',
+          mode: 'normal'
+          cursor: [1, 2]
+          text: "  12345\n    abcde\n  ABCDE"
+
   describe "the < keybinding", ->
     beforeEach ->
       set text: "  12345\n  abcde\nABCDE", cursor: [0, 0]
 
     describe "when followed by a <", ->
       it "indents the current line", ->
-        ensure '<<',
+        ensure '< <',
           text: "12345\n  abcde\nABCDE"
           cursor: [0, 0]
 
     describe "when followed by a repeating <", ->
       beforeEach ->
-        keystroke '2<<'
+        keystroke '2 < <'
 
       it "indents multiple lines at once", ->
         ensure
@@ -177,7 +221,7 @@ describe "Operator TransformString", ->
 
     describe "in visual mode", ->
       it "indents the current line and exits visual mode", ->
-        ensure 'V<',
+        ensure 'V <',
           mode: 'normal'
           text: "12345\n  abcde\nABCDE"
           selectedBufferRange: [[0, 0], [0, 0]]
@@ -203,14 +247,14 @@ describe "Operator TransformString", ->
 
       describe "when followed by a =", ->
         beforeEach ->
-          keystroke '=='
+          keystroke '= ='
 
         it "indents the current line", ->
           expect(editor.indentationForBufferRow(1)).toBe 0
 
       describe "when followed by a repeating =", ->
         beforeEach ->
-          keystroke '2=='
+          keystroke '2 = ='
 
         it "autoindents multiple lines at once", ->
           ensure text: "foo\nbar\nbaz", cursor: [1, 0]
@@ -226,14 +270,14 @@ describe "Operator TransformString", ->
         cursorBuffer: [0, 0]
 
     it "CamelCase text and not move cursor", ->
-      ensure 'gc$', text: 'vimMode\natom-text-editor\n', cursor: [0, 0]
-      ensure 'jgc$', text: 'vimMode\natomTextEditor\n', cursor: [1, 0]
+      ensure 'g c $', text: 'vimMode\natom-text-editor\n', cursor: [0, 0]
+      ensure 'j g c $', text: 'vimMode\natomTextEditor\n', cursor: [1, 0]
 
     it "CamelCase selected text", ->
-      ensure 'Vjgc', text: 'vimMode\natomTextEditor\n', cursor: [0, 0]
+      ensure 'V j g c', text: 'vimMode\natomTextEditor\n', cursor: [0, 0]
 
     it "gcgc CamelCase the line of text, won't move cursor", ->
-      ensure 'lgcgc', text: 'vimMode\natom-text-editor\n', cursor: [0, 1]
+      ensure 'l g c g c', text: 'vimMode\natom-text-editor\n', cursor: [0, 1]
 
   describe 'SnakeCase', ->
     beforeEach ->
@@ -245,14 +289,14 @@ describe "Operator TransformString", ->
           'g _': 'vim-mode-plus:snake-case'
 
     it "SnakeCase text and not move cursor", ->
-      ensure 'g_$', text: 'vim_mode\natom-text-editor\n', cursor: [0, 0]
-      ensure 'jg_$', text: 'vim_mode\natom_text_editor\n', cursor: [1, 0]
+      ensure 'g _ $', text: 'vim_mode\natom-text-editor\n', cursor: [0, 0]
+      ensure 'j g _ $', text: 'vim_mode\natom_text_editor\n', cursor: [1, 0]
 
     it "SnakeCase selected text", ->
-      ensure 'Vjg_', text: 'vim_mode\natom_text_editor\n', cursor: [0, 0]
+      ensure 'V j g _', text: 'vim_mode\natom_text_editor\n', cursor: [0, 0]
 
     it "g_g_ SnakeCase the line of text, won't move cursor", ->
-      ensure 'lg_g_', text: 'vim_mode\natom-text-editor\n', cursor: [0, 1]
+      ensure 'l g _ g _', text: 'vim_mode\natom-text-editor\n', cursor: [0, 1]
 
   describe 'DashCase', ->
     beforeEach ->
@@ -261,14 +305,14 @@ describe "Operator TransformString", ->
         cursorBuffer: [0, 0]
 
     it "DashCase text and not move cursor", ->
-      ensure 'g-$', text: 'vim-mode\natom_text_editor\n', cursor: [0, 0]
-      ensure 'jg-$', text: 'vim-mode\natom-text-editor\n', cursor: [1, 0]
+      ensure 'g - $', text: 'vim-mode\natom_text_editor\n', cursor: [0, 0]
+      ensure 'j g - $', text: 'vim-mode\natom-text-editor\n', cursor: [1, 0]
 
     it "DashCase selected text", ->
-      ensure 'Vjg-', text: 'vim-mode\natom-text-editor\n', cursor: [0, 0]
+      ensure 'V j g -', text: 'vim-mode\natom-text-editor\n', cursor: [0, 0]
 
     it "g-g- DashCase the line of text, won't move cursor", ->
-      ensure 'lg-g-', text: 'vim-mode\natom_text_editor\n', cursor: [0, 1]
+      ensure 'l g - g -', text: 'vim-mode\natom_text_editor\n', cursor: [0, 1]
 
   describe 'surround', ->
     beforeEach ->
@@ -290,22 +334,23 @@ describe "Operator TransformString", ->
           , 100
 
       it "surround text object with ( and repeatable", ->
-        ensure ['ysiw', char: '('],
+        # [FIXME] OLD STYLE
+        ensure ['y s i w', input: '('],
           text: "(apple)\npairs: [brackets]\npairs: [brackets]\n( multi\n  line )"
           cursor: [0, 0]
-        ensure 'j.',
+        ensure 'j .',
           text: "(apple)\n(pairs): [brackets]\npairs: [brackets]\n( multi\n  line )"
       it "surround text object with { and repeatable", ->
-        ensure ['ysiw', char: '{'],
+        ensure ['y s i w', input: '{'],
           text: "{apple}\npairs: [brackets]\npairs: [brackets]\n( multi\n  line )"
           cursor: [0, 0]
-        ensure 'j.',
+        ensure 'j .',
           text: "{apple}\n{pairs}: [brackets]\npairs: [brackets]\n( multi\n  line )"
       it "surround linewise", ->
-        ensure ['ysys', char: '{'],
+        ensure ['y s y s', input: '{'],
           text: "{\napple\n}\npairs: [brackets]\npairs: [brackets]\n( multi\n  line )"
           cursor: [0, 0]
-        ensure '3j.',
+        ensure '3 j .',
           text: "{\napple\n}\n{\npairs: [brackets]\n}\npairs: [brackets]\n( multi\n  line )"
 
       describe 'charactersToAddSpaceOnSurround setting', ->
@@ -316,11 +361,11 @@ describe "Operator TransformString", ->
 
         it "add additional space inside pair char when surround", ->
           settings.set('charactersToAddSpaceOnSurround', ['(', '{', '['])
-          ensure ['ysiw', char: '('], text: "( apple )\norange\nlemmon"
+          ensure ['y s i w', input: '('], text: "( apple )\norange\nlemmon"
           keystroke 'j'
-          ensure ['ysiw', char: '{'], text: "( apple )\n{ orange }\nlemmon"
+          ensure ['y s i w', input: '{'], text: "( apple )\n{ orange }\nlemmon"
           keystroke 'j'
-          ensure ['ysiw', char: '['], text: "( apple )\n{ orange }\n[ lemmon ]"
+          ensure ['y s i w', input: '['], text: "( apple )\n{ orange }\n[ lemmon ]"
 
     describe 'map-surround', ->
       beforeEach ->
@@ -341,16 +386,16 @@ describe "Operator TransformString", ->
           'atom-text-editor.vim-mode-plus.visual-mode':
             'm s':  'vim-mode-plus:map-surround'
       it "surround text for each word in target case-1", ->
-        ensure ['msip', char: '('],
+        ensure ['m s i p', input: '('],
           text: "\n(apple)\n(pairs) (tomato)\n(orange)\n(milk)\n"
           cursor: [1, 0]
       it "surround text for each word in target case-2", ->
         set cursor: [2, 1]
-        ensure ['msil', char: '<'],
+        ensure ['m s i l', input: '<'],
           text: '\napple\n<pairs> <tomato>\norange\nmilk\n'
           cursor: [2, 0]
       it "surround text for each word in visual selection", ->
-        ensure ['vipms', char: '"'],
+        ensure ['v i p m s', input: '"'],
           text: '\n"apple"\n"pairs" "tomato"\n"orange"\n"milk"\n'
           cursor: [1, 0]
 
@@ -362,13 +407,13 @@ describe "Operator TransformString", ->
         set cursor: [1, 8]
 
       it "delete surrounded chars and repeatable", ->
-        ensure ['ds', char: '['],
+        ensure ['d s', input: '['],
           text: "apple\npairs: brackets\npairs: [brackets]\n( multi\n  line )"
-        ensure 'jl.',
+        ensure 'j l .',
           text: "apple\npairs: brackets\npairs: brackets\n( multi\n  line )"
       it "delete surrounded chars expanded to multi-line", ->
         set cursor: [3, 1]
-        ensure ['ds', char: '('],
+        ensure ['d s', input: '('],
           text: "apple\npairs: [brackets]\npairs: [brackets]\n multi\n  line "
       it "delete surrounded chars and trim padding spaces", ->
         set
@@ -377,8 +422,8 @@ describe "Operator TransformString", ->
             {  orange   }\n
             """
           cursor: [0, 0]
-        ensure ['ds', char: '('], text: "apple\n{  orange   }\n"
-        ensure ['jds', char: '{'], text: "apple\norange\n"
+        ensure ['d s', input: '('], text: "apple\n{  orange   }\n"
+        ensure ['j d s', input: '{'], text: "apple\norange\n"
       it "delete surrounded for multi-line but dont affect code layout", ->
         set
           cursor: [0, 34]
@@ -388,7 +433,7 @@ describe "Operator TransformString", ->
               hello: world
             }
             """
-        ensure ['ds', char: '{'],
+        ensure ['d s', input: '{'],
           text: [
               "highlightRanges @editor, range, "
               "  timeout: timeout"
@@ -411,14 +456,14 @@ describe "Operator TransformString", ->
             """
           cursorBuffer: [0, 1]
       it "change surrounded chars and repeatable", ->
-        ensure ['cs', char: '(['],
+        ensure ['c s', input: '(['],
           text: """
             [apple]
             (grape)
             <lemmon>
             {orange}
             """
-        ensure 'jl.',
+        ensure 'j l .',
           text: """
             [apple]
             [grape]
@@ -426,14 +471,14 @@ describe "Operator TransformString", ->
             {orange}
             """
       it "change surrounded chars", ->
-        ensure ['jjcs', char: '<"'],
+        ensure ['j j c s', input: '<"'],
           text: """
             (apple)
             (grape)
             "lemmon"
             {orange}
             """
-        ensure ['jlcs', char: '{!'],
+        ensure ['j l c s', input: '{!'],
           text: """
             (apple)
             (grape)
@@ -450,7 +495,7 @@ describe "Operator TransformString", ->
               hello: world
             }
             """
-        ensure ['cs', char: '{('],
+        ensure ['c s', input: '{('],
           text: """
             highlightRanges @editor, range, (
               timeout: timeout
@@ -465,16 +510,16 @@ describe "Operator TransformString", ->
             'y s w': 'vim-mode-plus:surround-word'
 
       it "surround a word with ( and repeatable", ->
-        ensure ['ysw', char: '('],
+        ensure ['y s w', input: '('],
           text: "(apple)\npairs: [brackets]\npairs: [brackets]\n( multi\n  line )"
           cursor: [0, 0]
-        ensure 'j.',
+        ensure 'j .',
           text: "(apple)\n(pairs): [brackets]\npairs: [brackets]\n( multi\n  line )"
       it "surround a word with { and repeatable", ->
-        ensure ['ysw', char: '{'],
+        ensure ['y s w', input: '{'],
           text: "{apple}\npairs: [brackets]\npairs: [brackets]\n( multi\n  line )"
           cursor: [0, 0]
-        ensure 'j.',
+        ensure 'j .',
           text: "{apple}\n{pairs}: [brackets]\npairs: [brackets]\n( multi\n  line )"
 
     describe 'delete-surround-any-pair', ->
@@ -494,14 +539,14 @@ describe "Operator TransformString", ->
             'd s': 'vim-mode-plus:delete-surround-any-pair'
 
       it "delete surrounded any pair found and repeatable", ->
-        ensure 'ds',
+        ensure 'd s',
           text: 'apple\n(pairs: brackets)\n{pairs "s" [brackets]}\n( multi\n  line )'
         ensure '.',
           text: 'apple\npairs: brackets\n{pairs "s" [brackets]}\n( multi\n  line )'
 
       it "delete surrounded any pair found with skip pair out of cursor and repeatable", ->
         set cursor: [2, 14]
-        ensure 'ds',
+        ensure 'd s',
           text: 'apple\n(pairs: [brackets])\n{pairs "s" brackets}\n( multi\n  line )'
         ensure '.',
           text: 'apple\n(pairs: [brackets])\npairs "s" brackets\n( multi\n  line )'
@@ -510,7 +555,7 @@ describe "Operator TransformString", ->
 
       it "delete surrounded chars expanded to multi-line", ->
         set cursor: [3, 1]
-        ensure 'ds',
+        ensure 'd s',
           text: 'apple\n(pairs: [brackets])\n{pairs "s" [brackets]}\n multi\n  line '
 
     describe 'delete-surround-any-pair-allow-forwarding', ->
@@ -526,13 +571,13 @@ describe "Operator TransformString", ->
           ___(inner)
           ___(inner)
           """
-        ensure 'ds',
+        ensure 'd s',
           text: """
           ___inner
           ___(inner)
           """
           cursor: [0, 0]
-        ensure 'j.',
+        ensure 'j .',
           text: """
           ___inner
           ___inner
@@ -555,9 +600,9 @@ describe "Operator TransformString", ->
             'c s': 'vim-mode-plus:change-surround-any-pair'
 
       it "change any surrounded pair found and repeatable", ->
-        ensure ['cs', char: '<'], text: "<apple>\n(grape)\n<lemmon>\n{orange}"
-        ensure 'j.', text: "<apple>\n<grape>\n<lemmon>\n{orange}"
-        ensure 'jj.', text: "<apple>\n<grape>\n<lemmon>\n<orange>"
+        ensure ['c s', input: '<'], text: "<apple>\n(grape)\n<lemmon>\n{orange}"
+        ensure 'j .', text: "<apple>\n<grape>\n<lemmon>\n{orange}"
+        ensure 'j j .', text: "<apple>\n<grape>\n<lemmon>\n<orange>"
 
     describe 'change-surround-any-pair-allow-forwarding', ->
       beforeEach ->
@@ -572,13 +617,13 @@ describe "Operator TransformString", ->
           ___(inner)
           ___(inner)
           """
-        ensure ['cs', char: '<'],
+        ensure ['c s', input: '<'],
           text: """
           ___<inner>
           ___(inner)
           """
           cursor: [0, 0]
-        ensure 'j.',
+        ensure 'j .',
           text: """
           ___<inner>
           ___<inner>
@@ -605,7 +650,7 @@ describe "Operator TransformString", ->
       set register: 'a': text: 'A register', type: 'character'
 
     it "replace selection with regisgter's content", ->
-      ensure 'viw',
+      ensure 'v i w',
         selectedText: 'aaa'
       ensure '_',
         mode: 'normal'
@@ -613,19 +658,19 @@ describe "Operator TransformString", ->
 
     it "replace text object with regisgter's content", ->
       set cursor: [1, 6]
-      ensure '_i(',
+      ensure '_ i (',
         mode: 'normal'
         text: originalText.replace('parenthesis', 'default register')
 
     it "can repeat", ->
       set cursor: [1, 6]
-      ensure '_i(j.',
+      ensure '_ i ( j .',
         mode: 'normal'
         text: originalText.replace(/parenthesis/g, 'default register')
 
     it "can use specified register to replace with", ->
       set cursor: [1, 6]
-      ensure ['"', char: 'a', '_i('],
+      ensure ['"', input: 'a', '_ i ('],
         mode: 'normal'
         text: originalText.replace('parenthesis', 'A register')
 
@@ -649,15 +694,15 @@ describe "Operator TransformString", ->
       set register: 'a': text: 'A register', type: 'character'
 
     it "swap selection with regisgter's content", ->
-      ensure 'viw', selectedText: 'aaa'
-      ensure 'gp',
+      ensure 'v i w', selectedText: 'aaa'
+      ensure 'g p',
         mode: 'normal'
         text: originalText.replace('aaa', 'default register')
         register: '"': text: 'aaa'
 
     it "swap text object with regisgter's content", ->
       set cursor: [1, 6]
-      ensure 'gpi(',
+      ensure 'g p i (',
         mode: 'normal'
         text: originalText.replace('111', 'default register')
         register: '"': text: '111'
@@ -669,14 +714,14 @@ describe "Operator TransformString", ->
         here (default register)
         here (111)
         """
-      ensure 'gpi(j.',
+      ensure 'g p i ( j .',
         mode: 'normal'
         text: updatedText
         register: '"': text: '222'
 
     it "can use specified register to swap with", ->
       set cursor: [1, 6]
-      ensure ['"', char: 'a', 'gpi('],
+      ensure ['"', input: 'a', 'g p i ('],
         mode: 'normal'
         text: originalText.replace('111', 'A register')
         register: 'a': text: '111'
@@ -707,7 +752,7 @@ describe "Operator TransformString", ->
 
     it 'toggle comment for textobject for indent and repeatable', ->
       set cursor: [2, 0]
-      ensure 'g/ii',
+      ensure 'g / i i',
         text: """
           class Base
             constructor: (args) ->
@@ -721,7 +766,7 @@ describe "Operator TransformString", ->
 
     it 'toggle comment for textobject for paragraph and repeatable', ->
       set cursor: [2, 0]
-      ensure 'g/ip',
+      ensure 'g / i p',
         text: """
           # class Base
           #   constructor: (args) ->

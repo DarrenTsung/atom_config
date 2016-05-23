@@ -2,7 +2,6 @@ g2_dev:
   title: "Dolphin"
   paths: [
     "/Users/darren/Projects/storm8/phpdev"
-    "/Users/darren/Projects/storm8/g2_dev"
   ]
 dragon2:
   title: "server-dragon2"
@@ -15,6 +14,7 @@ casual:
   title: "Casual"
   paths: [
     "/Users/darren/Projects/storm8/casualdev"
+    "/Users/darren/Projects/storm8/g2_dev"
     "/Users/darren/Projects/storm8/phpdev"
   ]
 "iphonedev-dragon2":

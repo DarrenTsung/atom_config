@@ -1,12 +1,11 @@
-# Refactoring status: N/A
 _ = require 'underscore-plus'
 path = require 'path'
 {Emitter, Disposable, BufferedProcess, CompositeDisposable} = require 'atom'
 
 Base = require './base'
-{generateIntrospectionReport, getKeyBindingForCommand} = require './introspection'
+{generateIntrospectionReport} = require './introspection'
 settings = require './settings'
-{debug} = require './utils'
+{debug, getParent, getAncestors, getKeyBindingForCommand} = require './utils'
 
 packageScope = 'vim-mode-plus'
 getEditorState = null
@@ -20,20 +19,12 @@ class Developer
     commands =
       'toggle-debug': => @toggleDebug()
 
-      # TODO remove once finished #158
-      'debug-highlight-search': ->
-        globalState = require './global-state'
-        editor = atom.workspace.getActiveTextEditor()
-        vimState = getEditorState(editor)
-        console.log 'highlightSearchPattern', globalState.highlightSearchPattern
-        console.log "vimState's id is #{vimState.id}"
-        console.log "hlmarkers are"
-        vimState.highlightSearchMarkers.forEach (marker) ->
-          console.log marker.getBufferRange().toString()
-
       'open-in-vim': => @openInVim()
       'generate-introspection-report': => @generateIntrospectionReport()
-      'report-commands-have-no-default-keymap': => @reportCommandsHaveNoDefaultKeymap()
+      'generate-command-summary-table-for-commands-have-no-default-keymap': =>
+        @generateCommandSummaryTableForCommandsHaveNoDefaultKeymap()
+      'generate-command-summary-table': =>
+        @generateCommandSummaryTable()
       'toggle-dev-environment': => @toggleDevEnvironment()
       'reload-packages': => @reloadPackages()
       'toggle-reload-packages-on-save': => @toggleReloadPackagesOnSave()
@@ -99,16 +90,112 @@ class Developer
     settings.set('debug', not settings.get('debug'))
     console.log "#{settings.scope} debug:", settings.get('debug')
 
-  reportCommandsHaveNoDefaultKeymap: ->
-    packPath = atom.packages.resolvePackagePath('vim-mode-plus')
-    path.join(packPath, "keymaps", )
+  # Borrowed from underscore-plus
+  modifierKeyMap =
+    cmd: '\u2318'
+    "ctrl-": '\u2303'
+    alt: '\u2325'
+    option: '\u2325'
+    enter: '\u23ce'
+    left: '\u2190'
+    right: '\u2192'
+    up: '\u2191'
+    down: '\u2193'
+    backspace: 'BS'
+    space: 'SPC'
 
-    commandNames = (klass.getCommandName() for __, klass of Base.getRegistries() when klass.isCommand())
-    commandNames = commandNames.filter (commandName) ->
-      not getKeyBindingForCommand(commandName)
+  selectorMap =
+    "atom-text-editor.vim-mode-plus": ''
+    ".normal-mode": 'n'
+    ".insert-mode": 'i'
+    ".replace": 'R'
+    ".visual-mode": 'v'
+    ".characterwise": 'C'
+    ".blockwise": 'B'
+    ".linewise": 'L'
+    ".operator-pending-mode": 'o'
+    ".with-count": '#'
+
+  getCommandSpecs: ->
+    compactSelector = (selector) ->
+      pattern = ///(#{_.keys(selectorMap).map(_.escapeRegExp).join('|')})///g
+      selector.split(/,\s*/g).map (scope) ->
+        scope
+          .replace(/:not\((.*)\)/, '!$1')
+          .replace(pattern, (s) -> selectorMap[s])
+      .join(",")
+
+    compactKeystrokes = (keystrokes) ->
+      pattern = ///(#{_.keys(modifierKeyMap).map(_.escapeRegExp).join('|')})///
+      keystrokes
+        .replace(/(`|_)/g, '\\$1')
+        .replace(pattern, (s) -> modifierKeyMap[s])
+        .replace(/\s+/, '')
+
+    commands = (
+      for name, klass of Base.getRegistries() when klass.isCommand()
+        kind = getAncestors(klass).map((k) -> k.name)[-2..-2][0]
+        commandName = klass.getCommandName()
+        description = klass.getDesctiption()?.replace(/\n/g, '<br/>')
+
+        keymap = null
+        if keymaps = getKeyBindingForCommand(commandName, packageName: "vim-mode-plus")
+          keymap = keymaps.map ({keystrokes, selector}) ->
+            "`#{compactSelector(selector)}` <kbd>#{compactKeystrokes(keystrokes)}</kbd>"
+          .join("<br/>")
+
+        {name, commandName, kind, description, keymap}
+    )
+    commands
+
+  kinds = ["Operator", "Motion", "TextObject", "InsertMode", "MiscCommand", "Scroll", "VisualBlockwise"]
+  generateSummaryTableForCommandSpecs: (specs, {header}={}) ->
+    grouped = _.groupBy(specs, 'kind')
+    str = ""
+    for kind in kinds when specs = grouped[kind]
+
+      report = [
+        "## #{kind}"
+        ""
+        "| Keymap | Command | Description |"
+        "|:-------|:--------|:------------|"
+      ]
+      for {keymap, commandName, description} in specs
+        commandName = commandName.replace(/vim-mode-plus:/, '')
+        description ?= ""
+        keymap ?= ""
+        report.push "| #{keymap} | `#{commandName}` | #{description} |"
+      str += report.join("\n") + "\n\n"
 
     atom.workspace.open().then (editor) ->
-      editor.setText commandNames.join("\n")
+      editor.insertText(header + "\n") if header?
+      editor.insertText(str)
+
+  generateCommandSummaryTable: ->
+    header = """
+    # Keymap selector abbreviations
+
+    In this document, following abbreviations are used for shortness.
+
+    | Abbrev | Selector                     | Description             |
+    |:-------|:-----------------------------|:------------------------|
+    | `!i`   | `:not(.insert-mode)`         | except insert-mode      |
+    | `i`    | `.insert-mode`               |                         |
+    | `o`    | `.operator-pending-mode`     |                         |
+    | `n`    | `.normal-mode`               |                         |
+    | `v`    | `.visual-mode`               |                         |
+    | `vB`   | `.visual-mode.blockwise`     |                         |
+    | `vL`   | `.visual-mode.linewise`      |                         |
+    | `vC`   | `.visual-mode.characterwise` |                         |
+    | `iR`   | `.insert-mode.replace`       |                         |
+    | `#`    | `.with-count`                | when count is specified |
+
+    """
+    @generateSummaryTableForCommandSpecs(@getCommandSpecs(), {header})
+
+  generateCommandSummaryTableForCommandsHaveNoDefaultKeymap: ->
+    commands = @getCommandSpecs().filter (command) -> not getKeyBindingForCommand(command.commandName, packageName: 'vim-mode-plus')
+    @generateSummaryTableForCommandSpecs(commands)
 
   openInVim: ->
     editor = atom.workspace.getActiveTextEditor()
@@ -120,8 +207,11 @@ class Developer
   generateIntrospectionReport: ->
     generateIntrospectionReport _.values(Base.getRegistries()),
       excludeProperties: [
+        'run'
+        'getCommandNameWithoutPrefix'
         'getClass', 'extend', 'getParent', 'getAncestors', 'isCommand'
         'getRegistries', 'command', 'reset'
+        'getDesctiption', 'description'
         'init', 'getCommandName', 'getCommandScope', 'registerCommand',
         'delegatesProperties', 'subscriptions', 'commandPrefix', 'commandScope'
         'delegatesMethods',
