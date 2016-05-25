@@ -21,7 +21,7 @@ atom.commands.add 'atom-text-editor',
       editor.foldBufferRow(bufferRow)
 
 # START SORT 'USINGS' ON SAVE
-# Order the first consecutive usings
+# Sort any consecutive lines matching the patterns ('usings')
 atom.workspace.observeTextEditors (editor) ->
   whiteListedGrammers = ['source.cs']
   editor.buffer.onWillSave ->
@@ -31,7 +31,8 @@ atom.workspace.observeTextEditors (editor) ->
 
     buffer = editor.getBuffer()
 
-    consecutiveMatchingLineCount = 0
+    startLine = 0
+    endLine = 0
     for i in [0..(buffer.getLineCount() - 1)]
       lineRange = buffer.rangeForRow(i)
 
@@ -40,15 +41,17 @@ atom.workspace.observeTextEditors (editor) ->
         matches = true
 
       if !matches
-        break
-      consecutiveMatchingLineCount = i
+        if endLine > startLine
+          sortLineRange(editor, startLine, endLine)
+        startLine = i
 
-    if consecutiveMatchingLineCount <= 0
-      return
+      endLine = i
 
-    sortRange = new Range([0, 0], buffer.rangeForRow(consecutiveMatchingLineCount).end)
-    text = editor.getTextInBufferRange(sortRange)
-    sortLines(editor, sortRange)
+sortLineRange = (editor, startLineNumber, endLineNumber) ->
+  buffer = editor.getBuffer()
+
+  sortRange = new Range(buffer.rangeForRow(startLineNumber).start, buffer.rangeForRow(endLineNumber).end)
+  sortLines(editor, sortRange)
 
 sortLines = (editor, range) ->
   sortTextLines editor, localeCompareSort, range
@@ -69,33 +72,27 @@ atom.commands.add 'atom-text-editor', 'thisify-storm8': (e) ->
 
   bufferRange = editor.getBuffer().getRange()
 
-  privateVariableRegex = ///
-    (\x20*[^\n]+?[^\.])\b(_[a-z]\w+)
+  className = ""
+  classRegex = ///
+    class\x20+(\w+(?:<[^>]+>)?)
+  ///g
+  editor.scanInBufferRange(classRegex, bufferRange, ({match}) ->
+    className = match[1]
+  )
+
+  tokenRegex = ///
+    (\x20*[^\n\w]*?[^\.])\b([_\w]+)
   ///g
   while true
     matched = false
-    editor.scanInBufferRange(privateVariableRegex, bufferRange, ({match, replace}) ->
-      if /(private|public|protected)/i.test(match[0])
+    editor.scanInBufferRange(tokenRegex, bufferRange, ({match, replace, range}) ->
+      lineRange = new Range(new Point(range.start.row, 0), range.end)
+      lineText = editor.getTextInBufferRange(lineRange)
+      if /(\/\/|private|public|protected|new)/i.test(lineText)
         return
 
-      matched = true
-      replace("#{match[1]}this.#{match[2]}")
-    )
-
-    if not matched
-      break
-
-  functionRegex = ///
-    (\x20*[^\n]+?[^\.])\b([A-Z]\w+)
-  ///g
-  while true
-    matched = false
-    editor.scanInBufferRange(functionRegex, bufferRange, ({match, replace}) ->
-      if /(\/\/|private|public|protected|new)/i.test(match[0])
-        return
-
-      numberOfDoubleQuotes = (match[0].match(/"/g) || []).length;
-      numberOfSingleQuotes = (match[0].match(/'/g) || []).length;
+      numberOfDoubleQuotes = (lineText.match(/"/g) || []).length;
+      numberOfSingleQuotes = (lineText.match(/'/g) || []).length;
 
       nonEvenNumberOfSingleQuotes = numberOfSingleQuotes % 2 != 0
       nonEvenNumberOfDoubleQuotes = numberOfDoubleQuotes % 2 != 0
@@ -103,12 +100,50 @@ atom.commands.add 'atom-text-editor', 'thisify-storm8': (e) ->
       if nonEvenNumberOfDoubleQuotes || nonEvenNumberOfSingleQuotes
         return
 
+      numberOfBrackets = (lineText.match(/(<|>)/g) || []).length;
+      nonEvenNumberOfBrackets = numberOfBrackets % 2 != 0
+
+      if nonEvenNumberOfBrackets
+        return
+
+      characterAfterMatchRange = new Range(range.end, [range.end.row, range.end.column + 1])
+      characterAfterMatch = editor.getTextInBufferRange(characterAfterMatchRange)
+
+      checkFunctionDeclaration = false
+      if /\(/i.test(characterAfterMatch)
+        checkFunctionDeclaration = true
+
+      # if this is possible adding / removing listener (+= or -=)
+      if /(\+|-)=/.test(lineText)
+        checkFunctionDeclaration = true
+
       # if we have a valid subject, let's make sure it's in this file
+      isStatic = false
       declarationInFile = false
-      #(private|public|protected)\s+\w+\s+.*\bDiscardRecording\b\s*(?:\([^\)]*\))?\s*{
-      editor.scanInBufferRange new RegExp("(private|public|protected)\\s+\\w+\\s+.*\\b#{match[2]}\\b\\s*(?:\\([^\\)]*\\))?\\s*{", ''), bufferRange, ({match}) ->
-        if /(region|class|const|static)/i.test(match[0])
+      if checkFunctionDeclaration
+        # check for function declarations
+        #(private|public|protected)\s+\w+(?:<[^>]+>)?\s+[^{=(]*\bDiscardRecording\b\s*(?:\([^\)]*\))?\s*{
+        editor.scanInBufferRange new RegExp("(private|public|protected)\\s+\\w+(?:<[^>]+>)?\\s+[^{=(]*\\b#{match[2]}\\b\\s*(?:\\([^\\)]*\\))?\\s*{", ''), bufferRange, ({match, range}) ->
+          declarationLineRange = new Range(new Point(range.start.row, 0), range.end)
+          declarationLineText = editor.getTextInBufferRange(declarationLineRange)
+          if /(region|class)/i.test(declarationLineText)
+            return
+
+          if /(const|static)/i.test(declarationLineText)
+            isStatic = true
+
+          declarationInFile = true
+
+      # always check for variable declarations
+      #(private|public|protected)\s+\w+(?:<[^>]+>)?\s+[^{=(]*\bget\b\s*(;|=)
+      editor.scanInBufferRange new RegExp("(private|public|protected)\\s+\\w+(?:<[^>]+>)?\\s+[^{=(]*\\b#{match[2]}\\b\\s*(;|=|{)", ''), bufferRange, ({match, range}) ->
+        declarationLineRange = new Range(new Point(range.start.row, 0), range.end)
+        declarationLineText = editor.getTextInBufferRange(declarationLineRange)
+        if /(region|class)/i.test(declarationLineText)
           return
+
+        if /(const|static)/i.test(declarationLineText)
+          isStatic = true
 
         declarationInFile = true
 
@@ -116,7 +151,10 @@ atom.commands.add 'atom-text-editor', 'thisify-storm8': (e) ->
         return
 
       matched = true
-      replace("#{match[1]}this.#{match[2]}")
+      if isStatic
+        replace("#{match[1]}#{className}.#{match[2]}")
+      else
+        replace("#{match[1]}this.#{match[2]}")
     )
 
     if not matched
