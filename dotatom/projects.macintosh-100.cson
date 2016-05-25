@@ -3,6 +3,7 @@
   paths: [
     "/Users/darren/Projects/storm8/s8unity_shared"
     "/Users/darren/Projects/storm8/detectivematch"
+    "/Users/darren/Projects/storm8/bakery2"
   ]
 "detectivematch-server":
   title: "DetectiveMatch-Server"

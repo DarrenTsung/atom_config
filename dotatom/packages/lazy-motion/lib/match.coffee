@@ -1,5 +1,5 @@
 _ = require 'underscore-plus'
-fuzzaldrin = require 'fuzzaldrin-plus'
+fuzzaldrin = require 'fuzzaldrin'
 {CompositeDisposable} = require 'atom'
 {selectVisibleBy, getIndex, flash, getView} = require './utils'
 
@@ -100,7 +100,7 @@ class MatchList
     marker.destroy() for marker in (@entries ? [])
     marker.destroy() for marker in (@tokens ? [])
     @subscriptions.dispose()
-    {@index, @tokens,@entries, @subscriptions} = {}
+    {@index, @tokens, @entries, @subscriptions} = {}
 
 class Match
   constructor: (@editor, {@range, @matchText}) ->

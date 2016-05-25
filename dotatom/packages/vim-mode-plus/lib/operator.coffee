@@ -8,6 +8,7 @@ _ = require 'underscore-plus'
   moveCursorLeft, moveCursorRight
   highlightRanges, getNewTextRangeFromCheckpoint
   isEndsWithNewLineForBufferRow
+  isAllWhiteSpace
 } = require './utils'
 swrap = require './selection-wrapper'
 settings = require './settings'
@@ -328,6 +329,22 @@ class DecodeUriComponent extends TransformString
   hover: icon: 'decodeURI', emoji: 'decodeURI'
   getNewText: (text) ->
     decodeURIComponent(text)
+
+class CompactSpaces extends TransformString
+  @extend()
+  @description: "Compact multiple spaces to single space"
+  displayName: 'Compact space'
+  mutateSelection: (selection) ->
+    text = @getNewText(selection.getText(), selection)
+    selection.insertText(text, {@autoIndent})
+    @restorePoint(selection) if @setPoint
+
+  getNewText: (text) ->
+    if text.match(/^[ ]+$/)
+      ' '
+    else
+      text.replace /^(\s*)(.*?)(\s*)$/gm, (m, leading, middle, trailing) ->
+        leading + middle.split(/[ \t]+/).join(' ') + trailing
 
 # -------------------------
 class TransformStringByExternalCommand extends TransformString
@@ -1229,12 +1246,6 @@ class Change extends ActivateInsertMode
   trackChange: true
   supportInsertionCount: false
 
-  # [FIXME] #231 workaround until Selection::insertText("\n", {autoIndent: true}) auto-indent again.
-  getAutoIndentedTextForNewLine: (selection, text) ->
-    range = selection.getBufferRange()
-    desiredIndentLevel = @editor.languageMode.suggestedIndentForLineAtBufferRow(range.start.row, text)
-    @editor.buildIndentString(desiredIndentLevel) + text
-
   execute: ->
     @selectTarget()
     text = ''
@@ -1246,7 +1257,6 @@ class Change extends ActivateInsertMode
     @editor.transact =>
       for selection in @editor.getSelections()
         @setTextToRegisterForSelection(selection)
-        text = @getAutoIndentedTextForNewLine(selection, text) if text is "\n"
         range = selection.insertText(text, autoIndent: true)
         selection.cursor.moveLeft() unless range.isEmpty()
     super

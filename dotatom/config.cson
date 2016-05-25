@@ -39,6 +39,7 @@
     tabType: "soft"
   "exception-reporting":
     userId: "44048cfb-4890-b4a9-ea94-754b28c3f60f"
+  "file-icons": {}
   "find-and-replace":
     openProjectFindResultsInRightPane: true
   "fuzzy-finder":
@@ -78,6 +79,11 @@
   "one-dark-ui": {}
   "project-manager":
     environmentSpecificProjects: true
+  "split-diff":
+    ignoreWhitespace: true
+    leftEditorColor: "red"
+    rightEditorColor: "green"
+    syncHorizontalScroll: true
   tabs: {}
   "tree-view":
     hideIgnoredNames: true

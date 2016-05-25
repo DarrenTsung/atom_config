@@ -1,7 +1,7 @@
 {
   "name": "lazy-motion",
   "main": "./lib/main",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Rapid cursor positioning with fuzzy search",
   "keywords": [],
   "repository": {
@@ -23,7 +23,7 @@
     ]
   },
   "dependencies": {
-    "fuzzaldrin-plus": "^0.3.1",
+    "fuzzaldrin": "^2.1.0",
     "underscore-plus": "^1.6.6"
   },
   "configSchema": {
@@ -63,17 +63,17 @@
     "url": "https://github.com/t9md/atom-lazy-motion/issues"
   },
   "homepage": "https://github.com/t9md/atom-lazy-motion#readme",
-  "_id": "lazy-motion@0.3.0",
-  "_shasum": "9fd2b34e003945be441f85aa6495fe729c70d128",
-  "_resolved": "file:../d-116026-77250-80tbky/package.tgz",
-  "_from": "../d-116026-77250-80tbky/package.tgz",
+  "_id": "lazy-motion@0.3.1",
+  "_shasum": "9124858204b552568e10a6543fd5cbbd717433dc",
+  "_resolved": "file:../d-116423-67394-w0nsqj/package.tgz",
+  "_from": "../d-116423-67394-w0nsqj/package.tgz",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [
       {
-        "name": "fuzzaldrin-plus",
-        "version": "0.3.1",
-        "path": "node_modules/fuzzaldrin-plus/lib/fuzzaldrin.js"
+        "name": "fuzzaldrin",
+        "version": "2.1.0",
+        "path": "node_modules/fuzzaldrin/lib/fuzzaldrin.js"
       },
       {
         "name": "underscore-plus",
@@ -89,7 +89,7 @@
     "extensions": {
       ".json": [
         "coffeelint.json",
-        "node_modules/fuzzaldrin-plus/package.json",
+        "node_modules/fuzzaldrin/package.json",
         "node_modules/underscore-plus/node_modules/underscore/package.json",
         "node_modules/underscore-plus/package.json",
         "package.json"
@@ -103,11 +103,10 @@
         "lib/utils.coffee"
       ],
       ".js": [
-        "node_modules/fuzzaldrin-plus/lib/filter.js",
-        "node_modules/fuzzaldrin-plus/lib/fuzzaldrin.js",
-        "node_modules/fuzzaldrin-plus/lib/legacy.js",
-        "node_modules/fuzzaldrin-plus/lib/matcher.js",
-        "node_modules/fuzzaldrin-plus/lib/scorer.js",
+        "node_modules/fuzzaldrin/lib/filter.js",
+        "node_modules/fuzzaldrin/lib/fuzzaldrin.js",
+        "node_modules/fuzzaldrin/lib/matcher.js",
+        "node_modules/fuzzaldrin/lib/scorer.js",
         "node_modules/underscore-plus/lib/underscore-plus.js",
         "node_modules/underscore-plus/node_modules/underscore/underscore-min.js",
         "node_modules/underscore-plus/node_modules/underscore/underscore.js"
@@ -120,7 +119,7 @@
           "lib"
         ],
         "dependencies": {
-          "fuzzaldrin-plus": "^0.3.1",
+          "fuzzaldrin": "^2.1.0",
           "underscore-plus": "^1.6.6"
         }
       },

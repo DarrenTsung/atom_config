@@ -1,30 +1,30 @@
 {Emitter, CompositeDisposable} = require 'atom'
 settings = require './settings'
+{ElementBuilder} = require './utils'
 
 class UI extends HTMLElement
+  ElementBuilder.includeInto(this)
+  
   createdCallback: ->
     @emitter = new Emitter
-    @classList.add 'lazy-motion-ui'
-    @counterContainer = @createElement('div', classList: ['counter'])
-    @editorContainer = @createElement('div', classList: ['editor-container'])
-    @appendChild @counterContainer
-    @appendChild @editorContainer
+    @className = 'lazy-motion-ui'
 
-    @editorElement = @createElement 'atom-text-editor',
-      classList: ['editor', 'lazy-motion']
-      attribute: {mini: ''}
+    @appendChild(
+      @counterContainer = @div
+        classList: ['counter']
+    )
+    @appendChild(
+      @editorContainer = @div
+        classList: ['editor-container']
+    ).appendChild(
+      @editorElement = @atomTextEditor
+        classList: ['editor', 'lazy-motion']
+        attribute: {mini: ''}
+    )
 
-    @editorContainer.appendChild @editorElement
     @editor = @editorElement.getModel()
     @editor.setMini true
     @panel = atom.workspace.addBottomPanel {item: this, visible: false}
-
-  createElement: (element, {classList, attribute}) ->
-    element = document.createElement element
-    element.classList.add classList...
-    for name, value of attribute ? {}
-      element.setAttribute(name, value)
-    element
 
   onDidChange: (fn) -> @emitter.on 'did-change', fn
   onDidConfirm: (fn) -> @emitter.on 'did-confirm', fn
@@ -98,7 +98,6 @@ class UI extends HTMLElement
     {@emitter, @panel, @editor, @subscriptions} = {}
     @remove()
 
-module.exports =
-document.registerElement 'lazy-motion-ui',
+module.exports = document.registerElement 'lazy-motion-ui',
   extends: 'div'
   prototype: UI.prototype
