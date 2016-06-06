@@ -28,92 +28,98 @@
 	@c-sharp: '\E004';
 	@c: '\E005';
 	@cake_php: '\E006';
-	@cjsx: '\E007';
-	@clock: '\E008';
-	@coffee: '\E009';
-	@coffee_erb: '\E00A';
-	@coldfusion: '\E00B';
-	@config: '\E00C';
-	@cpp: '\E00D';
-	@css: '\E00E';
-	@csv: '\E00F';
-	@default: '\E010';
-	@deprecation-cop: '\E011';
-	@docker: '\E012';
-	@editorconfig: '\E013';
-	@ejs: '\E014';
-	@elm: '\E015';
-	@error: '\E016';
-	@favicon: '\E017';
-	@folder: '\E018';
-	@font: '\E019';
-	@git_folder: '\E01A';
-	@git_ignore: '\E01B';
-	@github: '\E01C';
-	@go: '\E01D';
-	@go2: '\E01E';
-	@grails: '\E01F';
-	@grunt: '\E020';
-	@gulp: '\E021';
-	@hacklang: '\E022';
-	@haml: '\E023';
-	@haskell: '\E024';
-	@heroku: '\E025';
-	@html: '\E026';
-	@html_erb: '\E027';
-	@ignored: '\E028';
-	@illustrator: '\E029';
-	@image: '\E02A';
-	@jade: '\E02B';
-	@java: '\E02C';
-	@javascript: '\E02D';
-	@js_erb: '\E02E';
-	@json: '\E02F';
-	@julia: '\E030';
-	@karma: '\E031';
-	@less: '\E032';
-	@license: '\E033';
-	@liquid: '\E034';
-	@livescript: '\E035';
-	@lua: '\E036';
-	@markdown: '\E037';
-	@mustache: '\E038';
-	@new-file: '\E039';
-	@npm: '\E03A';
-	@npm_ignored: '\E03B';
-	@ocaml: '\E03C';
-	@pdf: '\E03D';
-	@perl: '\E03E';
-	@photoshop: '\E03F';
-	@php: '\E040';
-	@project: '\E041';
-	@pug: '\E042';
-	@puppet: '\E043';
-	@python: '\E044';
-	@rails: '\E045';
-	@react: '\E046';
-	@ruby: '\E047';
-	@rust: '\E048';
-	@sass: '\E049';
-	@sbt: '\E04A';
-	@scala: '\E04B';
-	@search: '\E04C';
-	@settings: '\E04D';
-	@shell: '\E04E';
-	@slim: '\E04F';
-	@smarty: '\E050';
-	@stylus: '\E051';
-	@svg: '\E052';
-	@swift: '\E053';
-	@tex: '\E054';
-	@time-cop: '\E055';
-	@todo: '\E056';
-	@twig: '\E057';
-	@typescript: '\E058';
-	@vala: '\E059';
-	@video: '\E05A';
-	@xml: '\E05B';
-	@yml: '\E05C';
+	@checkbox-unchecked: '\E007';
+	@checkbox: '\E008';
+	@cjsx: '\E009';
+	@clock: '\E00A';
+	@coffee: '\E00B';
+	@coffee_erb: '\E00C';
+	@coldfusion: '\E00D';
+	@config: '\E00E';
+	@cpp: '\E00F';
+	@css: '\E010';
+	@csv: '\E011';
+	@default: '\E012';
+	@deprecation-cop: '\E013';
+	@docker: '\E014';
+	@editorconfig: '\E015';
+	@ejs: '\E016';
+	@elm: '\E017';
+	@error: '\E018';
+	@favicon: '\E019';
+	@folder: '\E01A';
+	@font: '\E01B';
+	@git_folder: '\E01C';
+	@git_ignore: '\E01D';
+	@github: '\E01E';
+	@go: '\E01F';
+	@go2: '\E020';
+	@gradle: '\E021';
+	@grails: '\E022';
+	@grunt: '\E023';
+	@gulp: '\E024';
+	@hacklang: '\E025';
+	@haml: '\E026';
+	@haskell: '\E027';
+	@heroku: '\E028';
+	@html: '\E029';
+	@html_erb: '\E02A';
+	@ignored: '\E02B';
+	@illustrator: '\E02C';
+	@image: '\E02D';
+	@info: '\E02E';
+	@ionic: '\E02F';
+	@jade: '\E030';
+	@java: '\E031';
+	@javascript: '\E032';
+	@js_erb: '\E033';
+	@json: '\E034';
+	@julia: '\E035';
+	@karma: '\E036';
+	@less: '\E037';
+	@license: '\E038';
+	@liquid: '\E039';
+	@livescript: '\E03A';
+	@lua: '\E03B';
+	@markdown: '\E03C';
+	@mustache: '\E03D';
+	@new-file: '\E03E';
+	@npm: '\E03F';
+	@npm_ignored: '\E040';
+	@ocaml: '\E041';
+	@pdf: '\E042';
+	@perl: '\E043';
+	@photoshop: '\E044';
+	@php: '\E045';
+	@project: '\E046';
+	@pug: '\E047';
+	@puppet: '\E048';
+	@python: '\E049';
+	@rails: '\E04A';
+	@react: '\E04B';
+	@ruby: '\E04C';
+	@rust: '\E04D';
+	@sass: '\E04E';
+	@sbt: '\E04F';
+	@scala: '\E050';
+	@search: '\E051';
+	@settings: '\E052';
+	@shell: '\E053';
+	@slim: '\E054';
+	@smarty: '\E055';
+	@stylus: '\E056';
+	@svg: '\E057';
+	@swift: '\E058';
+	@terraform: '\E059';
+	@tex: '\E05A';
+	@time-cop: '\E05B';
+	@todo: '\E05C';
+	@twig: '\E05D';
+	@typescript: '\E05E';
+	@vala: '\E05F';
+	@video: '\E060';
+	@xml: '\E061';
+	@yml: '\E062';
 	
 	content: @@filename;
 }
@@ -145,6 +151,12 @@
 }
 .icon-cake_php {
 	.icon(cake_php);
+}
+.icon-checkbox-unchecked {
+	.icon(checkbox-unchecked);
+}
+.icon-checkbox {
+	.icon(checkbox);
 }
 .icon-cjsx {
 	.icon(cjsx);
@@ -218,6 +230,9 @@
 .icon-go2 {
 	.icon(go2);
 }
+.icon-gradle {
+	.icon(gradle);
+}
 .icon-grails {
 	.icon(grails);
 }
@@ -253,6 +268,12 @@
 }
 .icon-image {
 	.icon(image);
+}
+.icon-info {
+	.icon(info);
+}
+.icon-ionic {
+	.icon(ionic);
 }
 .icon-jade {
 	.icon(jade);
@@ -376,6 +397,9 @@
 }
 .icon-swift {
 	.icon(swift);
+}
+.icon-terraform {
+	.icon(terraform);
 }
 .icon-tex {
 	.icon(tex);

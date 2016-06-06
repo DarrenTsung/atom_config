@@ -1,7 +1,7 @@
 {
   "name": "git-time-machine",
   "main": "./lib/git-time-machine",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "Visually interact with git commit history for a file",
   "keywords": [
     "git",
@@ -28,7 +28,7 @@
     "d3": "^3.5.6",
     "git-log-utils": "0.2.2",
     "moment": "^2.10.6",
-    "split-diff": "git+https://github.com/mupchrch/split-diff.git#v0.7.5",
+    "split-diff": "git+https://github.com/mupchrch/split-diff.git#v0.8.3",
     "underscore-plus": "1.x"
   },
   "devDependencies": {},
@@ -38,10 +38,10 @@
     "url": "https://github.com/littlebee/git-time-machine/issues"
   },
   "homepage": "https://github.com/littlebee/git-time-machine#readme",
-  "_id": "git-time-machine@1.5.2",
-  "_shasum": "1a19439e3e961d23eee009c963c27265a49759c1",
-  "_resolved": "file:../d-11649-54758-1syviqp/package.tgz",
-  "_from": "../d-11649-54758-1syviqp/package.tgz",
+  "_id": "git-time-machine@1.5.3",
+  "_shasum": "6246a892bc6399a0f012c7ffb728273b0edaf79c",
+  "_resolved": "file:../d-11656-83731-2xy4sd/package.tgz",
+  "_from": "../d-11656-83731-2xy4sd/package.tgz",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [
@@ -152,7 +152,7 @@
       },
       {
         "name": "diff",
-        "version": "2.2.2",
+        "version": "2.2.3",
         "path": "node_modules/split-diff/node_modules/diff/lib/index.js"
       },
       {

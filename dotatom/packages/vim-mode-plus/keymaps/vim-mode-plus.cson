@@ -133,6 +133,7 @@
   'g U': 'vim-mode-plus:upper-case'
   'g u': 'vim-mode-plus:lower-case'
   'g c': 'vim-mode-plus:camel-case'
+  'g C': 'vim-mode-plus:pascal-case'
   'g /': 'vim-mode-plus:toggle-line-comments'
   'g -': 'vim-mode-plus:dash-case'
   'g space': 'vim-mode-plus:compact-spaces'
@@ -426,6 +427,7 @@
   's': 'vim-mode-plus:change'
   'o': 'vim-mode-plus:reverse-selections'
   '"': 'vim-mode-plus:set-register-name'
+  'D': 'vim-mode-plus:delete-line'
 
   'v': 'vim-mode-plus:activate-characterwise-visual-mode'
   'V': 'vim-mode-plus:activate-linewise-visual-mode'
@@ -446,6 +448,7 @@
   'O': 'vim-mode-plus:reverse-selections',
   'I': 'vim-mode-plus:insert-at-start-of-selection'
   'A': 'vim-mode-plus:insert-at-end-of-selection'
+  'D': 'vim-mode-plus:delete-to-last-character-of-line' # To avoid overridden by delete-line in visual-mode
 
 # Input mini editor e.g. mark, surround.
 # -------------------------

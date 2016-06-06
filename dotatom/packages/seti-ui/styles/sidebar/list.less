@@ -10,7 +10,6 @@ atom-panel-container.left, atom-panel-container.right {
     .directory.entry.list-nested-item {
       &.selected {
         &::before {
-          background: @tree-view-highlight;
           margin-top: -5px;
           height: 35px;
         }
@@ -29,6 +28,7 @@ atom-panel-container.left, atom-panel-container.right {
       &.selected {
         &::before {
           background: @tree-view-highlight;
+          border-left: solid 3px @seti-primary;
           height: 35px;
         }
       }

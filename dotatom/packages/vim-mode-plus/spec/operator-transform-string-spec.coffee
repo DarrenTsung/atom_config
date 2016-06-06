@@ -269,15 +269,31 @@ describe "Operator TransformString", ->
         text: 'vim-mode\natom-text-editor\n'
         cursorBuffer: [0, 0]
 
-    it "CamelCase text and not move cursor", ->
+    it "transform text by motion and repeatable", ->
       ensure 'g c $', text: 'vimMode\natom-text-editor\n', cursor: [0, 0]
-      ensure 'j g c $', text: 'vimMode\natomTextEditor\n', cursor: [1, 0]
+      ensure 'j .', text: 'vimMode\natomTextEditor\n', cursor: [1, 0]
 
-    it "CamelCase selected text", ->
+    it "transform selection", ->
       ensure 'V j g c', text: 'vimMode\natomTextEditor\n', cursor: [0, 0]
 
-    it "gcgc CamelCase the line of text, won't move cursor", ->
+    it "repeating twice works on current-line and won't move cursor", ->
       ensure 'l g c g c', text: 'vimMode\natom-text-editor\n', cursor: [0, 1]
+
+  describe 'PascalCase', ->
+    beforeEach ->
+      set
+        text: 'vim-mode\natom-text-editor\n'
+        cursorBuffer: [0, 0]
+
+    it "transform text by motion and repeatable", ->
+      ensure 'g C $', text: 'VimMode\natom-text-editor\n', cursor: [0, 0]
+      ensure 'j .', text: 'VimMode\nAtomTextEditor\n', cursor: [1, 0]
+
+    it "transform selection", ->
+      ensure 'V j g C', text: 'VimMode\natomTextEditor\n', cursor: [0, 0]
+
+    it "repeating twice works on current-line and won't move cursor", ->
+      ensure 'l g C g C', text: 'VimMode\natom-text-editor\n', cursor: [0, 1]
 
   describe 'SnakeCase', ->
     beforeEach ->
@@ -288,14 +304,14 @@ describe "Operator TransformString", ->
         'atom-text-editor.vim-mode-plus:not(.insert-mode)':
           'g _': 'vim-mode-plus:snake-case'
 
-    it "SnakeCase text and not move cursor", ->
+    it "transform text by motion and repeatable", ->
       ensure 'g _ $', text: 'vim_mode\natom-text-editor\n', cursor: [0, 0]
-      ensure 'j g _ $', text: 'vim_mode\natom_text_editor\n', cursor: [1, 0]
+      ensure 'j .', text: 'vim_mode\natom_text_editor\n', cursor: [1, 0]
 
-    it "SnakeCase selected text", ->
+    it "transform selection", ->
       ensure 'V j g _', text: 'vim_mode\natom_text_editor\n', cursor: [0, 0]
 
-    it "g_g_ SnakeCase the line of text, won't move cursor", ->
+    it "repeating twice works on current-line and won't move cursor", ->
       ensure 'l g _ g _', text: 'vim_mode\natom-text-editor\n', cursor: [0, 1]
 
   describe 'DashCase', ->
@@ -304,14 +320,14 @@ describe "Operator TransformString", ->
         text: 'vimMode\natom_text_editor\n'
         cursorBuffer: [0, 0]
 
-    it "DashCase text and not move cursor", ->
+    it "transform text by motion and repeatable", ->
       ensure 'g - $', text: 'vim-mode\natom_text_editor\n', cursor: [0, 0]
-      ensure 'j g - $', text: 'vim-mode\natom-text-editor\n', cursor: [1, 0]
+      ensure 'j .', text: 'vim-mode\natom-text-editor\n', cursor: [1, 0]
 
-    it "DashCase selected text", ->
+    it "transform selection", ->
       ensure 'V j g -', text: 'vim-mode\natom-text-editor\n', cursor: [0, 0]
 
-    it "g-g- DashCase the line of text, won't move cursor", ->
+    it "repeating twice works on current-line and won't move cursor", ->
       ensure 'l g - g -', text: 'vim-mode\natom_text_editor\n', cursor: [0, 1]
 
   describe 'CompactSpaces', ->

@@ -1,6 +1,7 @@
 {CompositeDisposable, Directory, File} = require 'atom'
 DiffViewEditor = require './build-lines'
 LoadingView = require './loading-view'
+FooterView = require './footer-view'
 SyncScroll = require './sync-scroll'
 configSchema = require "./config-schema"
 path = require 'path'
@@ -11,8 +12,6 @@ module.exports = SplitDiff =
   diffViewEditor1: null
   diffViewEditor2: null
   editorSubscriptions: null
-  isWhitespaceIgnored: false
-  isWordDiffEnabled: true
   linkedDiffChunks: null
   diffChunkPointer: 0
   isFirstChunkSelect: true
@@ -24,37 +23,47 @@ module.exports = SplitDiff =
   hasGitRepo: false
   process: null
   loadingView: null
+  copyHelpMsg: 'Place your cursor in a chunk first!'
 
   activate: (state) ->
     @subscriptions = new CompositeDisposable()
 
     @subscriptions.add atom.commands.add 'atom-workspace',
       'split-diff:enable': => @diffPanes()
-      'split-diff:next-diff': => @nextDiff()
-      'split-diff:prev-diff': => @prevDiff()
-      'split-diff:copy-to-right': => @copyChunkToRight()
-      'split-diff:copy-to-left': => @copyChunkToLeft()
+      'split-diff:next-diff': =>
+        if @isEnabled
+          @nextDiff()
+      'split-diff:prev-diff': =>
+        if @isEnabled
+          @prevDiff()
+      'split-diff:copy-to-right': =>
+        if @isEnabled
+          @copyChunkToRight()
+      'split-diff:copy-to-left': =>
+        if @isEnabled
+          @copyChunkToLeft()
       'split-diff:disable': => @disable()
       'split-diff:ignore-whitespace': => @toggleIgnoreWhitespace()
       'split-diff:toggle': => @toggle()
 
   deactivate: ->
-    @disable(false)
+    @disable()
     @subscriptions.dispose()
 
   # called by "toggle" command
   # toggles split diff
   toggle: ->
     if @isEnabled
-      @disable(true)
+      @disable()
     else
       @diffPanes()
 
   # called by "Disable" command
   # removes diff and sync scroll, disposes of subscriptions
-  disable: (displayMsg) ->
+  disable: () ->
     @isEnabled = false
 
+    # remove listeners
     if @editorSubscriptions?
       @editorSubscriptions.dispose()
       @editorSubscriptions = null
@@ -71,8 +80,14 @@ module.exports = SplitDiff =
       if @wasEditor2Created
         @diffViewEditor2.cleanUp()
 
+    # remove bottom panel
+    if @footerView?
+      @footerView.destroy()
+      @footerView = null
+
     @_clearDiff()
 
+    # reset all variables
     @diffChunkPointer = 0
     @isFirstChunkSelect = true
     @wasEditor1SoftWrapped = false
@@ -81,14 +96,11 @@ module.exports = SplitDiff =
     @wasEditor2Created = false
     @hasGitRepo = false
 
-    if displayMsg
-      atom.notifications.addInfo('Split Diff Disabled', {dismissable: false})
-
   # called by "toggle ignore whitespace" command
   # toggles ignoring whitespace and refreshes the diff
   toggleIgnoreWhitespace: ->
-    @_setConfig('ignoreWhitespace', !@isWhitespaceIgnored)
-    @isWhitespaceIgnored = @_getConfig('ignoreWhitespace')
+    isWhitespaceIgnored = @_getConfig('ignoreWhitespace')
+    @_setConfig('ignoreWhitespace', !isWhitespaceIgnored)
 
   # called by "Move to next diff" command
   nextDiff: ->
@@ -99,7 +111,7 @@ module.exports = SplitDiff =
     else
       @isFirstChunkSelect = false
 
-    @_selectDiffs(@linkedDiffChunks[@diffChunkPointer])
+    @_selectDiffs(@linkedDiffChunks[@diffChunkPointer], @diffChunkPointer)
 
   # called by "Move to previous diff" command
   prevDiff: ->
@@ -110,26 +122,44 @@ module.exports = SplitDiff =
     else
       @isFirstChunkSelect = false
 
-    @_selectDiffs(@linkedDiffChunks[@diffChunkPointer])
+    @_selectDiffs(@linkedDiffChunks[@diffChunkPointer], @diffChunkPointer)
 
-  copyChunkToRight: () ->
+  copyChunkToRight: ->
     linesToMove = @diffViewEditor1.getCursorDiffLines()
+
+    if linesToMove.length == 0
+      atom.notifications.addWarning('Split Diff', {detail: @copyHelpMsg, dismissable: false, icon: 'diff'})
+
     offset = 0 # keep track of line offset (used when there are multiple chunks being moved)
     for lineRange in linesToMove
       for diffChunk in @linkedDiffChunks
         if lineRange.start.row == diffChunk.oldLineStart
           moveText = @diffViewEditor1.getEditor().getTextInBufferRange([[diffChunk.oldLineStart, 0], [diffChunk.oldLineEnd, 0]])
+          lastBufferRow = @diffViewEditor2.getEditor().getLastBufferRow()
+          # insert new line if the chunk we want to copy will be below the last line of the other editor
+          if (diffChunk.newLineStart + offset) > lastBufferRow
+            @diffViewEditor2.getEditor().setCursorBufferPosition([lastBufferRow, 0], {autoscroll: false})
+            @diffViewEditor2.getEditor().insertNewline()
           @diffViewEditor2.getEditor().setTextInBufferRange([[diffChunk.newLineStart + offset, 0], [diffChunk.newLineEnd + offset, 0]], moveText)
           # offset will be the amount of lines to be copied minus the amount of lines overwritten
           offset += (diffChunk.oldLineEnd - diffChunk.oldLineStart) - (diffChunk.newLineEnd - diffChunk.newLineStart)
 
-  copyChunkToLeft: () ->
+  copyChunkToLeft: ->
     linesToMove = @diffViewEditor2.getCursorDiffLines()
+
+    if linesToMove.length == 0
+      atom.notifications.addWarning('Split Diff', {detail: @copyHelpMsg, dismissable: false, icon: 'diff'})
+
     offset = 0 # keep track of line offset (used when there are multiple chunks being moved)
     for lineRange in linesToMove
       for diffChunk in @linkedDiffChunks
         if lineRange.start.row == diffChunk.newLineStart
           moveText = @diffViewEditor2.getEditor().getTextInBufferRange([[diffChunk.newLineStart, 0], [diffChunk.newLineEnd, 0]])
+          lastBufferRow = @diffViewEditor1.getEditor().getLastBufferRow()
+          # insert new line if the chunk we want to copy will be below the last line of the other editor
+          if (diffChunk.oldLineStart + offset) > lastBufferRow
+            @diffViewEditor1.getEditor().setCursorBufferPosition([lastBufferRow, 0], {autoscroll: false})
+            @diffViewEditor1.getEditor().insertNewline()
           @diffViewEditor1.getEditor().setTextInBufferRange([[diffChunk.oldLineStart + offset, 0], [diffChunk.oldLineEnd + offset, 0]], moveText)
           # offset will be the amount of lines to be copied minus the amount of lines overwritten
           offset += (diffChunk.newLineEnd - diffChunk.newLineStart) - (diffChunk.oldLineEnd - diffChunk.oldLineStart)
@@ -138,22 +168,31 @@ module.exports = SplitDiff =
   # sets up subscriptions for auto diff and disabling when a pane is destroyed
   diffPanes: ->
     # in case enable was called again
-    @disable(false)
+    @disable()
+
+    @editorSubscriptions = new CompositeDisposable()
 
     editors = @_getVisibleEditors()
 
-    @editorSubscriptions = new CompositeDisposable()
+    # add listeners
     @editorSubscriptions.add editors.editor1.onDidStopChanging =>
       @updateDiff(editors)
     @editorSubscriptions.add editors.editor2.onDidStopChanging =>
       @updateDiff(editors)
     @editorSubscriptions.add editors.editor1.onDidDestroy =>
-      @disable(true)
+      @disable()
     @editorSubscriptions.add editors.editor2.onDidDestroy =>
-      @disable(true)
-
+      @disable()
     @editorSubscriptions.add atom.config.onDidChange 'split-diff', () =>
       @updateDiff(editors)
+
+    isWhitespaceIgnored = @_getConfig('ignoreWhitespace')
+
+    # add the bottom UI panel
+    if !@footerView?
+      @footerView = new FooterView(isWhitespaceIgnored)
+      @footerView.createPanel()
+    @footerView.show()
 
     # update diff if there is no git repo (no onchange fired)
     if !@hasGitRepo
@@ -188,11 +227,6 @@ module.exports = SplitDiff =
       }]
     }
 
-    detailMsg = 'Ignore Whitespace: ' + @isWhitespaceIgnored
-    detailMsg += '\nShow Word Diff: ' + @isWordDiffEnabled
-    detailMsg += '\nSync Horizontal Scroll: ' + @_getConfig('syncHorizontalScroll')
-    atom.notifications.addInfo('Split Diff Enabled', {detail: detailMsg, dismissable: false})
-
   # called by both diffPanes and the editor subscription to update the diff
   updateDiff: (editors) ->
     @isEnabled = true
@@ -201,7 +235,7 @@ module.exports = SplitDiff =
       @process.kill()
       @process = null
 
-    @isWhitespaceIgnored = @_getConfig('ignoreWhitespace')
+    isWhitespaceIgnored = @_getConfig('ignoreWhitespace')
 
     editorPaths = @_createTempFiles(editors)
 
@@ -214,7 +248,7 @@ module.exports = SplitDiff =
     # --- kick off background process to compute diff ---
     {BufferedNodeProcess} = require 'atom'
     command = path.resolve __dirname, "./compute-diff.js"
-    args = [editorPaths.editor1Path, editorPaths.editor2Path, @isWhitespaceIgnored]
+    args = [editorPaths.editor1Path, editorPaths.editor2Path, isWhitespaceIgnored]
     computedDiff = ''
     theOutput = ''
     stdout = (output) =>
@@ -223,7 +257,7 @@ module.exports = SplitDiff =
     stderr = (err) =>
       theOutput = err
     exit = (code) =>
-      @loadingView.hide()
+      @loadingView?.hide()
 
       if code == 0
         @_resumeUpdateDiff(editors, computedDiff)
@@ -236,12 +270,25 @@ module.exports = SplitDiff =
   # resumes after the compute diff process returns
   _resumeUpdateDiff: (editors, computedDiff) ->
     @linkedDiffChunks = @_evaluateDiffOrder(computedDiff.chunks)
+    @footerView?.setNumDifferences(@linkedDiffChunks.length)
+
+    # make the last chunk equal size on both screens so the editors retain sync scroll #58
+    if @linkedDiffChunks.length > 0
+      lastDiffChunk = @linkedDiffChunks[@linkedDiffChunks.length-1]
+      oldChunkRange = lastDiffChunk.oldLineEnd - lastDiffChunk.oldLineStart
+      newChunkRange = lastDiffChunk.newLineEnd - lastDiffChunk.newLineStart
+      if oldChunkRange > newChunkRange
+        # make the offset as large as needed to make the chunk the same size in both editors
+        computedDiff.newLineOffsets[lastDiffChunk.newLineStart + newChunkRange] = oldChunkRange - newChunkRange
+      else if newChunkRange > oldChunkRange
+        # make the offset as large as needed to make the chunk the same size in both editors
+        computedDiff.oldLineOffsets[lastDiffChunk.oldLineStart + oldChunkRange] = newChunkRange - oldChunkRange
 
     @_clearDiff()
     @_displayDiff(editors, computedDiff)
 
-    @isWordDiffEnabled = @_getConfig('diffWords')
-    if @isWordDiffEnabled
+    isWordDiffEnabled = @_getConfig('diffWords')
+    if isWordDiffEnabled
       @_highlightWordDiff(@linkedDiffChunks)
 
     syncHorizontalScroll = @_getConfig('syncHorizontalScroll')
@@ -277,6 +324,17 @@ module.exports = SplitDiff =
       rightPane = atom.workspace.getActivePane().splitRight()
       rightPane.addItem(editor2)
 
+    BufferExtender = require './buffer-extender'
+    buffer1LineEnding = (new BufferExtender(editor1.getBuffer())).getLineEnding()
+
+    if @wasEditor2Created
+      # want to scroll a newly created editor to the first editor's position
+      atom.views.getView(editor1).focus()
+      # set the preferred line ending before inserting text #39
+      if buffer1LineEnding == '\n' || buffer1LineEnding == '\r\n'
+        @editorSubscriptions.add editor2.onWillInsertText () ->
+          editor2.getBuffer().setPreferredLineEnding(buffer1LineEnding)
+
     @_setupGitRepo(editor1, editor2)
 
     # unfold all lines so diffs properly align
@@ -291,9 +349,11 @@ module.exports = SplitDiff =
       @wasEditor2SoftWrapped = true
       editor2.setSoftWrapped(false)
 
-    # want to scroll a newly created editor to the first editor's position
-    if @wasEditor2Created
-      atom.views.getView(editor1).focus()
+    buffer2LineEnding = (new BufferExtender(editor2.getBuffer())).getLineEnding()
+    if buffer2LineEnding != '' && (buffer1LineEnding != buffer2LineEnding)
+      # pop warning if the line endings differ and we haven't done anything about it
+      lineEndingMsg = 'Warning: Editor line endings differ!'
+      atom.notifications.addWarning('Split Diff', {detail: lineEndingMsg, dismissable: false, icon: 'diff'})
 
     editors =
       editor1: editor1
@@ -312,7 +372,8 @@ module.exports = SplitDiff =
             relativeEditor1Path = projectRepo.relativize(editor1Path)
             gitHeadText = projectRepo.repo.getHeadBlob(relativeEditor1Path)
             if gitHeadText?
-              editor2.setText(gitHeadText)
+              editor2.selectAll()
+              editor2.insertText(gitHeadText)
               @hasGitRepo = true
               break
 
@@ -336,22 +397,23 @@ module.exports = SplitDiff =
 
     return editorPaths
 
-  _selectDiffs: (diffChunk) ->
-    if diffChunk? && @diffViewEditor1? && @diffViewEditor2?
+  _selectDiffs: (diffChunk, selectionCount) ->
+    if diffChunk?
+      # deselect previous next/prev highlights
       @diffViewEditor1.deselectAllLines()
       @diffViewEditor2.deselectAllLines()
-
-      if diffChunk.oldLineStart?
-        @diffViewEditor1.selectLines(diffChunk.oldLineStart, diffChunk.oldLineEnd)
-        @diffViewEditor2.getEditor().scrollToBufferPosition([diffChunk.oldLineStart, 0])
-      if diffChunk.newLineStart?
-        @diffViewEditor2.selectLines(diffChunk.newLineStart, diffChunk.newLineEnd)
-        @diffViewEditor2.getEditor().scrollToBufferPosition([diffChunk.newLineStart, 0])
+      # highlight and scroll editor 1
+      @diffViewEditor1.selectLines(diffChunk.oldLineStart, diffChunk.oldLineEnd)
+      @diffViewEditor1.getEditor().setCursorBufferPosition([diffChunk.oldLineStart, 0], {autoscroll: true})
+      # highlight and scroll editor 2
+      @diffViewEditor2.selectLines(diffChunk.newLineStart, diffChunk.newLineEnd)
+      @diffViewEditor2.getEditor().setCursorBufferPosition([diffChunk.newLineStart, 0], {autoscroll: true})
+      # update selection counter
+      @footerView.showSelectionCount(selectionCount+1)
 
   # removes diff and sync scroll
   _clearDiff: ->
-    if @loadingView?
-      @loadingView.hide()
+    @loadingView?.hide()
 
     if @diffViewEditor1?
       @diffViewEditor1.destroyMarkers()
@@ -444,9 +506,13 @@ module.exports = SplitDiff =
       diffChunk =
         newLineStart: (newLineNumber - prevChunk.count)
         newLineEnd: newLineNumber
+        oldLineStart: oldLineNumber
+        oldLineEnd: oldLineNumber
       diffChunks.push(diffChunk)
     else if prevChunk? && prevChunk.removed?
       diffChunk =
+        newLineStart: newLineNumber
+        newLineEnd: newLineNumber
         oldLineStart: (oldLineNumber - prevChunk.count)
         oldLineEnd: oldLineNumber
       diffChunks.push(diffChunk)
@@ -458,6 +524,7 @@ module.exports = SplitDiff =
     ComputeWordDiff = require './compute-word-diff'
     leftColor = @_getConfig('leftEditorColor')
     rightColor = @_getConfig('rightEditorColor')
+    isWhitespaceIgnored = @_getConfig('ignoreWhitespace')
     for c in chunks
       # make sure this chunk matches to another
       if c.newLineStart? && c.oldLineStart?
@@ -471,44 +538,44 @@ module.exports = SplitDiff =
           excessLines = (c.newLineEnd - c.newLineStart) - lineRange
         # figure out diff between lines and highlight
         for i in [0 ... lineRange] by 1
-          wordDiff = ComputeWordDiff.computeWordDiff(@diffViewEditor1.getEditor().lineTextForBufferRow(c.oldLineStart + i), @diffViewEditor2.getEditor().lineTextForBufferRow(c.newLineStart + i), @isWhitespaceIgnored)
+          wordDiff = ComputeWordDiff.computeWordDiff(@diffViewEditor1.getEditor().lineTextForBufferRow(c.oldLineStart + i), @diffViewEditor2.getEditor().lineTextForBufferRow(c.newLineStart + i))
           if leftColor == 'green'
-            @diffViewEditor1.setWordHighlights(c.oldLineStart + i, wordDiff.removedWords, 'added', @isWhitespaceIgnored)
+            @diffViewEditor1.setWordHighlights(c.oldLineStart + i, wordDiff.removedWords, 'added', isWhitespaceIgnored)
           else
-            @diffViewEditor1.setWordHighlights(c.oldLineStart + i, wordDiff.removedWords, 'removed', @isWhitespaceIgnored)
+            @diffViewEditor1.setWordHighlights(c.oldLineStart + i, wordDiff.removedWords, 'removed', isWhitespaceIgnored)
           if rightColor == 'green'
-            @diffViewEditor2.setWordHighlights(c.newLineStart + i, wordDiff.addedWords, 'added', @isWhitespaceIgnored)
+            @diffViewEditor2.setWordHighlights(c.newLineStart + i, wordDiff.addedWords, 'added', isWhitespaceIgnored)
           else
-            @diffViewEditor2.setWordHighlights(c.newLineStart + i, wordDiff.addedWords, 'removed', @isWhitespaceIgnored)
+            @diffViewEditor2.setWordHighlights(c.newLineStart + i, wordDiff.addedWords, 'removed', isWhitespaceIgnored)
         # fully highlight extra lines
         for j in [0 ... excessLines] by 1
           # check whether excess line is in editor1 or editor2
           if (c.newLineEnd - c.newLineStart) < (c.oldLineEnd - c.oldLineStart)
             if leftColor == 'green'
-              @diffViewEditor1.setWordHighlights(c.oldLineStart + lineRange + j, [{changed: true, value: @diffViewEditor1.getEditor().lineTextForBufferRow(c.oldLineStart + lineRange + j)}], 'added', @isWhitespaceIgnored)
+              @diffViewEditor1.setWordHighlights(c.oldLineStart + lineRange + j, [{changed: true, value: @diffViewEditor1.getEditor().lineTextForBufferRow(c.oldLineStart + lineRange + j)}], 'added', isWhitespaceIgnored)
             else
-              @diffViewEditor1.setWordHighlights(c.oldLineStart + lineRange + j, [{changed: true, value: @diffViewEditor1.getEditor().lineTextForBufferRow(c.oldLineStart + lineRange + j)}], 'removed', @isWhitespaceIgnored)
+              @diffViewEditor1.setWordHighlights(c.oldLineStart + lineRange + j, [{changed: true, value: @diffViewEditor1.getEditor().lineTextForBufferRow(c.oldLineStart + lineRange + j)}], 'removed', isWhitespaceIgnored)
           else if (c.newLineEnd - c.newLineStart) > (c.oldLineEnd - c.oldLineStart)
             if rightColor == 'green'
-              @diffViewEditor2.setWordHighlights(c.newLineStart + lineRange + j, [{changed: true, value: @diffViewEditor2.getEditor().lineTextForBufferRow(c.newLineStart + lineRange + j)}], 'added', @isWhitespaceIgnored)
+              @diffViewEditor2.setWordHighlights(c.newLineStart + lineRange + j, [{changed: true, value: @diffViewEditor2.getEditor().lineTextForBufferRow(c.newLineStart + lineRange + j)}], 'added', isWhitespaceIgnored)
             else
-              @diffViewEditor2.setWordHighlights(c.newLineStart + lineRange + j, [{changed: true, value: @diffViewEditor2.getEditor().lineTextForBufferRow(c.newLineStart + lineRange + j)}], 'removed', @isWhitespaceIgnored)
+              @diffViewEditor2.setWordHighlights(c.newLineStart + lineRange + j, [{changed: true, value: @diffViewEditor2.getEditor().lineTextForBufferRow(c.newLineStart + lineRange + j)}], 'removed', isWhitespaceIgnored)
       else if c.newLineStart?
         # fully highlight chunks that don't match up to another
         lineRange = c.newLineEnd - c.newLineStart
         for i in [0 ... lineRange] by 1
           if rightColor == 'green'
-            @diffViewEditor2.setWordHighlights(c.newLineStart + i, [{changed: true, value: @diffViewEditor2.getEditor().lineTextForBufferRow(c.newLineStart + i)}], 'added', @isWhitespaceIgnored)
+            @diffViewEditor2.setWordHighlights(c.newLineStart + i, [{changed: true, value: @diffViewEditor2.getEditor().lineTextForBufferRow(c.newLineStart + i)}], 'added', isWhitespaceIgnored)
           else
-            @diffViewEditor2.setWordHighlights(c.newLineStart + i, [{changed: true, value: @diffViewEditor2.getEditor().lineTextForBufferRow(c.newLineStart + i)}], 'removed', @isWhitespaceIgnored)
+            @diffViewEditor2.setWordHighlights(c.newLineStart + i, [{changed: true, value: @diffViewEditor2.getEditor().lineTextForBufferRow(c.newLineStart + i)}], 'removed', isWhitespaceIgnored)
       else if c.oldLineStart?
         # fully highlight chunks that don't match up to another
         lineRange = c.oldLineEnd - c.oldLineStart
         for i in [0 ... lineRange] by 1
           if leftColor == 'green'
-            @diffViewEditor1.setWordHighlights(c.oldLineStart + i, [{changed: true, value: @diffViewEditor1.getEditor().lineTextForBufferRow(c.oldLineStart + i)}], 'added', @isWhitespaceIgnored)
+            @diffViewEditor1.setWordHighlights(c.oldLineStart + i, [{changed: true, value: @diffViewEditor1.getEditor().lineTextForBufferRow(c.oldLineStart + i)}], 'added', isWhitespaceIgnored)
           else
-            @diffViewEditor1.setWordHighlights(c.oldLineStart + i, [{changed: true, value: @diffViewEditor1.getEditor().lineTextForBufferRow(c.oldLineStart + i)}], 'removed', @isWhitespaceIgnored)
+            @diffViewEditor1.setWordHighlights(c.oldLineStart + i, [{changed: true, value: @diffViewEditor1.getEditor().lineTextForBufferRow(c.oldLineStart + i)}], 'removed', isWhitespaceIgnored)
 
 
   _getConfig: (config) ->

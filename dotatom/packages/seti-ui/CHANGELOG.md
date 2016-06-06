@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.3.1
+- Tone down styles for tree-view-git-branch
+- Update terminal-plus styles
+
+## 1.3.0
+- Add styles for [tree-view-git-branch](https://atom.io/packages/tree-view-git-branch)
+- Set background colors for terminal plus
+- Update selected file state
+- Fix key binding colors #297
+- Adjust scrollbars #271
+- Add missing base-color variable
+- Add .editorconfig file
+- Add info icon for About tab
+- Fix conflict with git-control #301
+
+## 1.2.3
+- Adjust project find result for compact #289
+- Add icons for mp3 and ogg audio files
+- Add ionic icon
+- Update Objective C files #294
+- Add Gradle icon
+- Add Terraform icon
+
 ## 1.2.2
 - Remove hover cursor in tree view
 

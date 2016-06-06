@@ -1,3 +1,22 @@
+## 1.0.2 - 2016-06-03
+* Actually fixed line ending normalization for git repo #39 - thanks IceOnFire!
+
+## 1.0.1 - 2016-06-01
+* Fixed Uncaught TypeError when trying to highlight word diff #60
+* Fixed new pane not using same line endings as first pane for git repo #39
+* Fixed last chunk not being the same size which caused misalignment of editors #58
+
+## 1.0.0 - 2016-05-26
+* Added a user interface!
+* Added help notification when user fails the copy command
+* Added new pane opened by package will use same line endings as first pane (except for git panes) #39
+* Removed notifications on enable/disable #57
+* Changed next/prev diff command to move cursor with it so copy commands are easy #51
+* Fixed error when trying to copy last chunk when it didn't have a match #50
+* Fixed ignore whitespace not affecting the diff outcome #52
+* Fixed Uncaught TypeError when trying to highlight word diff #49
+* Fixed pane not getting destroyed if auto-opened editor was last item in it #48
+
 ## 0.8.3 - 2016-05-16
 * Fixed loading modal appearing forever after diff computes quickly #47
 

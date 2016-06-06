@@ -322,6 +322,10 @@ export default class MinimapElement {
     this.attached = true
     this.attachedToTextEditor = this.parentNode === this.getTextEditorElementRoot()
 
+    if (this.attachedToTextEditor) {
+      this.getTextEditorElement().setAttribute('with-minimap', '')
+    }
+
     /*
       We use `atom.styles.onDidAddStyleElement` instead of
       `atom.themes.onDidChangeActiveThemes`.
@@ -376,10 +380,6 @@ export default class MinimapElement {
   attach (parent) {
     if (this.attached) { return }
     (parent || this.getTextEditorElementRoot()).appendChild(this)
-
-    if (!parent) {
-      this.getTextEditorElement().setAttribute('with-minimap', '')
-    }
   }
 
   /**
@@ -792,13 +792,14 @@ export default class MinimapElement {
         width: visibleWidth + 'px',
         height: minimap.getTextEditorScaledHeight() + 'px',
         top: visibleAreaTop + 'px',
-        left: visibleAreaLeft + 'px'
+        'border-left-width': visibleAreaLeft + 'px'
       })
     } else {
       this.applyStyles(this.visibleArea, {
         width: visibleWidth + 'px',
         height: minimap.getTextEditorScaledHeight() + 'px',
-        transform: this.makeTranslate(visibleAreaLeft, visibleAreaTop)
+        transform: this.makeTranslate(0, visibleAreaTop),
+        'border-left-width': visibleAreaLeft + 'px'
       })
     }
 
