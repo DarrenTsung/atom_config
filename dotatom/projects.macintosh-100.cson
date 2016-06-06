@@ -3,7 +3,6 @@
   paths: [
     "/Users/darren/Projects/storm8/s8unity_shared"
     "/Users/darren/Projects/storm8/detectivematch"
-    "/Users/darren/Projects/storm8/bakery2"
   ]
 "detectivematch-server":
   title: "DetectiveMatch-Server"
@@ -16,5 +15,11 @@
   title: "Bingo-Unity"
   paths: [
     "/Users/darren/Projects/storm8/bingo"
+    "/Users/darren/Projects/storm8/s8unity_shared"
+  ]
+"hungrybabies-unity":
+  title: "Hungrybabies-Unity"
+  paths: [
+    "/Users/darren/Projects/storm8/hungrybabies"
     "/Users/darren/Projects/storm8/s8unity_shared"
   ]

@@ -75,9 +75,12 @@
 
 # CoffeeScript Snippets
 '.source.coffee':
+  'Log':
+    'prefix': 'log'
+    'body': 'console.log("$1")'
   'LogVariable':
     'prefix': 'logVariable'
-    'body': 'console.log("$1: " + $1)'
+    'body': 'console.log("$1: #{$1}")'
   'LogObject':
     'prefix': 'logObject'
     'body': """
@@ -89,12 +92,9 @@
     #     paramStrings.push(k + " => " + v)
     #   console.log("${1:variableName}: {\\\\n" + paramStrings.reduceRight((x, y) -> x + "\\\\n" + y) + "\\\\n}")
 
-  'Region Mark':
-    'prefix': 'region'
-    'body': '#region mark - $1'
-  'End Region':
-    'prefix': 'endregion'
-    'body': '#endregion'
+  'Pragma':
+    'prefix': 'pragma'
+    'body': '#pragma mark - $1'
 
   'Add Notification Success':
     'prefix': 'notifSuccess'
