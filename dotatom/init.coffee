@@ -88,7 +88,11 @@ atom.commands.add 'atom-text-editor', 'thisify-storm8': (e) ->
     editor.scanInBufferRange(tokenRegex, bufferRange, ({match, replace, range}) ->
       lineRange = new Range(new Point(range.start.row, 0), range.end)
       lineText = editor.getTextInBufferRange(lineRange)
-      if /(\/\/|private|public|protected|new)/i.test(lineText)
+      if /(\/\/|private|public|protected)/i.test(lineText)
+        return
+
+      newRegex = new RegExp("new\\s+#{match[2]}", '')
+      if newRegex.test(lineText)
         return
 
       numberOfDoubleQuotes = (lineText.match(/"/g) || []).length;
@@ -126,7 +130,7 @@ atom.commands.add 'atom-text-editor', 'thisify-storm8': (e) ->
         editor.scanInBufferRange new RegExp("(private|public|protected)\\s+\\w+(?:<[^>]+>)?\\s+[^{=(]*\\b#{match[2]}\\b\\s*(?:\\([^\\)]*\\))?\\s*{", ''), bufferRange, ({match, range}) ->
           declarationLineRange = new Range(new Point(range.start.row, 0), range.end)
           declarationLineText = editor.getTextInBufferRange(declarationLineRange)
-          if /(region|class)/i.test(declarationLineText)
+          if /(region|class|enum)/i.test(declarationLineText)
             return
 
           if /(const|static)/i.test(declarationLineText)
@@ -135,11 +139,11 @@ atom.commands.add 'atom-text-editor', 'thisify-storm8': (e) ->
           declarationInFile = true
 
       # always check for variable declarations
-      #(private|public|protected)\s+\w+(?:<[^>]+>)?\s+[^{=(]*\bget\b\s*(;|=)
+      #(private|public|protected)\s+\w+(?:<[^>]+>)?\s+[^{=(]*\bget\b\s*(;|=|{)
       editor.scanInBufferRange new RegExp("(private|public|protected)\\s+\\w+(?:<[^>]+>)?\\s+[^{=(]*\\b#{match[2]}\\b\\s*(;|=|{)", ''), bufferRange, ({match, range}) ->
         declarationLineRange = new Range(new Point(range.start.row, 0), range.end)
         declarationLineText = editor.getTextInBufferRange(declarationLineRange)
-        if /(region|class)/i.test(declarationLineText)
+        if /(region|class|enum)/i.test(declarationLineText)
           return
 
         if /(const|static)/i.test(declarationLineText)
