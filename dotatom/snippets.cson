@@ -165,6 +165,10 @@
   'Header':
     'prefix': 'header'
     'body': '[Header("$1")]'
+  'Require Component':
+    'prefix': 'requirecomponent'
+    'body': '[RequireComponent(typeof($1))]'
+
 
   'Interface Region':
     'prefix': 'iregion'
