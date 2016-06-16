@@ -1,6 +1,6 @@
 'use babel'
 
-import {Emitter, CompositeDisposable} from 'atom'
+import {Emitter, CompositeDisposable, Range} from 'atom'
 import BottomPanel from './ui/bottom-panel'
 import BottomContainer from './ui/bottom-container'
 import {Message} from './ui/message-element'
@@ -70,27 +70,35 @@ export default class LinterViews {
   }
   renderBubble(editorLinter) {
     if (!this.showBubble || !editorLinter.messages.size) {
+      this.removeBubble()
       return
     }
     const point = editorLinter.editor.getCursorBufferPosition()
     if (this.bubbleRange && this.bubbleRange.containsPoint(point)) {
       return // The marker remains the same
-    } else if (this.bubble) {
-      this.bubble.destroy()
-      this.bubble = null
     }
-    for (let entry of editorLinter.markers) {
-      const bubbleRange = entry[1].getBufferRange()
-      if (bubbleRange.containsPoint(point)) {
-        this.bubbleRange = bubbleRange
-        this.bubble = editorLinter.editor.decorateMarker(entry[1], {
+    this.removeBubble()
+    for (let message of editorLinter.messages) {
+      if (message.range && message.range.containsPoint(point)) {
+        this.bubbleRange = Range.fromObject([point, point])
+        this.bubble = editorLinter.editor.markBufferRange(this.bubbleRange, {invalidate: 'inside'})
+        this.bubble.onDidDestroy(() => {
+          this.bubble = null
+          this.bubbleRange = null
+        })
+        editorLinter.editor.decorateMarker(this.bubble, {
           type: 'overlay',
-          item: createBubble(entry[0])
+          item: createBubble(message)
         })
         return
       }
     }
     this.bubbleRange = null
+  }
+  removeBubble() {
+    if (this.bubble) {
+      this.bubble.destroy()
+    }
   }
   notifyEditorLinters({added, removed}) {
     let editorLinter
@@ -108,6 +116,8 @@ export default class LinterViews {
     if (editorLinter) {
       editorLinter.calculateLineMessages(null)
       this.renderBubble(editorLinter)
+    } else {
+      this.removeBubble()
     }
   }
   notifyEditorLinter(editorLinter) {

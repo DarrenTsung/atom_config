@@ -1,7 +1,7 @@
 {
   "name": "merge-conflicts",
   "main": "./lib/main",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "private": true,
   "description": "Resolve git conflicts within Atom",
   "contributors": [
@@ -36,10 +36,10 @@
     "url": "https://github.com/smashwilson/merge-conflicts/issues"
   },
   "homepage": "https://github.com/smashwilson/merge-conflicts#readme",
-  "_id": "merge-conflicts@1.4.3",
-  "_shasum": "bd2ebb15115122f8e12cf71ef66c2aa051632ff4",
-  "_resolved": "file:../d-11656-83745-1ilxczo/package.tgz",
-  "_from": "../d-11656-83745-1ilxczo/package.tgz",
+  "_id": "merge-conflicts@1.4.4",
+  "_shasum": "13cf853aa1de19e1e27341f9ef8061fd2a0a270f",
+  "_resolved": "file:../d-116515-98461-8rnij9/package.tgz",
+  "_from": "../d-116515-98461-8rnij9/package.tgz",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [

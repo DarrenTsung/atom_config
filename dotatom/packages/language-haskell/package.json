@@ -1,6 +1,6 @@
 {
   "name": "language-haskell",
-  "version": "1.7.16",
+  "version": "1.7.17",
   "description": "Haskell language support in Atom",
   "repository": {
     "type": "git",
@@ -25,10 +25,10 @@
     "url": "https://github.com/atom-haskell/language-haskell/issues"
   },
   "homepage": "https://github.com/atom-haskell/language-haskell#readme",
-  "_id": "language-haskell@1.7.16",
-  "_shasum": "60b0ba3bb5df96ffa663959c41528e90a825cb89",
-  "_resolved": "file:../d-11656-83739-bc6uoq/package.tgz",
-  "_from": "../d-11656-83739-bc6uoq/package.tgz",
+  "_id": "language-haskell@1.7.17",
+  "_shasum": "033ac3a29f98de19bba020ca4b403edfd00a19df",
+  "_resolved": "file:../d-116515-98441-1ymhb28/package.tgz",
+  "_from": "../d-116515-98441-1ymhb28/package.tgz",
   "_atomModuleCache": {
     "version": 1,
     "dependencies": [
@@ -119,7 +119,7 @@
       },
       {
         "name": "abbrev",
-        "version": "1.0.7",
+        "version": "1.0.9",
         "path": "node_modules/season/node_modules/cson-safe/node_modules/coffee-script-redux/node_modules/nopt/node_modules/abbrev/abbrev.js"
       },
       {
@@ -319,7 +319,6 @@
         "node_modules/season/node_modules/cson-safe/node_modules/coffee-script-redux/node_modules/nopt/examples/my-program.js",
         "node_modules/season/node_modules/cson-safe/node_modules/coffee-script-redux/node_modules/nopt/lib/nopt.js",
         "node_modules/season/node_modules/cson-safe/node_modules/coffee-script-redux/node_modules/nopt/node_modules/abbrev/abbrev.js",
-        "node_modules/season/node_modules/cson-safe/node_modules/coffee-script-redux/node_modules/nopt/node_modules/abbrev/test.js",
         "node_modules/season/node_modules/cson-safe/node_modules/coffee-script-redux/node_modules/source-map/Makefile.dryice.js",
         "node_modules/season/node_modules/cson-safe/node_modules/coffee-script-redux/node_modules/source-map/build/assert-shim.js",
         "node_modules/season/node_modules/cson-safe/node_modules/coffee-script-redux/node_modules/source-map/build/mini-require.js",
@@ -373,6 +372,7 @@
         "node_modules/season/node_modules/cson-safe/node_modules/coffee-script-redux/node_modules/esmangle/node_modules/escope/gulpfile.coffee",
         "src/haskell.coffee",
         "src/main.coffee",
+        "src/prelude.coffee",
         "src/syntax-tools.coffee"
       ]
     },
